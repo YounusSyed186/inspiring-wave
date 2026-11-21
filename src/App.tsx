@@ -75,10 +75,11 @@ function Hero() {
   const introActive = useContext(IntroActive);
   return <AnimatedSection className="hero" aria-labelledby="hero-title" animation="none">
     <Marker n="01" light>INTRO</Marker>
+    <p className="hero-studio-label">A creative studio</p>
     <div className="hero-halo" />
     <Fragment key={String(introActive)}>
     <h1 id="hero-title">
-      <AnimatedCharacters text="IMPACT" delay={0.18} stagger={0.06} />
+      <AnimatedCharacters text="INSPIRING WAVE" delay={0.18} stagger={0.03} />
     </h1>
     <div className="hero-media"><img src="/assets/hero/hero-wave-v2.png" fetchPriority="high" alt="A restrained moonlit barrel wave curls behind dark volcanic rock" /></div>
     <div className="hero-media hero-wave-foreground" aria-hidden="true"><img src="/assets/hero/hero-wave-foreground.png" alt="" /></div>
@@ -654,15 +655,15 @@ function App() {
   return <MotionProvider>
     {loading && <TypeRemixPreloader
       className="site-preloader"
-      word="IMPACT"
+      word="INSPIRING WAVE"
       name="INSPIRING WAVE"
       discipline="STRATEGY / DESIGN / TECHNOLOGY"
       year="2026"
       period="HYDERABAD — INDIA"
       handle="INSPIRINGWAVE.IN"
       roles={['Digital Strategy', 'Web Development', 'UI/UX Design', 'Creative Technology']}
-      kicker="IMPACT"
-      tagline="IMPACT IN MOTION"
+      kicker="INSPIRING WAVE"
+      tagline="INSPIRING WAVE IN MOTION"
       motto="MAKE WAVES"
       durationMs={7000}
       themes={preloaderThemes}
