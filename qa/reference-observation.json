@@ -1,0 +1,655 @@
+{
+  "state": {
+    "scrollY": 440,
+    "scrollHeight": 7256,
+    "canvas": {
+      "rect": [
+        0,
+        0,
+        1440,
+        900
+      ],
+      "position": "fixed",
+      "transform": "none",
+      "zIndex": "-1"
+    },
+    "imgs": [
+      {
+        "src": "data:,",
+        "rect": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "display": "none",
+        "opacity": "1",
+        "transform": "none"
+      },
+      {
+        "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAC6SURBVHgBpdTdCcMgEAdwT/vk04EOkBG6QifpHH3rCF2hk3SVvBaEuoDYu4IgRRMv/iEkD/Hn+QnOuatS6gEAqDoJIQC/vfe594+m576FjAZKL6XXkSDiYox5UQFLXZEoNZJzXg9B/0hK6SKGWkiMcRVBewjnNIuURdIzyFBFo0jZPnoGqaMbCEqRJkSNIiFPCfILj7F1GLkySfvuqnFlShDxWesF6D76zF4jPJ/GWvum7/NRjBCegtsXQuuTY/odOJIAAAAASUVORK5CYII=",
+        "rect": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "display": "block",
+        "opacity": "1",
+        "transform": "none"
+      },
+      {
+        "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAC6SURBVHgBpdTdCcMgEAdwT/vk04EOkBG6QifpHH3rCF2hk3SVvBaEuoDYu4IgRRMv/iEkD/Hn+QnOuatS6gEAqDoJIQC/vfe594+m576FjAZKL6XXkSDiYox5UQFLXZEoNZJzXg9B/0hK6SKGWkiMcRVBewjnNIuURdIzyFBFo0jZPnoGqaMbCEqRJkSNIiFPCfILj7F1GLkySfvuqnFlShDxWesF6D76zF4jPJ/GWvum7/NRjBCegtsXQuuTY/odOJIAAAAASUVORK5CYII=",
+        "rect": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "display": "block",
+        "opacity": "1",
+        "transform": "none"
+      },
+      {
+        "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAC6SURBVHgBpdTdCcMgEAdwT/vk04EOkBG6QifpHH3rCF2hk3SVvBaEuoDYu4IgRRMv/iEkD/Hn+QnOuatS6gEAqDoJIQC/vfe594+m576FjAZKL6XXkSDiYox5UQFLXZEoNZJzXg9B/0hK6SKGWkiMcRVBewjnNIuURdIzyFBFo0jZPnoGqaMbCEqRJkSNIiFPCfILj7F1GLkySfvuqnFlShDxWesF6D76zF4jPJ/GWvum7/NRjBCegtsXQuuTY/odOJIAAAAASUVORK5CYII=",
+        "rect": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "display": "block",
+        "opacity": "1",
+        "transform": "none"
+      },
+      {
+        "src": "https://images.prismic.io/auge-xp/nTk2Qb6LITpLW8TG_maison_cover.jpg?auto=format,compress&w=1920",
+        "rect": [
+          -73.583984375,
+          -45.989990234375,
+          1587.16796875,
+          991.97998046875
+        ],
+        "display": "block",
+        "opacity": "0",
+        "transform": "none"
+      },
+      {
+        "src": "https://images.prismic.io/auge-xp/pUkcTZHGA7KhlJZ0_lunarossa_cover_2.jpg?auto=format,compress&w=1920",
+        "rect": [
+          449.9827880859375,
+          6349.671875,
+          540.018798828125,
+          334.125
+        ],
+        "display": "block",
+        "opacity": "1",
+        "transform": "matrix(1.2, 0, 0, 1.2, 0, 0)"
+      },
+      {
+        "src": "https://auge-xp.com/assets/svg/logo.svg",
+        "rect": [
+          1367.015625,
+          29.984375,
+          43,
+          40
+        ],
+        "display": "block",
+        "opacity": "1",
+        "transform": "none"
+      },
+      {
+        "src": "",
+        "rect": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "display": "block",
+        "opacity": "1",
+        "transform": "none"
+      }
+    ],
+    "fixed": [
+      {
+        "tag": "DIV",
+        "cls": "CybotMultilevel",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "fixed inset-0 -z-10",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          0,
+          1440,
+          900
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "pointer-events-none fixed top-0 left-0 z-40 flex w-full items-center justify-center [clip-path:inset(0_-9999px_0_-9999px)] supports-[mix-blend-mode:difference]:mix-blend-difference supports-[mix-blend-mode:difference]:text-white",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          0,
+          1440,
+          107.03125
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "pointer-events-none sticky z-40 flex w-full items-center justify-center py-[60px] text-center supports-[mix-blend-mode:difference]:mix-blend-difference supports-[mix-blend-mode:difference]:text-white",
+        "position": "sticky",
+        "transform": "none",
+        "rect": [
+          0,
+          460,
+          1440,
+          461.59375
+        ]
+      },
+      {
+        "tag": "A",
+        "cls": "fixed top-(--spacing-gutter-mobile) lg:top-(--spacing-gutter-desktop) right-(--spacing-gutter-mobile) lg:right-(--spacing-gutter-desktop) z-40 block cursor-pointer supports-[mix-blend-mode:difference]:mix-blend-difference",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          1367.015625,
+          29.984375,
+          43,
+          40
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "fixed bottom-(--spacing-gutter-desktop) left-(--spacing-gutter-desktop) z-40 hidden items-center gap-2 text-content-xs leading-normal font-medium supports-[mix-blend-mode:difference]:text-white supports-[mix-blend-mode:difference]:mix-blend-difference lg:flex",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          29.984375,
+          836.015625,
+          382.59375,
+          34
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "pointer-events-none fixed rounded-[3px] bg-accent",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          7255.953125,
+          0,
+          0
+        ]
+      },
+      {
+        "tag": "SPAN",
+        "cls": "pointer-events-none fixed overflow-hidden whitespace-nowrap text-foreground p-2 text-content-xs leading-normal font-medium",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          7255.953125,
+          16,
+          16
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "pointer-events-none fixed rounded-[3px] bg-accent",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          7255.953125,
+          0,
+          0
+        ]
+      },
+      {
+        "tag": "SPAN",
+        "cls": "pointer-events-none fixed overflow-hidden whitespace-nowrap text-foreground p-2 text-content-xs leading-normal font-medium",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          7255.953125,
+          16,
+          16
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "pointer-events-none fixed rounded-[3px] bg-accent",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          7255.953125,
+          0,
+          0
+        ]
+      },
+      {
+        "tag": "SPAN",
+        "cls": "pointer-events-none fixed overflow-hidden whitespace-nowrap text-foreground p-2 text-content-xs leading-normal font-medium",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          7255.953125,
+          29.609375,
+          27.984375
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "fixed right-(--spacing-gutter-mobile) bottom-(--spacing-gutter-mobile) z-40 lg:right-(--spacing-gutter-desktop) lg:bottom-(--spacing-gutter-desktop)",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          1350.015625,
+          780.015625,
+          60,
+          40
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "fixed bottom-(--spacing-gutter-desktop) z-40 hidden items-center gap-2 text-content-xs leading-normal font-medium supports-[mix-blend-mode:difference]:text-white supports-[mix-blend-mode:difference]:mix-blend-difference lg:flex",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          1247.4375,
+          836.015625,
+          170.578125,
+          34
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "pointer-events-none fixed rounded-[3px] bg-accent",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          7255.953125,
+          0,
+          0
+        ]
+      },
+      {
+        "tag": "SPAN",
+        "cls": "pointer-events-none fixed overflow-hidden whitespace-nowrap text-foreground p-2 text-content-xs leading-normal font-medium",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          7255.953125,
+          16,
+          16
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "pointer-events-none fixed rounded-[3px] bg-accent",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          7255.953125,
+          0,
+          0
+        ]
+      },
+      {
+        "tag": "SPAN",
+        "cls": "pointer-events-none fixed overflow-hidden whitespace-nowrap text-foreground p-2 text-content-xs leading-normal font-medium",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          7255.953125,
+          16,
+          16
+        ]
+      },
+      {
+        "tag": "CANVAS",
+        "cls": "pointer-events-none fixed inset-0 -z-[1] h-full w-full opacity-0",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          0,
+          1440,
+          900
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "pointer-events-none fixed top-0 left-0 z-[100] hidden supports-[mix-blend-mode:difference]:mix-blend-difference pointer-fine:block",
+        "position": "fixed",
+        "transform": "matrix(1, 0, 0, 1, 1007, 645)",
+        "rect": [
+          1007,
+          645,
+          0,
+          0
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "pointer-events-none fixed top-0 left-0 z-[100] hidden pointer-fine:block",
+        "position": "fixed",
+        "transform": "matrix(1, 0, 0, 1, 1007, 645)",
+        "rect": [
+          1007,
+          645,
+          0,
+          0
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "pointer-events-none fixed inset-0 isolate z-[55] flex items-center justify-center",
+        "position": "fixed",
+        "transform": "matrix(1, 0, 0, 1, 0, 940)",
+        "rect": [
+          0,
+          940,
+          1440,
+          900
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "tag": "DIV",
+        "cls": "",
+        "position": "fixed",
+        "transform": "none",
+        "rect": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "signatures": {
+      "lenis": false,
+      "three": false,
+      "gsap": true,
+      "ogl": false,
+      "locomotive": false
+    },
+    "chunkChars": 913391
+  },
+  "timeline": [
+    {
+      "name": "slow",
+      "dy": 180,
+      "delay": 16,
+      "localDelay": 16,
+      "y": 467,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "slow",
+      "dy": 180,
+      "delay": 50,
+      "localDelay": 50,
+      "y": 570,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "slow",
+      "dy": 180,
+      "delay": 100,
+      "localDelay": 100,
+      "y": 584,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "slow",
+      "dy": 180,
+      "delay": 200,
+      "localDelay": 200,
+      "y": 613,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "slow",
+      "dy": 180,
+      "delay": 400,
+      "localDelay": 400,
+      "y": 614,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "slow",
+      "dy": 180,
+      "delay": 800,
+      "localDelay": 800,
+      "y": 614,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "moderate",
+      "dy": 650,
+      "delay": 16,
+      "localDelay": 16,
+      "y": 665,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "moderate",
+      "dy": 650,
+      "delay": 50,
+      "localDelay": 50,
+      "y": 1037,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "moderate",
+      "dy": 650,
+      "delay": 100,
+      "localDelay": 100,
+      "y": 1102,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "moderate",
+      "dy": 650,
+      "delay": 200,
+      "localDelay": 200,
+      "y": 1205,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "moderate",
+      "dy": 650,
+      "delay": 400,
+      "localDelay": 400,
+      "y": 1245,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "moderate",
+      "dy": 650,
+      "delay": 800,
+      "localDelay": 800,
+      "y": 1264,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "fast",
+      "dy": 1800,
+      "delay": 16,
+      "localDelay": 16,
+      "y": 1406,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "fast",
+      "dy": 1800,
+      "delay": 50,
+      "localDelay": 50,
+      "y": 2191,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "fast",
+      "dy": 1800,
+      "delay": 100,
+      "localDelay": 100,
+      "y": 2378,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "fast",
+      "dy": 1800,
+      "delay": 200,
+      "localDelay": 200,
+      "y": 2825,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "fast",
+      "dy": 1800,
+      "delay": 400,
+      "localDelay": 400,
+      "y": 2976,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "fast",
+      "dy": 1800,
+      "delay": 800,
+      "localDelay": 800,
+      "y": 3064,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "reverse",
+      "dy": -1100,
+      "delay": 16,
+      "localDelay": 16,
+      "y": 2978,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "reverse",
+      "dy": -1100,
+      "delay": 50,
+      "localDelay": 50,
+      "y": 2423,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "reverse",
+      "dy": -1100,
+      "delay": 100,
+      "localDelay": 100,
+      "y": 2300,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "reverse",
+      "dy": -1100,
+      "delay": 200,
+      "localDelay": 200,
+      "y": 2060,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "reverse",
+      "dy": -1100,
+      "delay": 400,
+      "localDelay": 400,
+      "y": 2004,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    },
+    {
+      "name": "reverse",
+      "dy": -1100,
+      "delay": 800,
+      "localDelay": 800,
+      "y": 1976,
+      "canvas": "none",
+      "body": "none",
+      "html": "none"
+    }
+  ]
+}
