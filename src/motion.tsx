@@ -109,7 +109,7 @@ export function useHomepageMotion(scope: RefObject<HTMLElement | null>) {
       gsap.set('.reveal', { opacity: 1, y: 0 });
 
       const scenes = Array.from(scope.current?.children ?? [])
-        .filter((element): element is HTMLElement => element instanceof HTMLElement && element.matches('section') && !element.classList.contains('parallax-showcase'));
+        .filter((element): element is HTMLElement => element instanceof HTMLElement && element.matches('section') && !element.classList.contains('parallax-showcase') && !element.classList.contains('manifesto-section'));
       scenes.forEach((incoming, index) => {
         if (!index) return;
         const transition = gsap.timeline({

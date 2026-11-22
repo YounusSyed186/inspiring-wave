@@ -7,6 +7,7 @@ import { ZoomParallax } from '@/components/ui/zoom-parallax';
 import { zoomParallaxImages, DEMO_IMAGES } from '@/components/ui/demo';
 import { AnimatedMarqueeHero } from '@/components/ui/hero-3';
 import { ArtisticMethodSection } from '@/components/ui/artistic-method-section';
+import { CreativeMachineHero } from '@/components/creative-machine/CreativeMachineHero';
 import { TestimonialSlider, Review } from '@/components/ui/testimonial-slider-1';
 import { CtaSlider } from '@/components/ui/cta-slider';
 import DoodleCrewFooter from '@/components/ui/doodle-crew-footer';
@@ -75,45 +76,11 @@ function Marker({ n, children, light = false }: { n: string; children: React.Rea
 
 
 function Hero() {
-  const introActive = useContext(IntroActive);
-  return <AnimatedSection className="hero" aria-labelledby="hero-title" animation="none">
-    <Marker n="01" light>INTRO</Marker>
-    <p className="hero-studio-label">A creative studio</p>
-    <div className="hero-halo" />
-    <Fragment key={String(introActive)}>
-      <h1 id="hero-title">
-        <AnimatedCharacters text="INSPIRING WAVE" delay={0.18} stagger={0.03} />
-      </h1>
-      <div className="hero-media"><img src="/assets/hero/hero-wave-v2.png" fetchPriority="high" alt="A restrained moonlit barrel wave curls behind dark volcanic rock" /></div>
-      <div className="hero-media hero-wave-foreground" aria-hidden="true"><img src="/assets/hero/hero-wave-foreground.png" alt="" /></div>
-      <div className="hero-foam" />
-      <motion.div
-        className="hero-serif"
-        initial={{ opacity: 0, x: -36 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.9, delay: 0.42, ease: EASINGS.power4Out }}
-      >
-        in motion.
-      </motion.div>
-      <p className="hero-copy">
-        <AnimatedWords text="Strategy, design & technology" delay={0.52} stagger={0.035} />
-        <br />
-        <AnimatedWords text="for a world in motion." delay={0.65} stagger={0.035} />
-      </p>
-      <motion.div
-        className="scroll-cue"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.75, ease: EASINGS.power4Out }}
-      >
-        <Mono>SCROLL<br />TO EXPLORE</Mono><span>↓</span>
-      </motion.div>
-    </Fragment>
-  </AnimatedSection>;
+  return <CreativeMachineHero />;
 }
 
 function Manifesto() {
-  return <section id="manifesto" className="manifesto-section bg-[#f1efe7] text-[#080c12]" aria-label="Our manifesto">
+  return <section id="manifesto" className="manifesto-section cm-manifesto-overlap bg-[#f1efe7] text-[#080c12]" aria-label="Our manifesto">
     <TigerTearReveal
       word="NEITHER DO WE."
       tagline="02 / MANIFESTO — THE WORLD DOESN’T STAND STILL."
