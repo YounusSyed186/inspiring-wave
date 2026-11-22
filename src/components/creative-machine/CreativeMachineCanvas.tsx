@@ -41,7 +41,10 @@ export function CreativeMachineCanvas({
       renderer = new THREE.WebGLRenderer({
         canvas,
         alpha: true,
-        antialias: layout !== 'mobile',
+        antialias: true,
+        depth: true,
+        stencil: false,
+        precision: 'highp',
         powerPreference: 'high-performance',
       })
     } catch {
@@ -55,11 +58,12 @@ export function CreativeMachineCanvas({
     }
     canvas.addEventListener('webglcontextlost', handleContextLost)
 
-    const maxDpr = layout === 'mobile' ? 1.5 : 2
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr))
+    // Keep the sculpture crisp on high-density screens. Mobile gets a smaller
+    // uplift so the scroll-linked render loop remains responsive.
+    const maxDpr = layout === 'mobile' ? 1.75 : layout === 'tablet' ? 2.25 : 2.5
     renderer.setClearColor(0x080d17, 1)
     renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1.08
+    renderer.toneMappingExposure = 1.12
     renderer.outputColorSpace = THREE.SRGBColorSpace
 
     const scene = new THREE.Scene()
@@ -68,9 +72,11 @@ export function CreativeMachineCanvas({
 
     // Subtle studio environment reflections for brushed metal & chrome
     const pmrem = new THREE.PMREMGenerator(renderer)
-    const envRT = pmrem.fromScene(new RoomEnvironment(), 0.04)
+    const environment = new RoomEnvironment()
+    const envRT = pmrem.fromScene(environment, 0.04)
+    environment.dispose()
     scene.environment = envRT.texture
-    scene.environmentIntensity = 0.55
+    scene.environmentIntensity = 0.68
 
     let readyFired = false
     const fireReady = () => {
@@ -80,6 +86,7 @@ export function CreativeMachineCanvas({
     }
 
     const machine = new CreativeMachine(layout, fireReady)
+    machine.configureTextureQuality(renderer.capabilities.getMaxAnisotropy())
     scene.add(machine.root)
     scene.add(machine.lights)
 
@@ -97,7 +104,11 @@ export function CreativeMachineCanvas({
       const rect = canvas.parentElement?.getBoundingClientRect()
       viewW = Math.max(1, Math.round(rect?.width || window.innerWidth))
       viewH = Math.max(1, Math.round(rect?.height || window.innerHeight))
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr))
+      // Cap the backing buffer around 12 MP. This preserves the quality uplift
+      // at common viewports without allocating an unstable 8K render target.
+      const pixelBudgetDpr = Math.sqrt(12_000_000 / (viewW * viewH))
+      const dpr = Math.min(window.devicePixelRatio || 1, maxDpr, pixelBudgetDpr)
+      renderer.setPixelRatio(Math.max(1, dpr))
       renderer.setSize(viewW, viewH, false)
       camera.aspect = viewW / viewH
       camera.updateProjectionMatrix()

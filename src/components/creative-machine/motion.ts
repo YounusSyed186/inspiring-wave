@@ -81,8 +81,8 @@ const T = TUNNEL_Y
 
 export const CAMERA_KEYS: Record<Layout, CameraKey[]> = {
   desktop: [
-    { p: 0.0, pos: [3.4, 1.35, 17.2], target: [0.5, 0.35, 0], shiftX: -0.3, shiftY: -0.02, fov: 34 },
-    { p: 0.2, pos: [2.7, 1.1, 15.0], target: [0.4, 0.3, 0], shiftX: -0.27, shiftY: -0.02, fov: 34 },
+    { p: 0.0, pos: [4.2, 2.55, 14.8], target: [0.5, 0.35, 0], shiftX: -0.16, shiftY: -0.06, fov: 34 },
+    { p: 0.2, pos: [3.8, 2.15, 14.2], target: [0.4, 0.3, 0], shiftX: -0.15, shiftY: -0.05, fov: 34 },
     { p: 0.45, pos: [-4.4, 1.0, 11.4], target: [0.5, 0.25, -1.2], shiftX: -0.1, shiftY: 0, fov: 35 },
     { p: 0.6, pos: [-1.0, 0.5, 6.6], target: [0, T, -4], shiftX: 0, shiftY: 0, fov: 36 },
     { p: 0.675, pos: [-0.05, T + 0.05, 1.6], target: [0, T, -8], shiftX: 0, shiftY: 0, fov: 38 },
@@ -101,8 +101,8 @@ export const CAMERA_KEYS: Record<Layout, CameraKey[]> = {
     { p: 1.0, pos: [0, T, EXIT_Z + 1.4], target: [0, T, EXIT_Z - 6], shiftX: 0, shiftY: 0, fov: 44 },
   ],
   mobile: [
-    { p: 0.0, pos: [1.6, 0.9, 25.0], target: [0.3, 0.6, 0], shiftX: 0, shiftY: -0.3, fov: 46 },
-    { p: 0.2, pos: [1.3, 0.8, 22.5], target: [0.2, 0.5, 0], shiftX: 0, shiftY: -0.26, fov: 46 },
+    { p: 0.0, pos: [1.6, 0.9, 25.0], target: [0.3, 0.6, 0], shiftX: 0, shiftY: -0.035, fov: 46 },
+    { p: 0.2, pos: [1.3, 0.8, 22.5], target: [0.2, 0.5, 0], shiftX: 0, shiftY: -0.03, fov: 46 },
     { p: 0.45, pos: [-1.6, 0.7, 16.0], target: [0.2, 0.3, -1], shiftX: 0, shiftY: -0.1, fov: 48 },
     { p: 0.6, pos: [-0.4, 0.4, 9.0], target: [0, T, -4], shiftX: 0, shiftY: 0, fov: 52 },
     { p: 0.675, pos: [0, T, 2.2], target: [0, T, -8], shiftX: 0, shiftY: 0, fov: 56 },

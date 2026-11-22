@@ -1,10 +1,9 @@
-import { createContext, FormEvent, Fragment, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import TypeRemixPreloader, { RemixThemesInput } from '@/components/ui/type-remix-preloader';
+import { createContext, FormEvent, Fragment, useEffect, useRef, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { processSteps, services, testimonials } from './data';
 import { ZoomParallax } from '@/components/ui/zoom-parallax';
-import { zoomParallaxImages, DEMO_IMAGES } from '@/components/ui/demo';
+import { zoomParallaxImages } from '@/components/ui/demo';
 import { AnimatedMarqueeHero } from '@/components/ui/hero-3';
 import { ArtisticMethodSection } from '@/components/ui/artistic-method-section';
 import { CreativeMachineHero } from '@/components/creative-machine/CreativeMachineHero';
@@ -28,20 +27,6 @@ import {
 const Mono = ({ children }: { children: React.ReactNode }) => <span className="mono">{children}</span>;
 
 export const IntroActive = createContext(false);
-
-function shouldShowIntro() {
-  return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-const preloaderThemes: RemixThemesInput = {
-  sticker: { bg: '#080a0b', ink: '#f1efe7', accent: '#1945f5' },
-  felt: { bg: '#1945f5', ink: '#f1efe7', accent: '#07111a', pop: ['#f1efe7', '#8fb9d9', '#080a0b', '#f1efe7'] },
-  bubble: { bg: '#07111a', ink: '#f1efe7', accent: '#8fb9d9', pop: ['#1945f5', '#f1efe7', '#8fb9d9'] },
-  script: { bg: '#1945f5', ink: '#080a0b', accent: '#f1efe7' },
-  stretch: { bg: '#f1efe7', ink: '#080a0b', accent: '#1945f5' },
-  vector: { bg: '#07111a', ink: '#f1efe7', accent: '#1945f5' },
-  cutout: { bg: '#080a0b', ink: '#080a0b', accent: '#f1efe7' },
-};
 
 function Header({ menu, setMenu }: { menu: boolean; setMenu: (v: boolean) => void }) {
   const loc = useLocation();
@@ -126,7 +111,8 @@ function Work() {
       description="Digital products, brand identities, and high-performance web platforms engineered for clarity, cultural momentum, and measurable business impact."
       ctaText="View All Work"
       ctaHref="/work"
-      images={DEMO_IMAGES}
+      images={studies.map(study => study.image)}
+      items={studies.map(study => ({ number: study.n, title: study.title, category: study.tags, image: study.image, href: "/work/" + study.title.toLowerCase().replaceAll(" ", "-") }))}
     />
   </section>;
 }
@@ -618,28 +604,8 @@ function Contact() {
 }
 
 function App() {
-  const [loading, setLoading] = useState(shouldShowIntro); const [menu, setMenu] = useState(false);
-  const finishIntro = useCallback(() => {
-    setLoading(false);
-  }, []);
+  const [menu, setMenu] = useState(false);
   return <MotionProvider>
-    {loading && <TypeRemixPreloader
-      className="site-preloader"
-      word="INSPIRING WAVE"
-      name="INSPIRING WAVE"
-      discipline="STRATEGY / DESIGN / TECHNOLOGY"
-      year="2026"
-      period="HYDERABAD — INDIA"
-      handle="INSPIRINGWAVE.IN"
-      roles={['Digital Strategy', 'Web Development', 'UI/UX Design', 'Creative Technology']}
-      kicker="INSPIRING WAVE"
-      tagline="INSPIRING WAVE IN MOTION"
-      motto="MAKE WAVES"
-      durationMs={7000}
-      themes={preloaderThemes}
-      onComplete={finishIntro}
-    />}
-    <IntroActive.Provider value={loading}><div inert={loading}>
       <Header menu={menu} setMenu={setMenu} />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -654,7 +620,6 @@ function App() {
         <Route path="*" element={<Home />} />
       </Routes>
       <Footer />
-    </div></IntroActive.Provider>
   </MotionProvider>;
 }
 

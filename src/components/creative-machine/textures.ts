@@ -177,7 +177,7 @@ export function ribbonTexture(scale = 1) {
   const W = Math.round(2048 * scale)
   const H = Math.round(160 * scale)
   const { c, ctx } = canvas(W, H)
-  ctx.fillStyle = '#ece8dc'
+  ctx.fillStyle = '#fff0d5'
   ctx.fillRect(0, 0, W, H)
   // soft printed edge lines
   ctx.fillStyle = 'rgba(8,13,23,.75)'
@@ -191,8 +191,8 @@ export function ribbonTexture(scale = 1) {
   const gap = H * 0.42
   for (let i = 0; x < W * 0.7; i++) {
     const w = words[i % words.length]
-    ctx.fillText(w.split('').join(' '), x, H * 0.5)
-    x += ctx.measureText(w.split('').join(' ')).width + gap
+    ctx.fillText(w, x, H * 0.5)
+    x += ctx.measureText(w).width + gap
   }
   // cobalt checker block in a rotated grid
   const k = H * 0.22
@@ -217,9 +217,9 @@ export function ribbonTexture(scale = 1) {
 
 /** Wireframe globe drawn in cream on transparent — mounted inside a glass plane. */
 export function globeTexture() {
-  const S = 512
+  const S = 1024
   const { c, ctx } = canvas(S, S)
-  ctx.strokeStyle = 'rgba(241,239,231,.9)'
+  ctx.strokeStyle = 'rgba(104,156,255,.96)'
   ctx.lineWidth = 2
   const r = S * 0.36
   ctx.translate(S / 2, S / 2)
@@ -340,9 +340,24 @@ export function plateTexture(index: string, tone: 'cream' | 'cobalt' = 'cream') 
   return toTexture(c)
 }
 
+export function illuminatedEdgeTexture() {
+  const { c, ctx } = canvas(512, 512)
+  ctx.strokeStyle = '#dce7ff'
+  ctx.shadowColor = '#1643ff'
+  ctx.lineWidth = 2.5
+  for (const blur of [28, 14, 5]) {
+    ctx.shadowBlur = blur
+    ctx.strokeRect(28, 28, 456, 456)
+  }
+  return toTexture(c, { aniso: 16 })
+}
+
 export function loadImageTexture(url: string, onLoad?: () => void) {
   const tex = new THREE.TextureLoader().load(url, () => onLoad?.())
   tex.colorSpace = THREE.SRGBColorSpace
-  tex.anisotropy = 4
+  tex.magFilter = THREE.LinearFilter
+  tex.minFilter = THREE.LinearMipmapLinearFilter
+  tex.generateMipmaps = true
+  tex.anisotropy = 16
   return tex
 }

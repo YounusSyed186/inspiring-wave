@@ -4,10 +4,10 @@ import { EXIT_Z, TUNNEL_Y, easeIn, easeInOut, lerp, range, win, type Layout } fr
 import {
   brushedTexture,
   checkerTexture,
-  eyeTexture,
   globeTexture,
   halftoneTexture,
   loadImageTexture,
+  illuminatedEdgeTexture,
   plateTexture,
   radialTexture,
   ribbonTexture,
@@ -98,12 +98,14 @@ export class CreativeMachine {
   private panels: Panel[] = []
   private glass: Glass[] = []
   private halo = new THREE.Group()
+  private edgeLight!: THREE.MeshBasicMaterial
   private haloNode!: THREE.Mesh
   private haloRing!: GlowMat
   private haloLight!: THREE.PointLight
   private frames: Frame[] = []
   private corridorRun: THREE.Mesh[] = []
   private corridorLights: THREE.PointLight[] = []
+  private exit = new THREE.Group()
   private exitLight!: THREE.PointLight
   private shards: Shard[] = []
 
@@ -125,7 +127,7 @@ export class CreativeMachine {
 
   constructor(private layout: Layout, onAsset?: () => void) {
     const lite = layout === 'mobile'
-    this.ribbonN = lite ? 220 : 340
+    this.ribbonN = lite ? 320 : 560
     this.buildMaterials()
     this.buildEnvironment()
     this.buildCore()
@@ -134,8 +136,20 @@ export class CreativeMachine {
     this.buildRibbon(lite)
     this.buildHalo()
     this.buildInterior(lite ? 6 : 8)
+    this.root.add(this.exit)
     this.buildExit()
     this.buildLights()
+  }
+
+  configureTextureQuality(maxAnisotropy: number) {
+    const anisotropy = Math.min(maxAnisotropy, this.layout === 'mobile' ? 8 : 16)
+    for (const texture of this.textures) {
+      texture.anisotropy = anisotropy
+      texture.magFilter = THREE.LinearFilter
+      texture.minFilter = THREE.LinearMipmapLinearFilter
+      texture.generateMipmaps = true
+      texture.needsUpdate = true
+    }
   }
 
   /* ------------------------------------------------------------------ */
@@ -173,11 +187,11 @@ export class CreativeMachine {
         metalness: 0.15,
         roughness: 0.05,
         transparent: true,
-        opacity: 0.14,
+        opacity: 0.045,
         depthWrite: false,
         side: THREE.DoubleSide,
       }),
-      floor: new THREE.MeshStandardMaterial({ color: '#070b14', metalness: 0.6, roughness: 0.3 }),
+      floor: new THREE.MeshStandardMaterial({ envMapIntensity: 0.015, color: '#070b14', metalness: 0.6, roughness: 0.3 }),
     }
   }
 
@@ -193,7 +207,7 @@ export class CreativeMachine {
   /* ------------------------------------------------------------------ */
 
   private buildEnvironment() {
-    const floor = this.add(this.root, new THREE.PlaneGeometry(160, 160), this.m.floor)
+    const floor = this.add(this.root, new THREE.PlaneGeometry(160, 160), new THREE.MeshBasicMaterial({ color: '#080d17', toneMapped: false }))
     floor.rotation.x = -Math.PI / 2
     floor.position.set(0, FLOOR_Y, -20)
 
@@ -337,14 +351,10 @@ export class CreativeMachine {
 
   private buildFront() {
     const { cream, cobalt, cobaltDeep } = this.m
-    const lite = this.layout === 'mobile'
-    const eye = new THREE.MeshStandardMaterial({
-      map: this.tex(eyeTexture(lite ? 0.6 : 1)),
-      roughness: 0.62,
-      emissive: '#ffffff',
-      emissiveIntensity: 0.12,
+    const eye = new THREE.MeshBasicMaterial({
+      map: this.tex(loadImageTexture('/assets/hero/machine-eye-cobalt.webp')),
+      toneMapped: false,
     })
-    eye.emissiveMap = eye.map
     // 1 — halftone eye plate, hinged on its left edge
     const p1 = this.panel(new THREE.Vector3(-1.75, 0.5, 1.05), 1.3, new THREE.BoxGeometry(2.6, 3.2, 0.08), [cream, cream, cream, cream, eye, cream], new THREE.Euler(0, 0.07, 0))
     const back1 = this.add(p1, new THREE.BoxGeometry(2.74, 3.34, 0.05), cobaltDeep)
@@ -373,39 +383,41 @@ export class CreativeMachine {
   private buildGlass(onAsset?: () => void) {
     const { glass, chrome } = this.m
     const art = (map: THREE.Texture, transparent = false) => {
-      const mat = new THREE.MeshStandardMaterial({
-        map,
-        roughness: 0.55,
-        emissive: '#ffffff',
-        emissiveMap: map,
-        emissiveIntensity: 0.32,
+      const mat = new THREE.MeshBasicMaterial({
+        map, toneMapped: false, fog: false,
         transparent,
         depthWrite: !transparent,
         side: THREE.DoubleSide,
       })
       return mat
     }
-    const sources: (() => THREE.MeshStandardMaterial)[] = [
-      () => art(this.tex(loadImageTexture('/assets/architecture.webp', onAsset))),
-      () => art(this.tex(halftoneTexture(true))),
-      () => art(this.tex(loadImageTexture('/assets/fabric.webp', onAsset))),
+    this.edgeLight = new THREE.MeshBasicMaterial({
+      map: this.tex(illuminatedEdgeTexture()), transparent: true, depthWrite: false,
+      toneMapped: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+    })
+    const sources: (() => THREE.Material)[] = [
+      () => art(this.tex(loadImageTexture('/assets/hero/machine-eye-cobalt.webp', onAsset))),
+      () => art(this.tex(loadImageTexture('/assets/hero/machine-cloud.webp', onAsset))),
+      () => new THREE.MeshStandardMaterial({ color: '#b6ff00', emissive: '#74b900', emissiveIntensity: 0.2, toneMapped: false }),
       () => art(this.tex(globeTexture()), true),
-      () => art(this.tex(loadImageTexture('/assets/process/process-sculpture.webp', onAsset))),
+      () => art(this.tex(loadImageTexture('/assets/fabric.webp', onAsset))),
     ]
     const spec: [number, number, number, number, number][] = [
       // x, y, z, height, width
-      [0.55, 0.55, 2.65, 3.3, 1.9],
-      [1.5, 0.62, 2.12, 3.1, 1.85],
-      [2.45, 0.7, 1.62, 2.9, 1.8],
-      [3.42, 0.76, 0.98, 2.7, 1.75],
+      [-1.1, 0.65, 2.4, 4.5, 4.15],
+      [0.75, 0.85, 1.25, 4.65, 3.4],
+      [1.95, 0.7, 0.1, 4.35, 2.8],
+      [3.25, 0.48, -0.55, 3.7, 2.65],
       [4.35, 0.82, 0.05, 2.5, 1.7],
     ]
     spec.forEach(([x, y, z, h, w], i) => {
       const group = new THREE.Group()
       group.position.set(x, y, z)
-      const baseRY = -0.46
+      const baseRY = -0.52
+      group.rotation.z = 0.08
+      group.rotation.x = -0.25
       group.rotation.y = baseRY
-      const artMesh = this.add(group, new THREE.PlaneGeometry(w * 0.9, h * 0.9), sources[i]())
+      const artMesh = this.add(group, new THREE.PlaneGeometry(w * 0.995, h * 0.995), sources[i]())
       artMesh.position.z = -0.025
       this.add(group, new THREE.PlaneGeometry(w, h), glass)
       const fw = w / 2
@@ -416,7 +428,13 @@ export class CreativeMachine {
         bar(-fw, -fh, -fw, fh, 0, 0.025, 0.025),
         bar(fw, -fh, fw, fh, 0, 0.025, 0.025),
       ])!
-      this.add(group, frame, chrome)
+      this.add(group, frame, i < 2 ? this.frameGlow.mat : chrome)
+      if (i < 3) {
+        const light = this.add(group, new THREE.PlaneGeometry(w * 8 / 7, h * 8 / 7), this.edgeLight)
+        light.position.z = 0.025
+      }
+      const rake = new THREE.Matrix4().makeShear(0, 0, 0.18, 0, 0, 0)
+      for (const layer of group.children) (layer as THREE.Mesh).geometry.applyMatrix4(rake)
       this.root.add(group)
       this.glass.push({ group, base: group.position.clone(), baseRY, i })
     })
@@ -432,7 +450,7 @@ export class CreativeMachine {
       const th = (i / N) * Math.PI * 2
       // A: orbit wrapping the sculpture — low across the front, high behind
       this.ribbonA.push(
-        new THREE.Vector3(0.5 + 5.1 * Math.cos(th), 0.15 - 1.75 * Math.sin(th) + 0.32 * Math.sin(2 * th), 0.35 + 3.05 * Math.sin(th)),
+        new THREE.Vector3(0.5 + 5.1 * Math.cos(th), -0.7 - 1.25 * Math.sin(th) + 0.9 * Math.cos(th) + 0.9 * Math.sin(2 * th), 0.35 + 3.05 * Math.sin(th)),
       )
       // B: a gate ring standing in front of the passage — the camera flies through it
       this.ribbonB.push(
@@ -446,7 +464,7 @@ export class CreativeMachine {
     const uv = new Float32Array(verts * 2)
     const repeats = 3
     for (let i = 0; i <= N; i++) {
-      const u = (i / N) * repeats
+      const u = (1 - i / N) * repeats
       // front strip (2 verts), back strip (2 verts)
       uv.set([u, 1, u, 0, u, 1, u, 0], i * 8)
     }
@@ -462,9 +480,11 @@ export class CreativeMachine {
     }
     geo.setIndex(idx)
     this.ribbonGeo = geo
-    this.ribbonTex = this.tex(ribbonTexture(lite ? 0.5 : 1))
+    this.ribbonTex = this.tex(ribbonTexture(lite ? 0.8 : 1.5))
     const mat = new THREE.MeshStandardMaterial({
       map: this.ribbonTex,
+      color: '#fff1dc',
+      envMapIntensity: 0.18,
       roughness: 0.58,
       metalness: 0.05,
       side: THREE.DoubleSide,
@@ -503,7 +523,7 @@ export class CreativeMachine {
       w.copy(axis).addScaledVector(tan, -axis.dot(tan)).normalize()
       // a slow Möbius-like twist, strongest across the front of the orbit
       const th = (i / N) * Math.PI * 2
-      q.setFromAxisAngle(tan, 0.55 * Math.sin(th - 0.4) * (1 - s))
+      q.setFromAxisAngle(tan, 1.05 * Math.sin(th - 0.4) * (1 - s))
       w.applyQuaternion(q)
       n.crossVectors(tan, w).normalize()
       const o = i * 4
@@ -570,7 +590,7 @@ export class CreativeMachine {
       const d = variant === 2 ? 0.16 : 0.28
       const geo = new THREE.ExtrudeGeometry(shape, { depth: d, bevelEnabled: false })
       geo.translate(0, 0, -d / 2)
-      const mat = variant === 0 ? steel : variant === 1 ? cobaltDeep : cream
+      const mat = variant === 1 ? cobaltDeep : steel
       this.add(group, geo, mat)
       // inner light trim
       const zz = d / 2 + 0.01
@@ -610,60 +630,74 @@ export class CreativeMachine {
   }
 
   /* ------------------------------------------------------------------ */
-  /* G. exit: doorway + alpha window onto the manifesto                 */
+  /* G. exit: luminous transition threshold & exploding angular shards  */
   /* ------------------------------------------------------------------ */
 
   private buildExit() {
-    const { steel } = this.m
-    const wallZ = EXIT_Z + 2.0
-    const dx = 1.25
-    const dy0 = -1.65
-    const dy1 = 2.05
-    const wall = new THREE.ExtrudeGeometry(rectRing(-9, -6, 9, 7, -dx, dy0, dx, dy1), { depth: 0.3, bevelEnabled: false })
-    wall.translate(0, 0, wallZ - 0.15)
-    this.add(this.root, wall, steel)
-    const trim = mergeGeometries([
-      bar(-dx, dy0, dx, dy0, wallZ + 0.17, 0.05, 0.03),
-      bar(-dx, dy0, -dx, dy1, wallZ + 0.17, 0.05, 0.03),
-      bar(dx, dy0, dx, dy1, wallZ + 0.17, 0.05, 0.03),
-    ])!
-    this.add(this.root, trim, this.doorGlow.mat)
-    const lintel = this.add(this.root, bar(-dx, dy1, dx, dy1, wallZ + 0.17, 0.05, 0.03), this.limeGlow.mat)
-    void lintel
-
-    // The window: writes transparent black, punching through the canvas so
-    // the real DOM (cream veil + manifesto) is seen at the end of the corridor.
-    const windowMat = new THREE.MeshBasicMaterial({
-      color: 0x000000,
-      transparent: true,
-      opacity: 0,
-      blending: THREE.NoBlending,
-      fog: false,
-      toneMapped: false,
-    })
-    const win = this.add(this.root, new THREE.PlaneGeometry(40, 30), windowMat, 'manifesto-window')
-    win.position.set(0, TUNNEL_Y, EXIT_Z)
-    win.renderOrder = 10
-
-    // fragments of the machine drifting just beyond the doorway
     const { cobalt, cream } = this.m
     const checker = this.tex(checkerTexture(4))
-    const checkerMat = new THREE.MeshStandardMaterial({ map: checker, roughness: 0.6, side: THREE.DoubleSide })
+    const checkerMat = new THREE.MeshStandardMaterial({ map: checker, roughness: 0.55, side: THREE.DoubleSide })
+    const halftone = this.tex(halftoneTexture(true))
+    const halftoneMat = new THREE.MeshStandardMaterial({ map: halftone, roughness: 0.6, side: THREE.DoubleSide })
     const ribbonBit = new THREE.MeshStandardMaterial({ map: this.ribbonTex, roughness: 0.6, side: THREE.DoubleSide })
-    const defs: [THREE.BufferGeometry, Mat, [number, number, number], [number, number, number], [number, number, number]][] = [
-      [new THREE.BoxGeometry(0.9, 1.3, 0.04), cobalt, [-1.05, 1.35, EXIT_Z + 1.2], [-1, 0.6, 0.2], [0.3, 0.5, 0.2]],
-      [new THREE.PlaneGeometry(0.7, 0.7), checkerMat, [1.0, 1.25, EXIT_Z + 0.9], [1, 0.7, 0.1], [0.2, -0.4, 0.5]],
-      [new THREE.BoxGeometry(1.4, 0.32, 0.03), ribbonBit, [-0.95, -1.0, EXIT_Z + 1.0], [-1, -0.5, 0.2], [0.1, 0.4, -0.6]],
-      [new THREE.BoxGeometry(0.5, 0.9, 0.04), cream, [1.05, -0.95, EXIT_Z + 1.3], [1, -0.6, 0.2], [-0.4, 0.3, 0.3]],
-      [new THREE.PlaneGeometry(0.42, 0.42), checkerMat, [0.55, 1.62, EXIT_Z + 1.5], [0.4, 1, 0.2], [0.5, 0.2, -0.3]],
-      [new THREE.BoxGeometry(0.28, 0.6, 0.03), cobalt, [-0.45, -1.45, EXIT_Z + 1.5], [-0.3, -1, 0.2], [0.2, -0.5, 0.4]],
+
+    // Helper to generate sharp angular polygon shards
+    const triangleShard = (w: number, h: number, d = 0.05) => {
+      const s = new THREE.Shape()
+      s.moveTo(-w / 2, -h / 2)
+      s.lineTo(w / 2, -h * 0.25)
+      s.lineTo(w * 0.12, h / 2)
+      s.closePath()
+      const g = new THREE.ExtrudeGeometry(s, { depth: d, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 1 })
+      g.center()
+      return g
+    }
+
+    const trapezoidShard = (w1: number, w2: number, h: number, d = 0.05) => {
+      const s = new THREE.Shape()
+      s.moveTo(-w1 / 2, -h / 2)
+      s.lineTo(w1 / 2, -h / 2)
+      s.lineTo(w2 / 2, h / 2)
+      s.lineTo(-w2 * 0.85, h / 2)
+      s.closePath()
+      const g = new THREE.ExtrudeGeometry(s, { depth: d, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 1 })
+      g.center()
+      return g
+    }
+
+    // High-energy shards positioned around the corridor threshold that burst outward
+    const shardDefs: [THREE.BufferGeometry, Mat, [number, number, number], [number, number, number], [number, number, number]][] = [
+      // Top-left burst
+      [triangleShard(1.8, 2.2), cobalt, [-1.8, 1.8, EXIT_Z + 3.0], [-1.2, 1.0, 0.4], [0.5, 0.4, 0.6]],
+      [trapezoidShard(1.4, 0.8, 1.6), checkerMat, [-2.2, 0.9, EXIT_Z + 2.0], [-1.4, 0.5, 0.2], [-0.4, 0.6, -0.3]],
+      // Top-right burst
+      [triangleShard(2.0, 2.4), checkerMat, [1.9, 2.0, EXIT_Z + 2.8], [1.3, 1.1, 0.3], [-0.6, 0.5, 0.4]],
+      [trapezoidShard(1.2, 0.7, 1.4), halftoneMat, [2.3, 0.8, EXIT_Z + 1.8], [1.4, 0.4, 0.2], [0.4, -0.5, 0.5]],
+      // Bottom-left burst
+      [triangleShard(1.6, 1.9), ribbonBit, [-1.9, -1.6, EXIT_Z + 2.5], [-1.1, -0.9, 0.3], [0.3, -0.4, -0.5]],
+      [trapezoidShard(1.5, 0.9, 1.5), cobalt, [-1.4, -2.1, EXIT_Z + 1.5], [-0.9, -1.2, 0.2], [-0.5, 0.3, 0.4]],
+      // Bottom-right burst
+      [triangleShard(1.9, 2.0), cream, [1.8, -1.7, EXIT_Z + 2.4], [1.2, -1.0, 0.3], [-0.4, 0.5, 0.3]],
+      [trapezoidShard(1.3, 0.8, 1.6), checkerMat, [2.2, -1.2, EXIT_Z + 1.6], [1.3, -0.7, 0.2], [0.5, -0.4, -0.4]],
+      // Perimeter framing shards
+      [triangleShard(1.3, 1.5), halftoneMat, [-0.2, 2.4, EXIT_Z + 2.2], [0.1, 1.4, 0.3], [0.3, 0.6, 0.2]],
+      [trapezoidShard(1.8, 1.0, 0.9), cobalt, [0.3, -2.3, EXIT_Z + 2.0], [0.2, -1.3, 0.2], [-0.3, -0.5, 0.5]],
+      [triangleShard(1.2, 1.4), ribbonBit, [2.5, 0.1, EXIT_Z + 2.6], [1.5, 0.1, 0.3], [0.4, 0.3, -0.5]],
+      [triangleShard(1.1, 1.3), cobalt, [-2.6, 0.0, EXIT_Z + 2.4], [-1.5, 0.1, 0.3], [-0.4, -0.3, 0.4]],
     ]
-    defs.forEach(([geo, mat, pos, dir, spin], i) => {
-      const mesh = this.add(this.root, geo, mat)
+
+    shardDefs.forEach(([geo, mat, pos, dir, spin], i) => {
+      const mesh = this.add(this.exit, geo, mat)
       mesh.position.set(...pos)
-      const baseRot = new THREE.Euler(0.15 * (i % 3) - 0.1, 0.4 * ((i % 2) * 2 - 1), 0.2 * (i - 2.5))
+      const baseRot = new THREE.Euler(0.2 * (i % 3) - 0.1, 0.35 * ((i % 2) * 2 - 1), 0.25 * (i - 5.5))
       mesh.rotation.copy(baseRot)
-      this.shards.push({ mesh, base: new THREE.Vector3(...pos), dir: new THREE.Vector3(...dir).normalize(), spin: new THREE.Vector3(...spin), baseRot })
+      this.shards.push({
+        mesh,
+        base: new THREE.Vector3(...pos),
+        dir: new THREE.Vector3(...dir).normalize(),
+        spin: new THREE.Vector3(...spin),
+        baseRot,
+      })
     })
   }
 
@@ -715,6 +749,13 @@ export class CreativeMachine {
 
     // A. core: a controlled breath of rotation that returns to true before entry
     this.root.rotation.y = -0.05 * hold * (1 - win(p, 0.4, 0.56)) + 0.035 * Math.sin(Math.PI * range(p, 0.2, 0.56))
+    this.exit.visible = p > 0.55
+    this.edgeLight.opacity = 0.42 + 0.58 * win(p, 0.2, 0.45)
+    const unfolding = win(p, 0.38, 0.58)
+    this.core.scale.setScalar(0.04 + 0.96 * unfolding)
+    this.halo.visible = unfolding > 0.08
+    this.halo.scale.setScalar(0.04 + 0.96 * unfolding)
+    for (const panel of this.panels) panel.pivot.scale.setScalar(0.04 + 0.96 * unfolding)
     this.pillar.position.x = -3.8 - 1.1 * sepF
     this.pillar.rotation.z = 0.06 * sepF
     setGlow(this.crownGlow, 0.35 + 1.4 * win(p, 0.22, 0.34) + 0.1 * Math.sin(t * 1.3) * idle)
@@ -736,7 +777,7 @@ export class CreativeMachine {
       const s = easeInOut(range(p, 0.455 + g.i * 0.018, 0.585 + g.i * 0.018))
       const a = win(p, 0.3 + g.i * 0.02, 0.44 + g.i * 0.02)
       g.group.position.set(
-        g.base.x + (1.25 + g.i * 0.5) * s,
+        g.base.x + (g.i === 0 ? -2.85 : 1.65 + g.i * 0.5) * s,
         g.base.y + 0.03 * Math.sin(t * 0.55 + g.i) * idle + 0.12 * a,
         g.base.z + (0.9 - g.i * 0.32) * s + 0.12 * a * (g.i % 2 ? 1 : -1),
       )
@@ -771,12 +812,16 @@ export class CreativeMachine {
     this.exitLight.intensity = 34 * win(p, 0.6, 0.82)
     setGlow(this.doorGlow, 0.7 + 0.9 * enter)
 
-    // G. fragments drift out past the edges as the manifesto takes over
-    const out = easeIn(rev)
+    // G. high-velocity angular shards explode outward toward screen corners
+    const explode = easeInOut(range(p, 0.65, 0.88))
     for (const s of this.shards) {
-      s.mesh.position.copy(s.base).addScaledVector(s.dir, 3.2 * out)
-      s.mesh.position.y += 0.04 * Math.sin(t * 0.8 + s.base.x * 3) * idle
-      s.mesh.rotation.set(s.baseRot.x + s.spin.x * out * 2, s.baseRot.y + s.spin.y * out * 2, s.baseRot.z + s.spin.z * out * 2)
+      s.mesh.position.copy(s.base).addScaledVector(s.dir, 7.8 * explode)
+      s.mesh.position.y += 0.04 * Math.sin(t * 1.1 + s.base.x * 3) * idle
+      s.mesh.rotation.set(
+        s.baseRot.x + s.spin.x * explode * 3.2,
+        s.baseRot.y + s.spin.y * explode * 3.2,
+        s.baseRot.z + s.spin.z * explode * 3.2,
+      )
     }
   }
 
