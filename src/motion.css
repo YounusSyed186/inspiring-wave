@@ -54,8 +54,9 @@ body{overflow-x:clip}
   .home-cinematic>.trust{background:var(--paper)}
   .home-cinematic>.work,.home-cinematic>.method,.home-cinematic>.journal{background:var(--black)}
   .home-cinematic>.finale{background:var(--deep)}
-  .home-cinematic>.parallax-showcase{position:relative!important;top:auto!important;height:auto!important;min-height:300vh!important;will-change:auto!important;transform:none!important;filter:none!important;clip-path:none!important;background:var(--deep);overflow:visible!important}
-  .home-cinematic>.parallax-showcase::after{display:none!important}
+  .home-cinematic>.parallax-showcase,.home-cinematic>.method,.home-cinematic>.capabilities{position:relative!important;top:auto!important;height:auto!important;will-change:auto!important;transform:none!important;filter:none!important;clip-path:none!important;overflow:visible!important}
+  .home-cinematic>.parallax-showcase{min-height:260vh!important;background:var(--deep)}
+  .home-cinematic>.parallax-showcase::after,.home-cinematic>.method::after{display:none!important}
 }
 
 .parallax-showcase{position:relative;min-height:300vh;background:var(--deep);color:var(--ivory);overflow:visible}

@@ -131,11 +131,6 @@ export function useHomepageMotion(scope: RefObject<HTMLElement | null>) {
         });
       });
 
-      gsap.fromTo('.brush path', { strokeDasharray: 1100, strokeDashoffset: 1100 }, {
-        strokeDashoffset: 0,
-        ease: 'none',
-        scrollTrigger: { trigger: '.manifesto', start: 'top 52%', end: 'bottom 65%', scrub: 1 },
-      });
 
       gsap.from('.work-group:nth-child(2) .work-item', {
         y: index => index % 2 ? 120 : 75,
@@ -154,19 +149,6 @@ export function useHomepageMotion(scope: RefObject<HTMLElement | null>) {
         duration: .9,
         ease: 'power3.out',
         scrollTrigger: { trigger: '.service-list', start: 'top 80%' },
-      });
-
-      gsap.fromTo('.method-object img', { objectPosition: '0% center', scale: 1.18 }, {
-        objectPosition: '100% center',
-        scale: 1,
-        ease: 'none',
-        scrollTrigger: { trigger: '.method-layout', start: 'top 70%', end: 'bottom 35%', scrub: 1 },
-      });
-      gsap.from('.method-layout li', {
-        x: 80,
-        opacity: .12,
-        stagger: .14,
-        scrollTrigger: { trigger: '.method-layout', start: 'top 72%', end: 'bottom 68%', scrub: .8 },
       });
 
       gsap.fromTo('.studio-layout figure img', { scale: 1.14, filter: 'saturate(0)' }, {

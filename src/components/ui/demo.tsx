@@ -1,38 +1,79 @@
 'use client';
 import React from 'react';
-import { cn } from '@/lib/utils';
 import Lenis from '@studio-freight/lenis';
 import { ZoomParallax, Image } from '@/components/ui/zoom-parallax';
+import { AnimatedMarqueeHero } from '@/components/ui/hero-3';
+
+export const DEMO_IMAGES = [
+	'/assets/dimensions/dim-01-core.jpg',
+	'/assets/dimensions/dim-02-spatial.jpg',
+	'/assets/dimensions/dim-03-kinetic.jpg',
+	'/assets/dimensions/dim-04-system.jpg',
+	'/assets/dimensions/dim-05-texture.jpg',
+	'/assets/dimensions/dim-06-horizon.jpg',
+	'/assets/dimensions/dim-07-perspective.jpg',
+	'/assets/process/process-sculpture.webp',
+];
+
+export const AnimatedHeroDemo = () => {
+	return (
+		<AnimatedMarqueeHero
+			tagline="03 / SELECTED WORK — CONCEPT & CAPABILITY STUDIES"
+			title={
+				<>
+					Selected <em className="font-serif italic font-normal text-[#5676ff] lowercase">work.</em>
+				</>
+			}
+			description="Digital products, brand identities, and high-performance web platforms crafted for clarity, cultural momentum, and measurable business impact."
+			ctaText="View All Work"
+			ctaHref="/work"
+			images={DEMO_IMAGES}
+		/>
+	);
+};
 
 export const zoomParallaxImages: Image[] = [
 	{
-		src: '/assets/hero/oceans.mp4',
-		alt: 'Cinematic rolling barrel wave in fluid motion',
-		video: true,
+		src: '/assets/dimensions/dim-01-core.jpg',
+		alt: 'Sculptural liquid obsidian wave with electric cobalt glass ribbons and acid-lime light filaments',
+		code: 'LAYER 01 // CORE FOCUS',
+		tag: 'IMPACT IN MOTION',
 	},
 	{
-		src: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1200&q=80',
-		alt: 'Minimalist geometric architecture',
+		src: '/assets/dimensions/dim-02-spatial.jpg',
+		alt: 'Brutalist concrete and translucent cobalt-blue acrylic pavilions over reflective water',
+		code: 'LAYER 02 // SPATIAL',
+		tag: 'DIGITAL ARCHITECTURE',
 	},
 	{
-		src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
-		alt: 'Ocean waves and coastal energy',
+		src: '/assets/dimensions/dim-03-kinetic.jpg',
+		alt: 'Tactile darkroom flat-lay of torn ivory risograph prints, acid-lime stickers, and chrome sculpture',
+		code: 'LAYER 03 // KINETIC',
+		tag: 'PRINT & TYPOGRAPHY',
 	},
 	{
-		src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
-		alt: 'Urban monolithic glass reflection',
+		src: '/assets/dimensions/dim-04-system.jpg',
+		alt: 'Zero-gravity kinetic sculpture of matte carbon rings, cobalt optical fibers, and ivory spheres',
+		code: 'LAYER 04 // SYSTEM',
+		tag: 'SYSTEMS IN MOTION',
 	},
 	{
-		src: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1200&q=80',
-		alt: 'Minimalist desert ripples in motion',
+		src: '/assets/dimensions/dim-05-texture.jpg',
+		alt: 'Billowing metallic cobalt-blue and studio-ivory silk folds with acid-lime highlights',
+		code: 'LAYER 05 // TEXTURE',
+		tag: 'SURFACE RHYTHM',
 	},
 	{
-		src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80',
-		alt: 'Atmospheric natural horizon',
+		src: '/assets/dimensions/dim-06-horizon.jpg',
+		alt: 'Moonlit volcanic coastline with a bioluminescent cobalt wave and geometric light portal',
+		code: 'LAYER 06 // HORIZON',
+		tag: 'ATMOSPHERIC DEPTH',
 	},
 	{
-		src: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80',
-		alt: 'Curated studio light and form',
+		src: '/assets/dimensions/dim-07-perspective.jpg',
+		alt: 'Symmetrical architectural light-tunnel of ivory concrete and cobalt glass frames',
+		code: 'LAYER 07 // PERSPECTIVE',
+		tag: 'SPATIAL CLARITY',
 	},
 ];
 
@@ -54,22 +95,8 @@ export default function DefaultDemo() {
 
 	return (
 		<main className="min-h-screen w-full">
-			<div className="relative flex h-[50vh] items-center justify-center">
-				{/* Radial spotlight */}
-				<div
-					aria-hidden="true"
-					className={cn(
-						'pointer-events-none absolute -top-1/2 left-1/2 h-[120vmin] w-[120vmin] -translate-x-1/2 rounded-full',
-						'bg-[radial-gradient(ellipse_at_center,rgba(25,69,245,0.2),transparent_50%)]',
-						'blur-[30px]',
-					)}
-				/>
-				<h1 className="text-center text-4xl font-bold">
-					Scroll Down for Zoom Parallax
-				</h1>
-			</div>
+			<AnimatedHeroDemo />
 			<ZoomParallax images={zoomParallaxImages} />
-			<div className="h-[50vh]" />
 		</main>
 	);
 }

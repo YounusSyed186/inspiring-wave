@@ -24,6 +24,7 @@
     "react-dom": "latest",
     "react-router-dom": "latest",
     "tailwind-merge": "^3.7.1",
+    "three": "^0.187.0",
     "typescript": "latest",
     "vite": "latest"
   },
@@ -31,6 +32,7 @@
     "@types/node": "^26.6.6",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@types/three": "^0.187.0",
     "autoprefixer": "^10.7.0",
     "playwright": "^1.65.1",
     "postcss": "^8.5.33",

@@ -17,6 +17,11 @@ export default {
         sans: ["Inter", "Arial", "sans-serif"],
       },
       colors: {
+        "chart-1": "var(--color-chart-1, #1945f5)",
+        "chart-2": "var(--color-chart-2, #8fb9d9)",
+        "chart-3": "var(--color-chart-3, #4d6aff)",
+        "chart-4": "var(--color-chart-4, #16a6a1)",
+        "chart-5": "var(--color-chart-5, #c8deed)",
         border: "hsl(var(--border, 240 5.9% 90%))",
         input: "hsl(var(--input, 240 5.9% 90%))",
         ring: "hsl(var(--ring, 240 5.9% 10%))",
