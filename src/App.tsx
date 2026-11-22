@@ -7,7 +7,8 @@ import { zoomParallaxImages } from '@/components/ui/demo';
 import { AnimatedMarqueeHero } from '@/components/ui/hero-3';
 import { ArtisticMethodSection } from '@/components/ui/artistic-method-section';
 import { CreativeMachineHero } from '@/components/creative-machine/CreativeMachineHero';
-import { LivingCapabilities } from '@/components/living-capabilities/LivingCapabilities';
+import { CustomScrollbar } from '@/components/ui/custom-scrollbar';
+import { ServicesSection } from '@/components/services/ServicesSection';
 import { TestimonialSlider, Review } from '@/components/ui/testimonial-slider-1';
 import { CtaSlider } from '@/components/ui/cta-slider';
 import DoodleCrewFooter from '@/components/ui/doodle-crew-footer';
@@ -118,17 +119,8 @@ function Work() {
   </section>;
 }
 
-const serviceImages = [
-  '/assets/process/process-sculpture.webp',
-  '/assets/architecture.webp',
-  '/assets/studio/studio-collaboration.webp',
-  '/assets/fabric.webp',
-  '/assets/architecture.webp',
-  '/assets/process/process-sculpture.webp',
-];
-
 function Capabilities() {
-  return <LivingCapabilities />;
+  return <ServicesSection />;
 }
 
 function Method() {
@@ -529,20 +521,21 @@ function Contact() {
 function App() {
   const [menu, setMenu] = useState(false);
   return <MotionProvider>
-    <Header menu={menu} setMenu={setMenu} />
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/work" element={<Listing kind="work" />} />
-      <Route path="/work/:slug" element={<DetailPage type="work" />} />
-      <Route path="/services" element={<Listing kind="services" />} />
-      <Route path="/services/:slug" element={<DetailPage type="service" />} />
-      <Route path="/about" element={<Listing kind="about" />} />
-      <Route path="/journal" element={<Listing kind="journal" />} />
-      <Route path="/journal/:slug" element={<Listing kind="journal" />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="*" element={<Home />} />
-    </Routes>
-    <Footer />
+      <CustomScrollbar />
+      <Header menu={menu} setMenu={setMenu} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/work" element={<Listing kind="work" />} />
+        <Route path="/work/:slug" element={<DetailPage type="work" />} />
+        <Route path="/services" element={<Listing kind="services" />} />
+        <Route path="/services/:slug" element={<DetailPage type="service" />} />
+        <Route path="/about" element={<Listing kind="about" />} />
+        <Route path="/journal" element={<Listing kind="journal" />} />
+        <Route path="/journal/:slug" element={<Listing kind="journal" />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="*" element={<Home />} />
+      </Routes>
+      <Footer />
   </MotionProvider>;
 }
 

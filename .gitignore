@@ -5,3 +5,6 @@ dist/
 !.env.example
 playwright-report/
 test-results/
+qa/
+local/
+loacl/
