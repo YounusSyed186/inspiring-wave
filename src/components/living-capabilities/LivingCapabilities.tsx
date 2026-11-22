@@ -1,8 +1,8 @@
 /**
  * Living Capabilities – Main Component
  *
- * Assembles the scroll-pinned 3D service world.
- * Uses GSAP ScrollTrigger to pin and derive progress.
+ * Assembles the scroll-pinned 3D service world matching the website theme.
+ * Supports dark studio mode (matching website identity) and architectural cream mode.
  */
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -11,6 +11,7 @@ import { CapabilitiesNav } from './CapabilitiesNav';
 import { CapabilitiesProgress } from './CapabilitiesProgress';
 import { STATIONS, SCROLL_HEIGHT_VH, DESKTOP_MIN } from './config';
 import { getActiveStation } from './animations';
+import type { CapabilitiesTheme } from './types';
 import { ScrollTrigger, useGSAP } from '../../motion';
 import './living-capabilities.css';
 
@@ -19,6 +20,7 @@ export function LivingCapabilities() {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
   const [isPinned, setIsPinned] = useState(false);
+  const [theme, setTheme] = useState<CapabilitiesTheme>('dark');
   const [isDesktop, setIsDesktop] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth >= DESKTOP_MIN : false
   );
@@ -87,7 +89,7 @@ export function LivingCapabilities() {
   return (
     <section
       ref={sectionRef}
-      className="lc-section"
+      className={`lc-section lc-theme-${theme}`}
       id="services"
       aria-label="Our capabilities"
     >
@@ -97,16 +99,25 @@ export function LivingCapabilities() {
         {isDesktop && (
           <CapabilitiesCanvas
             progress={progress}
+            theme={theme}
             containerRef={viewportRef}
           />
         )}
 
         {/* DOM Overlay */}
         <div className="lc-overlay">
-          {/* Header typography (visible in overview and first phase) */}
+          {/* Header typography (visible in initial overview) */}
           <div className={`lc-header ${progress > 0.08 ? 'lc-header--scrolled' : ''}`}>
             <div className="lc-badge-row">
               <span className="lc-marker">04 / CAPABILITIES</span>
+              <button
+                type="button"
+                className="lc-theme-toggle"
+                onClick={() => setTheme(t => t === 'dark' ? 'cream' : 'dark')}
+                aria-label="Toggle exhibition theme"
+              >
+                <span>MODE:</span> <b>{theme.toUpperCase()}</b>
+              </button>
             </div>
             <h2 className="lc-title">
               <span className="lc-title-line">SERVICES IN</span>
@@ -121,6 +132,28 @@ export function LivingCapabilities() {
               EXPLORE CAPABILITIES <span className="lc-cta-arrow">↗</span>
             </Link>
           </div>
+
+          {/* Floating Infographic Callout Badges (matching reference artwork layout) */}
+          {isDesktop && (
+            <div className={`lc-callouts ${progress > 0.08 ? 'lc-callouts--scrolled' : ''}`} aria-hidden="true">
+              {STATIONS.map((s, idx) => (
+                <button
+                  key={s.slug}
+                  type="button"
+                  className={`lc-callout-pin lc-callout-${idx} ${activeStation === idx ? 'is-active' : ''}`}
+                  style={{
+                    left: `${s.markerScreenPos[0]}%`,
+                    top: `${s.markerScreenPos[1]}%`,
+                  }}
+                  onClick={() => navigateToStation(idx)}
+                >
+                  <span className="lc-pin-leader" />
+                  <span className="lc-pin-tag">{String(idx + 1).padStart(2, '0')}</span>
+                  <span className="lc-pin-label">{s.title.toUpperCase()}</span>
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Active station info panel (frosted editorial card) */}
           <div className={`lc-station-info ${isPinned && progress > 0.04 ? 'visible' : ''}`}>
@@ -140,7 +173,7 @@ export function LivingCapabilities() {
             </Link>
           </div>
 
-          {/* Bottom hint */}
+          {/* Bottom scroll hint */}
           <div className={`lc-scroll-hint ${progress > 0.04 ? 'hidden' : ''}`}>
             <span>↓</span> SCROLL TO EXPLORE
           </div>

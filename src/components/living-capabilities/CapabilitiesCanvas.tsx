@@ -1,21 +1,23 @@
 /**
  * Living Capabilities – Three.js Canvas Renderer
  *
- * Sets up WebGLRenderer, camera, scene, and animation loop.
- * Accepts scroll progress from parent and updates camera + animations.
+ * Sets up WebGLRenderer, PMREM studio environment, camera, scene, and animation loop.
+ * Accepts scroll progress and theme from parent and updates camera + animations.
  */
 import { useEffect, useRef, useCallback } from 'react';
 import * as THREE from 'three';
 import { buildCapabilitiesScene, type SceneResult } from './scene';
 import { updateCamera, animateStations } from './animations';
 import { DESKTOP_MIN } from './config';
+import type { CapabilitiesTheme } from './types';
 
 interface Props {
   progress: number;
+  theme: CapabilitiesTheme;
   containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export function CapabilitiesCanvas({ progress, containerRef }: Props) {
+export function CapabilitiesCanvas({ progress, theme, containerRef }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -46,20 +48,15 @@ export function CapabilitiesCanvas({ progress, containerRef }: Props) {
     const container = containerRef.current;
     if (!canvas || !container) return;
 
-    // Check for reduced motion or mobile
     const isDesktop = window.innerWidth >= DESKTOP_MIN;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!isDesktop || reducedMotion) return;
 
-    // Build scene
-    const sceneResult = buildCapabilitiesScene();
-    sceneRef.current = sceneResult;
-
-    // Camera
-    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 200);
+    // Camera setup
+    const camera = new THREE.PerspectiveCamera(44, container.clientWidth / container.clientHeight, 0.1, 200);
     cameraRef.current = camera;
 
-    // Renderer
+    // Renderer setup with soft shadows and studio tone mapping
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
@@ -69,9 +66,13 @@ export function CapabilitiesCanvas({ progress, containerRef }: Props) {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = theme === 'dark' ? 1.25 : 1.15;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     rendererRef.current = renderer;
+
+    // Build scene with environment reflections
+    const sceneResult = buildCapabilitiesScene(renderer, theme);
+    sceneRef.current = sceneResult;
 
     resize();
 
@@ -90,7 +91,6 @@ export function CapabilitiesCanvas({ progress, containerRef }: Props) {
     };
     rafRef.current = requestAnimationFrame(animate);
 
-    // Resize observer
     const ro = new ResizeObserver(resize);
     ro.observe(container);
 
@@ -103,7 +103,7 @@ export function CapabilitiesCanvas({ progress, containerRef }: Props) {
       cameraRef.current = null;
       sceneRef.current = null;
     };
-  }, [resize, containerRef]);
+  }, [resize, containerRef, theme]);
 
   return (
     <canvas

@@ -1,10 +1,9 @@
-/** Living Capabilities – station configs and camera path */
+/** Living Capabilities – station configs, camera paths and marker placements */
 
 import type { StationConfig, CameraKeyframe } from './types';
 
 /**
- * Six service stations arranged in an architectural landscape.
- * Terraced layout matching the reference artwork.
+ * Six service stations matching the architectural reference layout.
  */
 export const STATIONS: StationConfig[] = [
   {
@@ -13,10 +12,11 @@ export const STATIONS: StationConfig[] = [
     title: 'Digital Strategy',
     summary: 'Clarify the opportunity, connect business goals to human needs, and shape a focused digital roadmap.',
     deliverables: ['Research & discovery', 'Product strategy', 'Digital roadmaps'],
-    position: [-7, 0.5, 4],
-    lookAt: [-7, 2.2, 4],
-    cameraPos: [-11, 4.8, 11],
+    position: [-6.8, 0.4, 3.8],
+    lookAt: [-6.8, 2.3, 3.8],
+    cameraPos: [-10.5, 4.6, 10.5],
     scrollRange: [0.02, 0.18],
+    markerScreenPos: [37, 24],
     accent: '#1945f5',
   },
   {
@@ -25,10 +25,11 @@ export const STATIONS: StationConfig[] = [
     title: 'Web Development',
     summary: 'Fast, expressive websites and platforms engineered for clarity, reliability and measurable growth.',
     deliverables: ['Creative development', 'Commerce & platforms', 'Performance engineering'],
-    position: [0.5, 1.2, 0],
-    lookAt: [0.5, 2.8, 0],
-    cameraPos: [-3.5, 5.2, 7],
+    position: [0.2, 1.1, -0.2],
+    lookAt: [0.2, 2.7, -0.2],
+    cameraPos: [-3.2, 5.0, 6.8],
     scrollRange: [0.18, 0.35],
+    markerScreenPos: [66, 18],
     accent: '#2855ff',
   },
   {
@@ -37,10 +38,11 @@ export const STATIONS: StationConfig[] = [
     title: 'UI/UX Design',
     summary: 'Digital products that turn complexity into intuitive, distinctive experiences people want to return to.',
     deliverables: ['Experience design', 'Interface systems', 'Prototyping & testing'],
-    position: [8.5, 1.8, -1.5],
-    lookAt: [8.5, 3.2, -1.5],
-    cameraPos: [4.5, 5.8, 5],
+    position: [8.2, 1.7, -1.8],
+    lookAt: [8.2, 3.1, -1.8],
+    cameraPos: [4.4, 5.6, 4.8],
     scrollRange: [0.35, 0.52],
+    markerScreenPos: [91, 24],
     accent: '#4477ff',
   },
   {
@@ -49,10 +51,11 @@ export const STATIONS: StationConfig[] = [
     title: 'Social Media',
     summary: 'Strategy and creative that give brands a coherent voice and the momentum to travel across culture.',
     deliverables: ['Content strategy', 'Campaign creative', 'Channel management'],
-    position: [-6.5, 0.2, -8.5],
-    lookAt: [-6.5, 2.0, -8.5],
-    cameraPos: [-2.5, 4.8, -3.5],
+    position: [-6.2, 0.1, -8.2],
+    lookAt: [-6.2, 2.0, -8.2],
+    cameraPos: [-2.4, 4.7, -3.2],
     scrollRange: [0.52, 0.68],
+    markerScreenPos: [14, 62],
     accent: '#1945f5',
   },
   {
@@ -61,10 +64,11 @@ export const STATIONS: StationConfig[] = [
     title: 'Mobile App Development',
     summary: 'Purposeful mobile experiences built around the way people move, decide and interact.',
     deliverables: ['iOS & Android', 'Cross-platform apps', 'API integration'],
-    position: [2.5, 0.6, -11.5],
-    lookAt: [2.5, 2.6, -11.5],
-    cameraPos: [-1.5, 5.0, -6.5],
+    position: [2.2, 0.5, -11.2],
+    lookAt: [2.2, 2.5, -11.2],
+    cameraPos: [-1.4, 4.9, -6.2],
     scrollRange: [0.68, 0.84],
+    markerScreenPos: [56, 61],
     accent: '#2855ff',
   },
   {
@@ -73,49 +77,47 @@ export const STATIONS: StationConfig[] = [
     title: 'Software Development',
     summary: 'Custom systems that connect operations, simplify workflows and scale with the organisation.',
     deliverables: ['Custom software', 'ERP & CRM integration', 'Quality assurance'],
-    position: [11.5, 0.8, -14.5],
-    lookAt: [11.5, 2.4, -14.5],
-    cameraPos: [7.5, 4.8, -9.5],
+    position: [11.2, 0.7, -14.2],
+    lookAt: [11.2, 2.3, -14.2],
+    cameraPos: [7.2, 4.7, -9.2],
     scrollRange: [0.84, 0.98],
+    markerScreenPos: [88, 65],
     accent: '#4477ff',
   },
 ];
 
 /**
- * Camera keyframes for the cinematic journey.
- * Elevates the camera for sweeping, editorial perspective.
+ * Camera keyframes:
+ * Smooth, sweeping CatmullRom spline through the exhibition landscape.
  */
 export const CAMERA_PATH: CameraKeyframe[] = [
-  // Wide establishing shot: sweeping overview of the entire exhibition
-  { position: [-13, 10, 18], lookAt: [1, 1.5, -4], progress: 0 },
+  // Wide establishing shot: full isometric exhibition view matching reference
+  { position: [-12.5, 9.8, 17.5], lookAt: [1.2, 1.4, -3.8], progress: 0 },
   // Station 1: Digital Strategy
-  { position: [-11, 4.8, 11], lookAt: [-7, 2.2, 4], progress: 0.1 },
-  // Smooth transition 1→2
-  { position: [-6.5, 6.2, 9], lookAt: [-2.5, 2.0, 2], progress: 0.18 },
+  { position: [-10.5, 4.6, 10.5], lookAt: [-6.8, 2.3, 3.8], progress: 0.1 },
+  // Transition 1→2
+  { position: [-6.2, 5.8, 8.8], lookAt: [-2.2, 1.9, 2.2], progress: 0.18 },
   // Station 2: Web Development
-  { position: [-3.5, 5.2, 7], lookAt: [0.5, 2.8, 0], progress: 0.26 },
-  // Smooth transition 2→3
-  { position: [1.5, 6.5, 6], lookAt: [5.5, 2.5, -0.5], progress: 0.35 },
+  { position: [-3.2, 5.0, 6.8], lookAt: [0.2, 2.7, -0.2], progress: 0.26 },
+  // Transition 2→3
+  { position: [1.2, 6.2, 5.8], lookAt: [5.2, 2.4, -0.6], progress: 0.35 },
   // Station 3: UI/UX Design
-  { position: [4.5, 5.8, 5], lookAt: [8.5, 3.2, -1.5], progress: 0.44 },
-  // Smooth transition 3→4
-  { position: [3, 6.8, 1], lookAt: [-2, 2.2, -5], progress: 0.52 },
+  { position: [4.4, 5.6, 4.8], lookAt: [8.2, 3.1, -1.8], progress: 0.44 },
+  // Transition 3→4
+  { position: [2.8, 6.5, 0.8], lookAt: [-1.8, 2.1, -4.8], progress: 0.52 },
   // Station 4: Social Media
-  { position: [-2.5, 4.8, -3.5], lookAt: [-6.5, 2.0, -8.5], progress: 0.6 },
-  // Smooth transition 4→5
-  { position: [-0.5, 6.2, -5], lookAt: [1, 2.2, -9.5], progress: 0.68 },
+  { position: [-2.4, 4.7, -3.2], lookAt: [-6.2, 2.0, -8.2], progress: 0.6 },
+  // Transition 4→5
+  { position: [-0.4, 6.0, -4.8], lookAt: [1.2, 2.1, -9.2], progress: 0.68 },
   // Station 5: Mobile App
-  { position: [-1.5, 5.0, -6.5], lookAt: [2.5, 2.6, -11.5], progress: 0.76 },
-  // Smooth transition 5→6
-  { position: [4.5, 6.5, -8.5], lookAt: [8.5, 2.2, -13], progress: 0.84 },
+  { position: [-1.4, 4.9, -6.2], lookAt: [2.2, 2.5, -11.2], progress: 0.76 },
+  // Transition 5→6
+  { position: [4.2, 6.2, -8.2], lookAt: [8.2, 2.1, -12.8], progress: 0.84 },
   // Station 6: Software Development
-  { position: [7.5, 4.8, -9.5], lookAt: [11.5, 2.4, -14.5], progress: 0.92 },
-  // Final pullback
-  { position: [11, 9.5, -5], lookAt: [2, 1.2, -8], progress: 1 },
+  { position: [7.2, 4.7, -9.2], lookAt: [11.2, 2.3, -14.2], progress: 0.92 },
+  // Final pullback: majestic view of completed world
+  { position: [10.5, 9.2, -4.8], lookAt: [2.2, 1.2, -7.8], progress: 1 },
 ];
 
-/** Total scroll height for the pinned section (in vh units) */
 export const SCROLL_HEIGHT_VH = 450;
-
-/** Minimum screen width for full 3D experience */
 export const DESKTOP_MIN = 901;
