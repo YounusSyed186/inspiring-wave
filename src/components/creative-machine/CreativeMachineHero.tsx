@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
-import { CreativeMachineCanvas } from './CreativeMachineCanvas'
 import { layoutFor, win, type Layout } from './motion'
 import './creative-machine.css'
+
+const CreativeMachineCanvas = lazy(() => import('./CreativeMachineCanvas').then(module => ({ default: module.CreativeMachineCanvas })))
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
 
@@ -13,7 +14,7 @@ function CreativeMachineFallback() {
   return (
     <div className="cm-fallback" aria-hidden="true">
       <div className="cm-fallback-card">
-        <img src="/assets/architecture.webp" alt="" />
+        <img src="/assets/hero/machine-poster.webp" alt="" />
       </div>
     </div>
   )
@@ -27,7 +28,6 @@ export function CreativeMachineHero() {
   const copyRef = useRef<HTMLParagraphElement>(null)
   const ctasRef = useRef<HTMLDivElement>(null)
   const noteRef = useRef<HTMLDivElement>(null)
-  const cueRef = useRef<HTMLButtonElement>(null)
 
   const progressRef = useRef(0)
   const [layout, setLayout] = useState<Layout>(() =>
@@ -70,7 +70,7 @@ export function CreativeMachineHero() {
   useGSAP(
     () => {
       const el = heroRef.current
-      if (!el || reducedMotion) {
+      if (!el || reducedMotion || webglFailed) {
         progressRef.current = 0
         return
       }
@@ -78,14 +78,14 @@ export function CreativeMachineHero() {
       const distanceMultiplier =
         layout === 'desktop' ? 3.8 : layout === 'tablet' ? 2.8 : 2.0
 
+      const manifesto = document.getElementById("manifesto")
       const applyDomProgress = (p: number) => {
-        // Stage 01 (0-20%): scroll cue fades out
-        if (cueRef.current) {
-          const cueAlpha = 1 - win(p, 0.04, 0.18)
-          cueRef.current.style.opacity = String(cueAlpha)
-          cueRef.current.style.transform = `translate3d(0, ${(1 - cueAlpha) * 14}px, 0)`
-          cueRef.current.style.pointerEvents = cueAlpha > 0.1 ? 'auto' : 'none'
+        // Keep the original tear stage framed inside the doorway until the pin releases.
+        if (manifesto) {
+          const remaining = Math.min(0.25, 1 - p) * distanceMultiplier * window.innerHeight
+          manifesto.style.translate = remaining > 0 ? `0 -${remaining}px` : ''
         }
+        el.style.setProperty('--tear-opacity', String(1 - win(p, 0.2, 0.4)))
 
         // Stage 02 (20-45%): supporting copy, CTAs, kicker, and studio note exit
         const metaFade = 1 - win(p, 0.2, 0.36)
@@ -94,7 +94,7 @@ export function CreativeMachineHero() {
         }
         if (noteRef.current) {
           noteRef.current.style.opacity = String(metaFade)
-          noteRef.current.style.transform = `rotate(3.2deg) translate3d(0, ${-16 * (1 - metaFade)}px, 0)`
+          noteRef.current.style.transform = `rotate(-10deg) translate3d(0, ${-16 * (1 - metaFade)}px, 0)`
         }
 
         const copyFade = 1 - win(p, 0.22, 0.4)
@@ -103,6 +103,7 @@ export function CreativeMachineHero() {
           copyRef.current.style.transform = `translate3d(0, ${-14 * (1 - copyFade)}px, 0)`
         }
         if (ctasRef.current) {
+          ctasRef.current.inert = copyFade < 0.05
           ctasRef.current.style.opacity = String(copyFade)
           ctasRef.current.style.transform = `translate3d(0, ${-10 * (1 - copyFade)}px, 0)`
         }
@@ -120,7 +121,7 @@ export function CreativeMachineHero() {
 
         // Stage 05-06 (75-100%): canvas fades out cleanly onto the real #manifesto underneath
         if (canvasWrapRef.current) {
-          const fadeOut = win(p, 0.85, 0.985)
+          const fadeOut = win(p, 0.77, 0.94)
           canvasWrapRef.current.style.opacity = String(1 - fadeOut)
         }
 
@@ -135,6 +136,7 @@ export function CreativeMachineHero() {
         pinSpacing: true,
         scrub: 0.9,
         invalidateOnRefresh: true,
+        onToggle: self => el.classList.toggle("cm-pinned", self.isActive),
         onUpdate: (self) => {
           progressRef.current = self.progress
           applyDomProgress(self.progress)
@@ -147,15 +149,15 @@ export function CreativeMachineHero() {
 
       return () => {
         st.kill()
+        manifesto?.style.removeProperty('translate')
+        if (ctasRef.current) ctasRef.current.inert = false
+        for (const node of [kickerRef, noteRef, copyRef, ctasRef, headlineRef, canvasWrapRef]) node.current?.removeAttribute('style')
+        el.style.removeProperty('--tear-opacity')
+        el.classList.remove('cm-hero--inactive', 'cm-pinned')
       }
     },
-    { scope: heroRef, dependencies: [layout, reducedMotion] },
+    { scope: heroRef, revertOnUpdate: true, dependencies: [layout, reducedMotion, webglFailed] },
   )
-
-  const handleDiscoverClick = useCallback(() => {
-    const step = Math.round(window.innerHeight * 0.95)
-    window.scrollBy({ top: step, behavior: reducedMotion ? 'auto' : 'smooth' })
-  }, [reducedMotion])
 
   const handleContextLost = useCallback(() => {
     setWebglFailed(true)
@@ -164,20 +166,20 @@ export function CreativeMachineHero() {
   return (
     <section
       ref={heroRef}
-      className="creative-machine-hero cm-hero"
+      className={`creative-machine-hero cm-hero${webglFailed ? " cm-static" : ""}`}
       aria-labelledby="hero-title"
     >
       <div ref={canvasWrapRef} className="cm-canvas-wrap">
-        {webglFailed ? (
+        {webglFailed || reducedMotion ? (
           <CreativeMachineFallback />
         ) : (
-          <CreativeMachineCanvas
+          <Suspense fallback={<CreativeMachineFallback />}><CreativeMachineCanvas
             progressRef={progressRef}
             layout={layout}
             reducedMotion={reducedMotion}
             isVisible={isVisible}
             onContextLost={handleContextLost}
-          />
+          /></Suspense>
         )}
       </div>
 
@@ -237,21 +239,6 @@ export function CreativeMachineHero() {
           <br />
           STUDIO
         </div>
-
-        <button
-          ref={cueRef}
-          type="button"
-          className="cm-scroll-cue"
-          onClick={handleDiscoverClick}
-          aria-label="Scroll to discover the Creative Machine"
-        >
-          <span className="cm-scroll-ring">
-            <span className="cm-scroll-dot" aria-hidden="true">
-              ↓
-            </span>
-          </span>
-          <span className="cm-scroll-label">SCROLL TO DISCOVER</span>
-        </button>
       </div>
     </section>
   )
