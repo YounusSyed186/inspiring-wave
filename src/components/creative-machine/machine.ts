@@ -630,74 +630,60 @@ export class CreativeMachine {
   }
 
   /* ------------------------------------------------------------------ */
-  /* G. exit: luminous transition threshold & exploding angular shards  */
+  /* G. exit: doorway + alpha window onto the manifesto                 */
   /* ------------------------------------------------------------------ */
 
   private buildExit() {
+    const { steel } = this.m
+    const wallZ = EXIT_Z + 2.0
+    const dx = 1.25
+    const dy0 = -1.65
+    const dy1 = 2.05
+    const wall = new THREE.ExtrudeGeometry(rectRing(-9, -6, 9, 7, -dx, dy0, dx, dy1), { depth: 0.3, bevelEnabled: false })
+    wall.translate(0, 0, wallZ - 0.15)
+    this.add(this.exit, wall, steel)
+    const trim = mergeGeometries([
+      bar(-dx, dy0, dx, dy0, wallZ + 0.17, 0.05, 0.03),
+      bar(-dx, dy0, -dx, dy1, wallZ + 0.17, 0.05, 0.03),
+      bar(dx, dy0, dx, dy1, wallZ + 0.17, 0.05, 0.03),
+    ])!
+    this.add(this.exit, trim, this.doorGlow.mat)
+    const lintel = this.add(this.exit, bar(-dx, dy1, dx, dy1, wallZ + 0.17, 0.05, 0.03), this.limeGlow.mat)
+    void lintel
+
+    // The window: writes transparent black, punching through the canvas so
+    // the real DOM (cream veil + manifesto) is seen at the end of the corridor.
+    const windowMat = new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.NoBlending,
+      fog: false,
+      toneMapped: false,
+    })
+    const win = this.add(this.exit, new THREE.PlaneGeometry(40, 30), windowMat, 'manifesto-window')
+    win.position.set(0, TUNNEL_Y, EXIT_Z)
+    win.renderOrder = 10
+
+    // fragments of the machine drifting just beyond the doorway
     const { cobalt, cream } = this.m
     const checker = this.tex(checkerTexture(4))
-    const checkerMat = new THREE.MeshStandardMaterial({ map: checker, roughness: 0.55, side: THREE.DoubleSide })
-    const halftone = this.tex(halftoneTexture(true))
-    const halftoneMat = new THREE.MeshStandardMaterial({ map: halftone, roughness: 0.6, side: THREE.DoubleSide })
+    const checkerMat = new THREE.MeshStandardMaterial({ map: checker, roughness: 0.6, side: THREE.DoubleSide })
     const ribbonBit = new THREE.MeshStandardMaterial({ map: this.ribbonTex, roughness: 0.6, side: THREE.DoubleSide })
-
-    // Helper to generate sharp angular polygon shards
-    const triangleShard = (w: number, h: number, d = 0.05) => {
-      const s = new THREE.Shape()
-      s.moveTo(-w / 2, -h / 2)
-      s.lineTo(w / 2, -h * 0.25)
-      s.lineTo(w * 0.12, h / 2)
-      s.closePath()
-      const g = new THREE.ExtrudeGeometry(s, { depth: d, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 1 })
-      g.center()
-      return g
-    }
-
-    const trapezoidShard = (w1: number, w2: number, h: number, d = 0.05) => {
-      const s = new THREE.Shape()
-      s.moveTo(-w1 / 2, -h / 2)
-      s.lineTo(w1 / 2, -h / 2)
-      s.lineTo(w2 / 2, h / 2)
-      s.lineTo(-w2 * 0.85, h / 2)
-      s.closePath()
-      const g = new THREE.ExtrudeGeometry(s, { depth: d, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 1 })
-      g.center()
-      return g
-    }
-
-    // High-energy shards positioned around the corridor threshold that burst outward
-    const shardDefs: [THREE.BufferGeometry, Mat, [number, number, number], [number, number, number], [number, number, number]][] = [
-      // Top-left burst
-      [triangleShard(1.8, 2.2), cobalt, [-1.8, 1.8, EXIT_Z + 3.0], [-1.2, 1.0, 0.4], [0.5, 0.4, 0.6]],
-      [trapezoidShard(1.4, 0.8, 1.6), checkerMat, [-2.2, 0.9, EXIT_Z + 2.0], [-1.4, 0.5, 0.2], [-0.4, 0.6, -0.3]],
-      // Top-right burst
-      [triangleShard(2.0, 2.4), checkerMat, [1.9, 2.0, EXIT_Z + 2.8], [1.3, 1.1, 0.3], [-0.6, 0.5, 0.4]],
-      [trapezoidShard(1.2, 0.7, 1.4), halftoneMat, [2.3, 0.8, EXIT_Z + 1.8], [1.4, 0.4, 0.2], [0.4, -0.5, 0.5]],
-      // Bottom-left burst
-      [triangleShard(1.6, 1.9), ribbonBit, [-1.9, -1.6, EXIT_Z + 2.5], [-1.1, -0.9, 0.3], [0.3, -0.4, -0.5]],
-      [trapezoidShard(1.5, 0.9, 1.5), cobalt, [-1.4, -2.1, EXIT_Z + 1.5], [-0.9, -1.2, 0.2], [-0.5, 0.3, 0.4]],
-      // Bottom-right burst
-      [triangleShard(1.9, 2.0), cream, [1.8, -1.7, EXIT_Z + 2.4], [1.2, -1.0, 0.3], [-0.4, 0.5, 0.3]],
-      [trapezoidShard(1.3, 0.8, 1.6), checkerMat, [2.2, -1.2, EXIT_Z + 1.6], [1.3, -0.7, 0.2], [0.5, -0.4, -0.4]],
-      // Perimeter framing shards
-      [triangleShard(1.3, 1.5), halftoneMat, [-0.2, 2.4, EXIT_Z + 2.2], [0.1, 1.4, 0.3], [0.3, 0.6, 0.2]],
-      [trapezoidShard(1.8, 1.0, 0.9), cobalt, [0.3, -2.3, EXIT_Z + 2.0], [0.2, -1.3, 0.2], [-0.3, -0.5, 0.5]],
-      [triangleShard(1.2, 1.4), ribbonBit, [2.5, 0.1, EXIT_Z + 2.6], [1.5, 0.1, 0.3], [0.4, 0.3, -0.5]],
-      [triangleShard(1.1, 1.3), cobalt, [-2.6, 0.0, EXIT_Z + 2.4], [-1.5, 0.1, 0.3], [-0.4, -0.3, 0.4]],
+    const defs: [THREE.BufferGeometry, Mat, [number, number, number], [number, number, number], [number, number, number]][] = [
+      [new THREE.BoxGeometry(0.9, 1.3, 0.04), cobalt, [-1.05, 1.35, EXIT_Z + 1.2], [-1, 0.6, 0.2], [0.3, 0.5, 0.2]],
+      [new THREE.PlaneGeometry(0.7, 0.7), checkerMat, [1.0, 1.25, EXIT_Z + 0.9], [1, 0.7, 0.1], [0.2, -0.4, 0.5]],
+      [new THREE.BoxGeometry(1.4, 0.32, 0.03), ribbonBit, [-0.95, -1.0, EXIT_Z + 1.0], [-1, -0.5, 0.2], [0.1, 0.4, -0.6]],
+      [new THREE.BoxGeometry(0.5, 0.9, 0.04), cream, [1.05, -0.95, EXIT_Z + 1.3], [1, -0.6, 0.2], [-0.4, 0.3, 0.3]],
+      [new THREE.PlaneGeometry(0.42, 0.42), checkerMat, [0.55, 1.62, EXIT_Z + 1.5], [0.4, 1, 0.2], [0.5, 0.2, -0.3]],
+      [new THREE.BoxGeometry(0.28, 0.6, 0.03), cobalt, [-0.45, -1.45, EXIT_Z + 1.5], [-0.3, -1, 0.2], [0.2, -0.5, 0.4]],
     ]
-
-    shardDefs.forEach(([geo, mat, pos, dir, spin], i) => {
+    defs.forEach(([geo, mat, pos, dir, spin], i) => {
       const mesh = this.add(this.exit, geo, mat)
       mesh.position.set(...pos)
-      const baseRot = new THREE.Euler(0.2 * (i % 3) - 0.1, 0.35 * ((i % 2) * 2 - 1), 0.25 * (i - 5.5))
+      const baseRot = new THREE.Euler(0.15 * (i % 3) - 0.1, 0.4 * ((i % 2) * 2 - 1), 0.2 * (i - 2.5))
       mesh.rotation.copy(baseRot)
-      this.shards.push({
-        mesh,
-        base: new THREE.Vector3(...pos),
-        dir: new THREE.Vector3(...dir).normalize(),
-        spin: new THREE.Vector3(...spin),
-        baseRot,
-      })
+      this.shards.push({ mesh, base: new THREE.Vector3(...pos), dir: new THREE.Vector3(...dir).normalize(), spin: new THREE.Vector3(...spin), baseRot })
     })
   }
 
@@ -812,16 +798,12 @@ export class CreativeMachine {
     this.exitLight.intensity = 34 * win(p, 0.6, 0.82)
     setGlow(this.doorGlow, 0.7 + 0.9 * enter)
 
-    // G. high-velocity angular shards explode outward toward screen corners
-    const explode = easeInOut(range(p, 0.65, 0.88))
+    // G. fragments drift out past the edges as the manifesto takes over
+    const out = easeIn(rev)
     for (const s of this.shards) {
-      s.mesh.position.copy(s.base).addScaledVector(s.dir, 7.8 * explode)
-      s.mesh.position.y += 0.04 * Math.sin(t * 1.1 + s.base.x * 3) * idle
-      s.mesh.rotation.set(
-        s.baseRot.x + s.spin.x * explode * 3.2,
-        s.baseRot.y + s.spin.y * explode * 3.2,
-        s.baseRot.z + s.spin.z * explode * 3.2,
-      )
+      s.mesh.position.copy(s.base).addScaledVector(s.dir, 3.2 * out)
+      s.mesh.position.y += 0.04 * Math.sin(t * 0.8 + s.base.x * 3) * idle
+      s.mesh.rotation.set(s.baseRot.x + s.spin.x * out * 2, s.baseRot.y + s.spin.y * out * 2, s.baseRot.z + s.spin.z * out * 2)
     }
   }
 

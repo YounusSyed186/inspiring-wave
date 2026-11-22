@@ -4,8 +4,6 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { layoutFor, win, type Layout } from './motion'
-import { PaperTearCurtain } from './PaperTearCurtain'
-import { ManifestoRevealCard } from './ManifestoRevealCard'
 import './creative-machine.css'
 
 const CreativeMachineCanvas = lazy(() => import('./CreativeMachineCanvas').then(module => ({ default: module.CreativeMachineCanvas })))
@@ -30,10 +28,6 @@ export function CreativeMachineHero() {
   const copyRef = useRef<HTMLParagraphElement>(null)
   const ctasRef = useRef<HTMLDivElement>(null)
   const noteRef = useRef<HTMLDivElement>(null)
-  const curtainStageRef = useRef<HTMLDivElement>(null)
-  const topFlapRef = useRef<HTMLDivElement>(null)
-  const bottomFlapRef = useRef<HTMLDivElement>(null)
-  const cardRef = useRef<HTMLDivElement>(null)
 
   const progressRef = useRef(0)
   const [layout, setLayout] = useState<Layout>(() =>
@@ -84,7 +78,13 @@ export function CreativeMachineHero() {
       const distanceMultiplier =
         layout === 'desktop' ? 3.8 : layout === 'tablet' ? 2.8 : 2.0
 
+      const manifesto = document.getElementById("manifesto")
       const applyDomProgress = (p: number) => {
+        // Keep the original tear stage framed inside the doorway until the pin releases.
+        if (manifesto) {
+          const remaining = Math.min(0.25, 1 - p) * distanceMultiplier * window.innerHeight
+          manifesto.style.translate = remaining > 0 ? `0 -${remaining}px` : ''
+        }
         el.style.setProperty('--tear-opacity', String(1 - win(p, 0.2, 0.4)))
 
         // Stage 02 (20-45%): supporting copy, CTAs, kicker, and studio note exit
@@ -119,40 +119,9 @@ export function CreativeMachineHero() {
           headlineRef.current.style.transform = `translate3d(${tx.toFixed(1)}px, 0, 0) scale(${sc.toFixed(4)})`
         }
 
-        // Stage 05 (65-92%): Paper Tear Reveal Curtain & Manifesto Reveal Card
-        const cardAlpha = win(p, 0.66, 0.76) * (1 - win(p, 0.94, 0.99))
-        if (cardRef.current) {
-          cardRef.current.style.opacity = String(cardAlpha)
-          const scale = 0.94 + 0.06 * win(p, 0.66, 0.84)
-          cardRef.current.style.transform = `scale(${scale.toFixed(4)})`
-          cardRef.current.style.pointerEvents = p >= 0.88 ? 'auto' : 'none'
-        }
-
-        const curtainAlpha = win(p, 0.62, 0.68) * (1 - win(p, 0.92, 0.98))
-        if (curtainStageRef.current) {
-          if (curtainAlpha > 0.01) {
-            curtainStageRef.current.style.display = 'block'
-            curtainStageRef.current.style.opacity = String(Math.min(1, curtainAlpha * 1.6))
-          } else {
-            curtainStageRef.current.style.display = 'none'
-          }
-        }
-
-        const tearProgress = win(p, 0.68, 0.90)
-        if (topFlapRef.current) {
-          const ty = -108 * tearProgress
-          const rot = -3.5 * tearProgress
-          topFlapRef.current.style.transform = `translate3d(0, ${ty.toFixed(1)}%, 0) rotate(${rot.toFixed(2)}deg)`
-        }
-        if (bottomFlapRef.current) {
-          const ty = 108 * tearProgress
-          const rot = 2.8 * tearProgress
-          bottomFlapRef.current.style.transform = `translate3d(0, ${ty.toFixed(1)}%, 0) rotate(${rot.toFixed(2)}deg)`
-        }
-
-        // Canvas fades out smoothly as the paper tear opens
+        // Stage 05-06 (75-100%): canvas fades out cleanly onto the real #manifesto underneath
         if (canvasWrapRef.current) {
-          const fadeOut = win(p, 0.76, 0.92)
+          const fadeOut = win(p, 0.77, 0.94)
           canvasWrapRef.current.style.opacity = String(1 - fadeOut)
         }
 
@@ -180,19 +149,9 @@ export function CreativeMachineHero() {
 
       return () => {
         st.kill()
+        manifesto?.style.removeProperty('translate')
         if (ctasRef.current) ctasRef.current.inert = false
-        for (const node of [
-          kickerRef,
-          noteRef,
-          copyRef,
-          ctasRef,
-          headlineRef,
-          canvasWrapRef,
-          cardRef,
-          curtainStageRef,
-          topFlapRef,
-          bottomFlapRef,
-        ]) node.current?.removeAttribute('style')
+        for (const node of [kickerRef, noteRef, copyRef, ctasRef, headlineRef, canvasWrapRef]) node.current?.removeAttribute('style')
         el.style.removeProperty('--tear-opacity')
         el.classList.remove('cm-hero--inactive', 'cm-pinned')
       }
@@ -281,16 +240,6 @@ export function CreativeMachineHero() {
           STUDIO
         </div>
       </div>
-
-      {/* Stage 05 Authentic Manifesto Reveal Card */}
-      <ManifestoRevealCard cardRef={cardRef} />
-
-      {/* Stage 05 Jagged Paper Tear Curtains */}
-      <PaperTearCurtain
-        stageRef={curtainStageRef}
-        topFlapRef={topFlapRef}
-        bottomFlapRef={bottomFlapRef}
-      />
     </section>
   )
 }
