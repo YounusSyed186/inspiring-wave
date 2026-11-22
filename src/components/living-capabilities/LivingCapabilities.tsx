@@ -1,197 +1,188 @@
-import React, { useRef, useState, useCallback, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useGSAP } from '@gsap/react'
-import { CAPABILITY_SERVICES, getActiveServiceIndex } from './types'
-import { CapabilitiesNav } from './CapabilitiesNav'
-import { CapabilitiesCanvas } from './CapabilitiesCanvas'
-import { CapabilitiesProgress } from './CapabilitiesProgress'
-import './living-capabilities.css'
+/**
+ * Living Capabilities – Main Component
+ *
+ * Assembles the scroll-pinned 3D service world.
+ * Uses GSAP ScrollTrigger to pin and derive progress.
+ */
+import { useRef, useState, useCallback, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { CapabilitiesCanvas } from './CapabilitiesCanvas';
+import { CapabilitiesNav } from './CapabilitiesNav';
+import { CapabilitiesProgress } from './CapabilitiesProgress';
+import { STATIONS, SCROLL_HEIGHT_VH, DESKTOP_MIN } from './config';
+import { getActiveStation } from './animations';
+import { ScrollTrigger, useGSAP } from '../../motion';
+import './living-capabilities.css';
 
-gsap.registerPlugin(ScrollTrigger, useGSAP)
+export function LivingCapabilities() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
+  const [isPinned, setIsPinned] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= DESKTOP_MIN : false
+  );
 
-export const LivingCapabilities: React.FC = () => {
-  const sectionRef = useRef<HTMLElement>(null)
-  const stageRef = useRef<HTMLDivElement>(null)
-  const stRef = useRef<ScrollTrigger | null>(null)
+  const activeStation = getActiveStation(progress);
+  const station = STATIONS[activeStation];
 
-  const [progress, setProgress] = useState(0)
-  const [activeIdx, setActiveIdx] = useState(0)
-  const [isReduced, setIsReduced] = useState(() =>
-    typeof window !== 'undefined'
-      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      : false,
-  )
-
+  // Check desktop on resize
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const onMotionChange = () => setIsReduced(mq.matches)
-    mq.addEventListener('change', onMotionChange)
-    return () => mq.removeEventListener('change', onMotionChange)
-  }, [])
+    const check = () => setIsDesktop(window.innerWidth >= DESKTOP_MIN);
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
-  // Master GSAP ScrollTrigger
-  useGSAP(
-    () => {
-      const section = sectionRef.current
-      const stage = stageRef.current
-      if (!section || !stage || isReduced) return
+  // ScrollTrigger pin
+  useGSAP(() => {
+    if (!isDesktop) return;
+    const section = sectionRef.current;
+    if (!section) return;
 
-      const isMobile = window.innerWidth < 768
-      const isTablet = window.innerWidth < 1200
-      const scrollMultiplier = isMobile ? 2.8 : isTablet ? 4.2 : 5.5
+    const trigger = ScrollTrigger.create({
+      id: 'lc-trigger',
+      trigger: section,
+      start: 'top top',
+      end: () => `+=${Math.round(window.innerHeight * (SCROLL_HEIGHT_VH / 100))}`,
+      pin: viewportRef.current!,
+      pinSpacing: true,
+      scrub: 0.5,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        setProgress(self.progress);
+        setIsPinned(self.isActive);
+      },
+      onRefresh: (self) => {
+        setProgress(self.progress);
+        setIsPinned(self.isActive);
+      },
+      onEnter: () => setIsPinned(true),
+      onLeave: () => setIsPinned(false),
+      onEnterBack: () => setIsPinned(true),
+      onLeaveBack: () => setIsPinned(false),
+    });
 
-      const st = ScrollTrigger.create({
-        trigger: section,
-        start: 'top top',
-        end: () => `+=${Math.round(window.innerHeight * scrollMultiplier)}`,
-        pin: stage,
-        pinSpacing: true,
-        scrub: 0.8,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          const p = self.progress
-          setProgress(p)
-          const idx = getActiveServiceIndex(p)
-          setActiveIdx(idx)
-        },
-      })
+    return () => trigger.kill();
+  }, { dependencies: [isDesktop] });
 
-      stRef.current = st
+  // Navigate to station
+  const navigateToStation = useCallback((index: number) => {
+    const section = sectionRef.current;
+    if (!section) return;
 
-      return () => {
-        st.kill()
-        stRef.current = null
-      }
-    },
-    { scope: sectionRef, dependencies: [isReduced] },
-  )
+    const st = ScrollTrigger.getById('lc-trigger');
+    const startY = st ? st.start : (section.getBoundingClientRect().top + window.scrollY);
+    const totalScroll = st ? (st.end - st.start) : (SCROLL_HEIGHT_VH * window.innerHeight / 100);
+    const midpoint = (STATIONS[index].scrollRange[0] + STATIONS[index].scrollRange[1]) / 2;
+    const targetScroll = startY + totalScroll * midpoint;
 
-  // Direct scene navigation (clicking nav rail or timeline dot)
-  const handleSelectService = useCallback(
-    (pTarget: number) => {
-      if (isReduced) {
-        const idx = getActiveServiceIndex(pTarget)
-        setActiveIdx(idx)
-        setProgress(pTarget)
-        return
-      }
-
-      const st = stRef.current
-      if (!st) return
-
-      const targetY = st.start + pTarget * (st.end - st.start)
-      window.scrollTo({
-        top: Math.round(targetY),
-        behavior: 'smooth',
-      })
-    },
-    [isReduced],
-  )
-
-  // Advance to next stage or next section
-  const handleAdvance = useCallback(() => {
-    if (activeIdx < CAPABILITY_SERVICES.length - 1) {
-      handleSelectService(CAPABILITY_SERVICES[activeIdx + 1].pCenter)
+    const lenis = (window as any).__lenis;
+    if (lenis) {
+      lenis.scrollTo(targetScroll, { duration: 1.2 });
     } else {
-      const nextEl = document.getElementById('method') || document.querySelector('.method')
-      if (nextEl) {
-        nextEl.scrollIntoView({ behavior: 'smooth' })
-      } else {
-        window.scrollBy({ top: window.innerHeight, behavior: 'smooth' })
-      }
+      window.scrollTo({ top: targetScroll, behavior: 'smooth' });
     }
-  }, [activeIdx, handleSelectService])
-
-  const activeService = CAPABILITY_SERVICES[activeIdx]
+  }, []);
 
   return (
     <section
       ref={sectionRef}
+      className="lc-section"
       id="services"
-      className="lca-section capabilities section"
-      aria-label="Capabilities — What We Build"
+      aria-label="Our capabilities"
     >
-      <div ref={stageRef} className="lca-stage-pinned">
-        {/* TOP ROW: Section Identifier + Oversized Headline + Statement */}
-        <header className="lca-header-row">
-          <div className="lca-index-marker">
-            <span>04 /</span>
-            <span>SERVICES</span>
-          </div>
-
-          <div className="lca-main-title-wrap">
-            <h2 className="lca-main-title">
-              <span className="lca-title-black">WHAT WE</span>
-              <span className="lca-title-blue">BUILD</span>
-            </h2>
-            <div className="lca-tape-pill">
-              <span>FOR A DIGITAL WORLD IN MOTION.</span>
-            </div>
-          </div>
-
-          <aside className="lca-statement-box">
-            <p>
-              End-to-end digital capabilities that turn ideas into scalable, impactful experiences.
-            </p>
-          </aside>
-        </header>
-
-        {/* CENTER ROW: 6-Item Rail + Active Service Card + Living Canvas */}
-        <main className="lca-center-grid">
-          {/* Left: 6-Item Service Navigation Rail */}
-          <CapabilitiesNav
-            services={CAPABILITY_SERVICES}
-            activeIdx={activeIdx}
-            onSelect={handleSelectService}
-          />
-
-          {/* Center: Active Service Editorial Focus Card */}
-          <article
-            className="lca-active-content"
-            id={`lca-panel-${activeService.num}`}
-            role="tabpanel"
-            aria-labelledby={`lca-tab-${activeService.num}`}
-          >
-            <div className="lca-service-kicker">
-              <span className="lca-service-bullet" />
-              <span>{activeService.num} // SERVICE</span>
-            </div>
-
-            <div className="lca-service-title-lockup">
-              <h3 className="lca-service-title">{activeService.title}</h3>
-              <div className="lca-lime-brush" />
-            </div>
-
-            <p className="lca-service-desc">{activeService.summary}</p>
-
-            <Link
-              to={`/services/${activeService.slug}`}
-              className="lca-explore-cta"
-            >
-              <span>EXPLORE SERVICE</span>
-              <span aria-hidden="true">↗</span>
-            </Link>
-          </article>
-
-          {/* Right: The Living Graphical Canvas */}
+      {/* Pinned viewport */}
+      <div ref={viewportRef} className="lc-viewport">
+        {/* 3D Canvas */}
+        {isDesktop && (
           <CapabilitiesCanvas
             progress={progress}
-            activeIdx={activeIdx}
+            containerRef={viewportRef}
           />
-        </main>
+        )}
 
-        {/* BOTTOM ROW: Timeline Progress Bar + Scroll Explorer */}
-        <CapabilitiesProgress
-          services={CAPABILITY_SERVICES}
-          activeIdx={activeIdx}
-          progress={progress}
-          onSelect={handleSelectService}
-          onAdvance={handleAdvance}
+        {/* DOM Overlay */}
+        <div className="lc-overlay">
+          {/* Header typography (visible in overview and first phase) */}
+          <div className={`lc-header ${progress > 0.08 ? 'lc-header--scrolled' : ''}`}>
+            <div className="lc-badge-row">
+              <span className="lc-marker">04 / CAPABILITIES</span>
+            </div>
+            <h2 className="lc-title">
+              <span className="lc-title-line">SERVICES IN</span>
+              <em className="lc-title-em">motion.</em>
+            </h2>
+            <p className="lc-subtitle">
+              Integrated digital capabilities that connect strategy,
+              design, and technology — built to create real
+              momentum for your business.
+            </p>
+            <Link to="/services" className="lc-cta-btn">
+              EXPLORE CAPABILITIES <span className="lc-cta-arrow">↗</span>
+            </Link>
+          </div>
+
+          {/* Active station info panel (frosted editorial card) */}
+          <div className={`lc-station-info ${isPinned && progress > 0.04 ? 'visible' : ''}`}>
+            <div className="lc-station-badge">
+              <span className="lc-badge-tag">{String(activeStation + 1).padStart(2, '0')}</span>
+              <span className="lc-badge-discipline">DISCIPLINE</span>
+            </div>
+            <h3 className="lc-station-title">{station.title}</h3>
+            <p className="lc-station-summary">{station.summary}</p>
+            <div className="lc-station-deliverables">
+              {station.deliverables.map(d => (
+                <span key={d} className="lc-deliverable">{d}</span>
+              ))}
+            </div>
+            <Link to={`/services/${station.slug}`} className="lc-station-link">
+              EXPLORE SERVICE <span>→</span>
+            </Link>
+          </div>
+
+          {/* Bottom hint */}
+          <div className={`lc-scroll-hint ${progress > 0.04 ? 'hidden' : ''}`}>
+            <span>↓</span> SCROLL TO EXPLORE
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <CapabilitiesNav
+          activeStation={activeStation}
+          onNavigate={navigateToStation}
+          visible={isPinned && isDesktop}
         />
+
+        {/* Progress bar */}
+        <CapabilitiesProgress progress={progress} visible={isPinned} />
       </div>
+
+      {/* Mobile fallback */}
+      {!isDesktop && (
+        <div className="lc-mobile">
+          <div className="lc-mobile-header">
+            <span className="lc-marker">04 / CAPABILITIES</span>
+            <h2 className="lc-title">
+              <span className="lc-title-line">SERVICES IN</span>
+              <em className="lc-title-em">motion.</em>
+            </h2>
+          </div>
+          <div className="lc-mobile-grid">
+            {STATIONS.map((s, i) => (
+              <Link to={`/services/${s.slug}`} key={s.slug} className="lc-mobile-card">
+                <span className="lc-mobile-num">{String(i + 1).padStart(2, '0')}</span>
+                <div>
+                  <h3>{s.title}</h3>
+                  <p>{s.summary}</p>
+                </div>
+                <span className="lc-mobile-arrow">↗</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
-  )
+  );
 }
-export default LivingCapabilities
+
+export default LivingCapabilities;

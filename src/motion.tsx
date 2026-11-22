@@ -11,6 +11,10 @@ import { WaveMediaRenderer } from './motion/WaveMediaRenderer';
 export * from './motion/animations';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
+if (typeof window !== 'undefined') {
+  (window as any).gsap = gsap;
+  (window as any).ScrollTrigger = ScrollTrigger;
+}
 
 type MotionProviderProps = { children: ReactNode };
 
@@ -47,11 +51,13 @@ export function MotionProvider({ children }: MotionProviderProps) {
     };
     lenis?.on('scroll', ScrollTrigger.update);
     window.addEventListener('iw:rail-enter', settleForRail);
+    (window as any).__lenis = lenis;
     gsap.ticker.add(update);
     gsap.ticker.lagSmoothing(0);
     if (lenis) document.documentElement.classList.add('lenis-active');
 
     return () => {
+      (window as any).__lenis = null;
       document.documentElement.classList.remove('lenis-active');
       gsap.ticker.remove(update);
       window.removeEventListener('iw:rail-enter', settleForRail);
@@ -109,7 +115,7 @@ export function useHomepageMotion(scope: RefObject<HTMLElement | null>) {
       gsap.set('.reveal', { opacity: 1, y: 0 });
 
       const scenes = Array.from(scope.current?.children ?? [])
-        .filter((element): element is HTMLElement => element instanceof HTMLElement && element.matches('section') && !element.classList.contains('parallax-showcase') && !element.classList.contains('manifesto-section') && !element.classList.contains('capabilities'));
+        .filter((element): element is HTMLElement => element instanceof HTMLElement && element.matches('section') && !element.classList.contains('parallax-showcase') && !element.classList.contains('manifesto-section') && !element.classList.contains('lc-section'));
       scenes.forEach((incoming, index) => {
         if (!index) return;
         const transition = gsap.timeline({

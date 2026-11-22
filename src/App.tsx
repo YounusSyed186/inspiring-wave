@@ -529,20 +529,20 @@ function Contact() {
 function App() {
   const [menu, setMenu] = useState(false);
   return <MotionProvider>
-      <Header menu={menu} setMenu={setMenu} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/work" element={<Listing kind="work" />} />
-        <Route path="/work/:slug" element={<DetailPage type="work" />} />
-        <Route path="/services" element={<Listing kind="services" />} />
-        <Route path="/services/:slug" element={<DetailPage type="service" />} />
-        <Route path="/about" element={<Listing kind="about" />} />
-        <Route path="/journal" element={<Listing kind="journal" />} />
-        <Route path="/journal/:slug" element={<Listing kind="journal" />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="*" element={<Home />} />
-      </Routes>
-      <Footer />
+    <Header menu={menu} setMenu={setMenu} />
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/work" element={<Listing kind="work" />} />
+      <Route path="/work/:slug" element={<DetailPage type="work" />} />
+      <Route path="/services" element={<Listing kind="services" />} />
+      <Route path="/services/:slug" element={<DetailPage type="service" />} />
+      <Route path="/about" element={<Listing kind="about" />} />
+      <Route path="/journal" element={<Listing kind="journal" />} />
+      <Route path="/journal/:slug" element={<Listing kind="journal" />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="*" element={<Home />} />
+    </Routes>
+    <Footer />
   </MotionProvider>;
 }
 

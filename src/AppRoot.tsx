@@ -20,7 +20,8 @@ const preloaderThemes: RemixThemesInput = {
 
 export default function AppRoot() {
   const [loading, setLoading] = useState(
-    () => !preloaderStartedForDocument && !preloaderCompletedForDocument,
+    () => !preloaderStartedForDocument && !preloaderCompletedForDocument &&
+      !(typeof window !== 'undefined' && window.location.search.includes('skip-preloader')),
   );
   const completionHandled = useRef(false);
 

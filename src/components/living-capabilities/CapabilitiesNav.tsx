@@ -1,43 +1,35 @@
-import React from 'react'
-import { CapabilityService } from './types'
+/**
+ * Living Capabilities – Station Navigation
+ *
+ * Side navigation with station numbers and abbreviated titles.
+ * Clicking a station scrolls to its position in the timeline.
+ */
+import { STATIONS } from './config';
 
-export interface CapabilitiesNavProps {
-  services: CapabilityService[]
-  activeIdx: number
-  onSelect: (pTarget: number) => void
+interface Props {
+  activeStation: number;
+  onNavigate: (index: number) => void;
+  visible: boolean;
 }
 
-export const CapabilitiesNav: React.FC<CapabilitiesNavProps> = ({
-  services,
-  activeIdx,
-  onSelect,
-}) => {
+export function CapabilitiesNav({ activeStation, onNavigate, visible }: Props) {
+  if (!visible) return null;
+
   return (
-    <nav className="lca-nav-rail" aria-label="Capabilities index">
-      <ul className="lca-nav-list" role="tablist">
-        {services.map((s, i) => {
-          const isActive = i === activeIdx
-          return (
-            <li key={s.id} className="lca-nav-item" role="presentation">
-              <button
-                type="button"
-                role="tab"
-                id={`lca-tab-${s.num}`}
-                aria-selected={isActive}
-                aria-controls={`lca-panel-${s.num}`}
-                className={`lca-nav-btn ${isActive ? 'is-active' : ''}`}
-                onClick={() => onSelect(s.pCenter)}
-              >
-                <span className="lca-nav-num">{s.num}</span>
-                <span className="lca-nav-title">{s.title}</span>
-                {isActive && (
-                  <span className="lca-nav-brush" aria-hidden="true" />
-                )}
-              </button>
-            </li>
-          )
-        })}
-      </ul>
+    <nav className="lc-nav" aria-label="Service stations">
+      {STATIONS.map((station, i) => (
+        <button
+          key={station.slug}
+          className={`lc-nav-item ${i === activeStation ? 'active' : ''}`}
+          onClick={() => onNavigate(i)}
+          aria-current={i === activeStation ? 'step' : undefined}
+        >
+          <span className="lc-nav-num">{String(i + 1).padStart(2, '0')}</span>
+          <span className="lc-nav-label">{station.title.split(' ')[0]}</span>
+        </button>
+      ))}
     </nav>
-  )
+  );
 }
+
+export default CapabilitiesNav;
