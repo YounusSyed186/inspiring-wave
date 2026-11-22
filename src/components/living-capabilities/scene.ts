@@ -1,780 +1,679 @@
 /**
- * Living Capabilities – Architectural Scene Builder
+ * Living Capabilities – Multidimensional Editorial 3D Collage Scene Builder
  *
- * Cinema-grade 3D architectural landscape with studio lighting,
- * dynamic environment reflections, water caustics, and 6 high-fidelity
- * sculptural service installations matching the reference artwork.
+ * Implements the approved art-directed 3D composition matching media_1795368079976_6c362555.jpg:
+ * - Technical grid backdrop with glowing fluorescent lime halo and wireframe geodesic sphere
+ * - Central surreal monochrome sculpture portrait with sliced cumulus cloud planes
+ * - Dynamic electric cobalt blue satin and liquid silver ribbons
+ * - 6 unique 3D capability installations (Wave, Browser, Glass UI, Social Globe, Smartphone, Software Cubes)
+ * - Sweeping cream typography ribbon: STRATEGY / DESIGN / TECHNOLOGY / IN MOTION
  */
 import * as THREE from 'three';
 import { STATIONS } from './config';
 import { THEMES, type CapabilitiesTheme } from './types';
 
-/* ── Environment Map Generator ───────────────────────────────────── */
+export interface SceneResult {
+  scene: THREE.Scene;
+  stationGroup: THREE.Group[];
+  ribbonMesh: THREE.Mesh;
+  headGroup: THREE.Group;
+  bgGroup: THREE.Group;
+  cursorMesh: THREE.Mesh;
+  socialGroup: THREE.Group;
+  phoneGroup: THREE.Group;
+  cubesGroup: THREE.Group;
+  dispose: () => void;
+}
 
+/* ── Texture Loader Helper ───────────────────────────────────────── */
+const textureLoader = new THREE.TextureLoader();
+
+function loadSafeTexture(url: string, onLoad?: (t: THREE.Texture) => void): THREE.Texture {
+  return textureLoader.load(
+    url,
+    (t) => {
+      t.colorSpace = THREE.SRGBColorSpace;
+      if (onLoad) onLoad(t);
+    },
+    undefined,
+    () => {
+      // Fallback if loading fails
+    }
+  );
+}
+
+/* ── Studio Environment Map ──────────────────────────────────────── */
 export function createStudioEnvironment(renderer: THREE.WebGLRenderer, theme: CapabilitiesTheme): THREE.Texture {
   const pmrem = new THREE.PMREMGenerator(renderer);
   pmrem.compileEquirectangularShader();
 
   const envScene = new THREE.Scene();
-  envScene.background = new THREE.Color(theme === 'dark' ? '#04070b' : '#eae5da');
+  envScene.background = new THREE.Color(theme === 'dark' ? '#06080d' : '#f5f2ea');
 
-  // Overhead studio softbox
+  // Overhead softbox
   const topLight = new THREE.Mesh(
-    new THREE.PlaneGeometry(35, 35),
+    new THREE.PlaneGeometry(30, 30),
     new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })
   );
-  topLight.position.set(0, 20, 0);
+  topLight.position.set(0, 15, 0);
   topLight.rotation.x = Math.PI / 2;
   envScene.add(topLight);
 
   // Cobalt blue key accent light
   const sideLight = new THREE.Mesh(
-    new THREE.PlaneGeometry(25, 25),
+    new THREE.PlaneGeometry(20, 20),
     new THREE.MeshBasicMaterial({ color: 0x1945f5, side: THREE.DoubleSide })
   );
-  sideLight.position.set(-18, 10, -5);
+  sideLight.position.set(-15, 6, -2);
   sideLight.rotation.y = Math.PI / 2;
   envScene.add(sideLight);
 
-  // Warm rim light
-  const rimLight = new THREE.Mesh(
-    new THREE.PlaneGeometry(25, 25),
-    new THREE.MeshBasicMaterial({ color: theme === 'dark' ? 0xffea9f : 0xfffaea, side: THREE.DoubleSide })
+  // Fluorescent lime kicker light
+  const limeLight = new THREE.Mesh(
+    new THREE.PlaneGeometry(15, 15),
+    new THREE.MeshBasicMaterial({ color: 0xd8f03c, side: THREE.DoubleSide })
   );
-  rimLight.position.set(18, 12, 10);
-  rimLight.rotation.y = -Math.PI / 2;
-  envScene.add(rimLight);
+  limeLight.position.set(15, 8, 5);
+  limeLight.rotation.y = -Math.PI / 2;
+  envScene.add(limeLight);
 
   const envTexture = pmrem.fromScene(envScene, 0.04).texture;
   pmrem.dispose();
   return envTexture;
 }
 
-/* ── Material Helpers ────────────────────────────────────────────── */
-
-function createMaterials(theme: CapabilitiesTheme) {
-  const t = THEMES[theme];
-
-  return {
-    ground: new THREE.MeshStandardMaterial({
-      color: t.ground,
-      roughness: 0.65,
-      metalness: 0.05,
-    }),
-    platformBase: new THREE.MeshStandardMaterial({
-      color: t.platformBase,
-      roughness: 0.5,
-      metalness: 0.15,
-    }),
-    platformTop: new THREE.MeshStandardMaterial({
-      color: t.platformTop,
-      roughness: 0.35,
-      metalness: 0.2,
-    }),
-    water: new THREE.MeshStandardMaterial({
-      color: t.water,
-      roughness: 0.05,
-      metalness: 0.85,
-      transparent: true,
-      opacity: 0.9,
-    }),
-    chrome: new THREE.MeshStandardMaterial({
-      color: t.chrome,
-      roughness: 0.06,
-      metalness: 0.94,
-    }),
-    cobalt: new THREE.MeshStandardMaterial({
-      color: t.cobalt,
-      roughness: 0.18,
-      metalness: 0.55,
-      emissive: new THREE.Color(t.cobalt),
-      emissiveIntensity: 0.25,
-    }),
-    frostedGlass: new THREE.MeshPhysicalMaterial({
-      color: theme === 'dark' ? '#3b82f6' : '#2563eb',
-      transparent: true,
-      opacity: theme === 'dark' ? 0.65 : 0.45,
-      roughness: 0.08,
-      metalness: 0.15,
-      transmission: 0.82,
-      thickness: 0.75,
-      ior: 1.52,
-      side: THREE.DoubleSide,
-    }),
-    crystalGlass: new THREE.MeshPhysicalMaterial({
-      color: '#60a5fa',
-      transparent: true,
-      opacity: 0.5,
-      roughness: 0.04,
-      metalness: 0.05,
-      transmission: 0.92,
-      thickness: 0.5,
-      ior: 1.55,
-      side: THREE.DoubleSide,
-    }),
-    neonBlue: new THREE.MeshStandardMaterial({
-      color: t.neonBlue,
-      emissive: new THREE.Color(t.neonBlue),
-      emissiveIntensity: 3.2,
-      transparent: true,
-      opacity: 0.95,
-    }),
-    neonYellow: new THREE.MeshStandardMaterial({
-      color: t.neonYellow,
-      emissive: new THREE.Color(t.neonYellow),
-      emissiveIntensity: 2.8,
-    }),
-    monolith: new THREE.MeshStandardMaterial({
-      color: t.stone,
-      roughness: 0.7,
-      metalness: 0.05,
-    }),
-    foliage: new THREE.MeshStandardMaterial({
-      color: theme === 'dark' ? '#1c3a1c' : '#2d5e2d',
-      roughness: 0.9,
-    }),
-  };
-}
-
-/* ── Ground, Water Basin & Lighting ──────────────────────────────── */
-
-function buildGroundAndWater(scene: THREE.Scene, mats: ReturnType<typeof createMaterials>) {
-  // Main ground terrace
-  const groundGeo = new THREE.PlaneGeometry(140, 140);
-  const ground = new THREE.Mesh(groundGeo, mats.ground);
-  ground.rotation.x = -Math.PI / 2;
-  ground.position.y = -0.05;
-  ground.receiveShadow = true;
-  scene.add(ground);
-
-  // Large reflective water pool in foreground/channels
-  const waterGeo = new THREE.PlaneGeometry(110, 110, 32, 32);
-  const water = new THREE.Mesh(waterGeo, mats.water);
-  water.rotation.x = -Math.PI / 2;
-  water.position.y = -0.38;
-  water.receiveShadow = true;
-  water.name = 'water-surface';
-  scene.add(water);
-
-  // Basin border coping
-  const rimGeo = new THREE.BoxGeometry(65, 0.5, 1.4);
-  const rim = new THREE.Mesh(rimGeo, mats.platformBase);
-  rim.position.set(0, -0.15, 12);
-  rim.receiveShadow = true;
-  scene.add(rim);
-}
-
-function buildLighting(scene: THREE.Scene, theme: CapabilitiesTheme) {
-  const isDark = theme === 'dark';
-
-  // Warm ambient fill
-  const ambient = new THREE.AmbientLight(isDark ? 0x141e2e : 0xfff6ec, isDark ? 0.9 : 0.8);
-  scene.add(ambient);
-
-  // Key architectural sunlight
-  const sun = new THREE.DirectionalLight(0xfffdf5, isDark ? 2.2 : 1.9);
-  sun.position.set(16, 28, 20);
-  sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048);
-  sun.shadow.camera.near = 1;
-  sun.shadow.camera.far = 90;
-  sun.shadow.camera.left = -38;
-  sun.shadow.camera.right = 38;
-  sun.shadow.camera.top = 38;
-  sun.shadow.camera.bottom = -38;
-  sun.shadow.bias = -0.0003;
-  scene.add(sun);
-
-  // Sky blue side fill
-  const fill = new THREE.DirectionalLight(0x3b82f6, isDark ? 1.1 : 0.65);
-  fill.position.set(-20, 16, -14);
-  scene.add(fill);
-
-  // Vibrant under-glow from neon paths and water
-  const bounce = new THREE.DirectionalLight(0x1945f5, isDark ? 0.75 : 0.4);
-  bounce.position.set(0, -8, 6);
-  scene.add(bounce);
-
-  // Subtle hemisphere
-  const hemi = new THREE.HemisphereLight(
-    isDark ? 0x203048 : 0xfff8ee,
-    isDark ? 0x05080f : 0xb8b0a2,
-    0.6
-  );
-  scene.add(hemi);
-}
-
-/* ── Terraced Podiums ─────────────────────────────────────────────── */
-
-function buildTerracedPlatform(
-  scene: THREE.Scene,
-  mats: ReturnType<typeof createMaterials>,
-  pos: [number, number, number],
-  radius = 2.7,
-  height = 0.48,
-  hasStairs = true
-) {
-  // Lower pedestal ring
-  const baseGeo = new THREE.CylinderGeometry(radius * 1.14, radius * 1.2, height * 0.7, 48);
-  const baseMesh = new THREE.Mesh(baseGeo, mats.platformBase);
-  baseMesh.position.set(pos[0], pos[1] + (height * 0.7) / 2, pos[2]);
-  baseMesh.receiveShadow = true;
-  baseMesh.castShadow = true;
-  scene.add(baseMesh);
-
-  // Upper polished dais
-  const topGeo = new THREE.CylinderGeometry(radius, radius, height * 0.5, 48);
-  const topMesh = new THREE.Mesh(topGeo, mats.platformTop);
-  topMesh.position.set(pos[0], pos[1] + height * 0.7 + (height * 0.5) / 2, pos[2]);
-  topMesh.receiveShadow = true;
-  topMesh.castShadow = true;
-  scene.add(topMesh);
-
-  // Glowing neon edge ring
-  const neonRingGeo = new THREE.TorusGeometry(radius, 0.04, 12, 64);
-  const neonRing = new THREE.Mesh(neonRingGeo, mats.neonBlue);
-  neonRing.rotation.x = Math.PI / 2;
-  neonRing.position.set(pos[0], pos[1] + height * 1.2 + 0.015, pos[2]);
-  scene.add(neonRing);
-
-  // Brushed chrome beveled rim
-  const trimGeo = new THREE.TorusGeometry(radius * 1.14, 0.05, 12, 64);
-  const trimMesh = new THREE.Mesh(trimGeo, mats.chrome);
-  trimMesh.rotation.x = Math.PI / 2;
-  trimMesh.position.set(pos[0], pos[1] + height * 0.7, pos[2]);
-  scene.add(trimMesh);
-
-  // Curved architectural steps
-  if (hasStairs) {
-    for (let i = 0; i < 4; i++) {
-      const stepRadius = radius + 0.55 + i * 0.32;
-      const stepGeo = new THREE.CylinderGeometry(stepRadius, stepRadius, 0.09, 32, 1, false, 0, Math.PI * 0.45);
-      const step = new THREE.Mesh(stepGeo, mats.platformBase);
-      step.rotation.y = -Math.PI * 0.22;
-      step.position.set(pos[0], pos[1] + (i + 1) * 0.08, pos[2]);
-      step.receiveShadow = true;
-      step.castShadow = true;
-      scene.add(step);
-    }
-  }
-
-  return pos[1] + height * 1.2;
-}
-
-/* ── Winding Pathway ──────────────────────────────────────────────── */
-
-function buildConnectingPathway(scene: THREE.Scene, mats: ReturnType<typeof createMaterials>) {
-  const pts = STATIONS.map((s) => new THREE.Vector3(s.position[0], s.position[1] + 0.08, s.position[2]));
-  const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal', 0.5);
-
-  // Concrete pathway ribbon
-  const shape = new THREE.Shape();
-  shape.moveTo(-0.58, 0);
-  shape.lineTo(0.58, 0);
-  const extrudeGeo = new THREE.ExtrudeGeometry(shape, {
-    steps: 140,
-    extrudePath: curve,
-    bevelEnabled: false,
-  });
-  const pathMesh = new THREE.Mesh(extrudeGeo, mats.platformBase);
-  pathMesh.receiveShadow = true;
-  scene.add(pathMesh);
-
-  // Glowing blue center guideline
-  const curvePoints = curve.getPoints(160);
-  const lineGeo = new THREE.BufferGeometry().setFromPoints(curvePoints);
-  const lineMat = new THREE.LineBasicMaterial({
-    color: '#1945f5',
-    linewidth: 3,
-    transparent: true,
-    opacity: 0.95,
-  });
-  const pathLine = new THREE.Line(lineGeo, lineMat);
-  pathLine.position.y = 0.04;
-  scene.add(pathLine);
-
-  // Waypoint discs at stations
-  STATIONS.forEach((s) => {
-    const discGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.05, 24);
-    const disc = new THREE.Mesh(discGeo, mats.neonBlue);
-    disc.position.set(s.position[0], s.position[1] + 0.12, s.position[2]);
-    scene.add(disc);
-  });
-}
-
-/* ── Station 01: Digital Strategy – Luminous Network Sphere ──────── */
-
-function buildStation01(scene: THREE.Scene, group: THREE.Group, mats: ReturnType<typeof createMaterials>) {
-  const pos = STATIONS[0].position;
-  const platformY = buildTerracedPlatform(scene, mats, pos, 2.7, 0.5);
-  const localY = platformY + 1.65;
-
-  // Tiered circular metallic plinth
-  const pedGeo = new THREE.CylinderGeometry(1.4, 1.7, 0.38, 40);
-  const ped = new THREE.Mesh(pedGeo, mats.chrome);
-  ped.position.set(pos[0], platformY + 0.19, pos[2]);
-  ped.castShadow = true;
-  group.add(ped);
-
-  // Inner glowing cyan/blue core sphere
-  const coreGeo = new THREE.SphereGeometry(1.08, 36, 36);
-  const coreMat = new THREE.MeshStandardMaterial({
-    color: '#0052ff',
-    emissive: new THREE.Color('#1044ff'),
-    emissiveIntensity: 1.6,
-    roughness: 0.15,
-    metalness: 0.4,
-  });
-  const core = new THREE.Mesh(coreGeo, coreMat);
-  core.position.set(pos[0], localY, pos[2]);
-  core.name = 'st01-core';
-  group.add(core);
-
-  // Outer geodesic network wireframe sphere
-  const icoGeo = new THREE.IcosahedronGeometry(1.68, 2);
-  const wireMat = new THREE.MeshBasicMaterial({
-    color: '#90baff',
-    wireframe: true,
-    transparent: true,
-    opacity: 0.85,
-  });
-  const wireSphere = new THREE.Mesh(icoGeo, wireMat);
-  wireSphere.position.set(pos[0], localY, pos[2]);
-  wireSphere.name = 'st01-sphere';
-  group.add(wireSphere);
-
-  // Luminous white/gold vertex beacon nodes
-  const nodeGeo = new THREE.SphereGeometry(0.068, 14, 14);
-  const nodeMat = mats.neonYellow;
-  const posAttr = icoGeo.getAttribute('position');
-  const seen = new Set<string>();
-
-  for (let i = 0; i < posAttr.count; i++) {
-    const x = Math.round(posAttr.getX(i) * 100);
-    const y = Math.round(posAttr.getY(i) * 100);
-    const z = Math.round(posAttr.getZ(i) * 100);
-    const key = `${x},${y},${z}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-
-    const node = new THREE.Mesh(nodeGeo, nodeMat);
-    node.position.set(
-      posAttr.getX(i) + pos[0],
-      posAttr.getY(i) + localY,
-      posAttr.getZ(i) + pos[2]
-    );
-    group.add(node);
-  }
-}
-
-/* ── Station 02: Web Development – Rounded Gateway Portals ───────── */
-
-function buildStation02(scene: THREE.Scene, group: THREE.Group, mats: ReturnType<typeof createMaterials>) {
-  const pos = STATIONS[1].position;
-  const platformY = buildTerracedPlatform(scene, mats, pos, 3.3, 0.45);
-
-  const frameCount = 5;
-  const frameWidth = 2.8;
-  const frameHeight = 3.4;
-  const spacing = 0.82;
-
-  for (let i = 0; i < frameCount; i++) {
-    const scale = 1 - i * 0.11;
-    const depthOffset = i * spacing;
-    const w = frameWidth * scale;
-    const h = frameHeight * scale;
-    const t = 0.2;
-
-    const frameGroup = new THREE.Group();
-    frameGroup.position.set(pos[0], platformY + h / 2, pos[2] - depthOffset);
-
-    const fMat = i === 0 ? mats.platformTop : mats.chrome;
-
-    // Top beam
-    const top = new THREE.Mesh(new THREE.BoxGeometry(w, t, 0.24), fMat);
-    top.position.y = h / 2 - t / 2;
-    top.castShadow = true;
-    frameGroup.add(top);
-
-    // Left pillar
-    const left = new THREE.Mesh(new THREE.BoxGeometry(t, h - t, 0.24), fMat);
-    left.position.set(-w / 2 + t / 2, -t / 2, 0);
-    left.castShadow = true;
-    frameGroup.add(left);
-
-    // Right pillar
-    const right = left.clone();
-    right.position.x = w / 2 - t / 2;
-    frameGroup.add(right);
-
-    // Glowing electric blue interior light channels
-    const neonTop = new THREE.Mesh(new THREE.BoxGeometry(w - t * 2, 0.045, 0.14), mats.neonBlue);
-    neonTop.position.y = h / 2 - t - 0.02;
-    frameGroup.add(neonTop);
-
-    const neonLeft = new THREE.Mesh(new THREE.BoxGeometry(0.045, h - t * 2, 0.14), mats.neonBlue);
-    neonLeft.position.x = -w / 2 + t + 0.02;
-    frameGroup.add(neonLeft);
-
-    const neonRight = neonLeft.clone();
-    neonRight.position.x = w / 2 - t - 0.02;
-    frameGroup.add(neonRight);
-
-    // macOS browser dots on front portal
-    if (i === 0) {
-      const dotColors = ['#ff5f56', '#ffbd2e', '#27c93f'];
-      dotColors.forEach((color, dIdx) => {
-        const dot = new THREE.Mesh(
-          new THREE.CircleGeometry(0.055, 16),
-          new THREE.MeshBasicMaterial({ color })
-        );
-        dot.position.set(-w / 2 + 0.38 + dIdx * 0.15, h / 2 - t / 2, 0.13);
-        frameGroup.add(dot);
-      });
-    }
-
-    group.add(frameGroup);
-  }
-
-  // Backlit screen deep in portal tunnel
-  const screen = new THREE.Mesh(
-    new THREE.PlaneGeometry(1.8, 2.4),
-    new THREE.MeshStandardMaterial({
-      color: '#06132e',
-      emissive: new THREE.Color('#0d3bb5'),
-      emissiveIntensity: 0.9,
-    })
-  );
-  screen.position.set(pos[0], platformY + 1.7, pos[2] - 4.1);
-  screen.name = 'st02-screen';
-  group.add(screen);
-}
-
-/* ── Station 03: UI/UX Design – Frosted Glass Layer Stack ────────── */
-
-function buildStation03(scene: THREE.Scene, group: THREE.Group, mats: ReturnType<typeof createMaterials>) {
-  const pos = STATIONS[2].position;
-  const platformY = buildTerracedPlatform(scene, mats, pos, 3.1, 0.45);
-
-  const layerConfigs = [
-    { w: 2.9, h: 1.85, z: 0.65, rx: 0.04, ry: -0.16, mat: mats.frostedGlass },
-    { w: 2.6, h: 1.65, z: 0.05, rx: 0.02, ry: -0.09, mat: mats.crystalGlass },
-    { w: 2.3, h: 1.45, z: -0.55, rx: -0.02, ry: 0.05, mat: mats.frostedGlass },
-    { w: 2.0, h: 1.25, z: -1.15, rx: -0.04, ry: 0.11, mat: mats.crystalGlass },
-  ];
-
-  layerConfigs.forEach((cfg, idx) => {
-    const layer = new THREE.Mesh(
-      new THREE.BoxGeometry(cfg.w, cfg.h, 0.055),
-      cfg.mat
-    );
-    layer.position.set(pos[0] + (idx - 1.5) * 0.28, platformY + 1.8 + idx * 0.26, pos[2] + cfg.z);
-    layer.rotation.set(cfg.rx, cfg.ry, 0);
-    layer.castShadow = true;
-    layer.name = `st03-layer-${idx}`;
-    group.add(layer);
-
-    // Subtle beveled perimeter wire
-    const border = new THREE.LineSegments(
-      new THREE.EdgesGeometry(layer.geometry),
-      new THREE.LineBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.75 })
-    );
-    layer.add(border);
-
-    // Front UI controls: neon toggle capsule & card mockup
-    if (idx === 0) {
-      const toggle = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.16, 0.045), mats.neonYellow);
-      toggle.position.set(0.7, 0.52, 0.04);
-      layer.add(toggle);
-
-      const card = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.65), mats.crystalGlass);
-      card.position.set(-0.55, -0.22, 0.04);
-      layer.add(card);
-    }
-  });
-
-  // Glossy 3D pointer cursor
-  const cursorShape = new THREE.Shape();
-  cursorShape.moveTo(0, 0);
-  cursorShape.lineTo(0, -0.65);
-  cursorShape.lineTo(0.2, -0.48);
-  cursorShape.lineTo(0.38, -0.76);
-  cursorShape.lineTo(0.52, -0.68);
-  cursorShape.lineTo(0.33, -0.4);
-  cursorShape.lineTo(0.56, -0.37);
-  cursorShape.closePath();
-
-  const cursorGeo = new THREE.ExtrudeGeometry(cursorShape, { depth: 0.065, bevelEnabled: false });
-  const cursor = new THREE.Mesh(
-    cursorGeo,
-    new THREE.MeshStandardMaterial({
-      color: '#ffffff',
-      roughness: 0.08,
-      metalness: 0.4,
-      emissive: new THREE.Color('#ffffff'),
-      emissiveIntensity: 0.65,
-    })
-  );
-  cursor.position.set(pos[0] + 1.45, platformY + 2.9, pos[2] + 0.95);
-  cursor.name = 'st03-cursor';
-  group.add(cursor);
-}
-
-/* ── Station 04: Social Media – Dynamic Chrome Orbital Rings ─────── */
-
-function buildStation04(scene: THREE.Scene, group: THREE.Group, mats: ReturnType<typeof createMaterials>) {
-  const pos = STATIONS[3].position;
-  const platformY = buildTerracedPlatform(scene, mats, pos, 2.9, 0.45);
-  const localY = platformY + 1.85;
-
-  // Interlocking mirror-finish chrome rings
-  const ringParams = [
-    { r: 2.2, tube: 0.095, rx: 0.72, rz: 0.28, mat: mats.chrome },
-    { r: 1.7, tube: 0.085, rx: -0.58, rz: -0.38, mat: mats.chrome },
-    { r: 1.2, tube: 0.075, rx: 0.38, rz: 0.82, mat: mats.cobalt },
-  ];
-
-  ringParams.forEach((cfg, i) => {
-    const ringGeo = new THREE.TorusGeometry(cfg.r, cfg.tube, 16, 72);
-    const ring = new THREE.Mesh(ringGeo, cfg.mat);
-    ring.position.set(pos[0], localY, pos[2]);
-    ring.rotation.set(cfg.rx, 0, cfg.rz);
-    ring.castShadow = true;
-    ring.name = `st04-ring-${i}`;
-    group.add(ring);
-  });
-
-  // Floating glossy 3D social badges
-  const icons = [
-    { type: 'heart', angle: 0, rad: 2.3, col: '#ff3b5c' },
-    { type: 'play', angle: 1.6, rad: 1.9, col: '#2563eb' },
-    { type: 'signal', angle: 3.2, rad: 2.4, col: '#ffffff' },
-    { type: 'chat', angle: 4.8, rad: 2.0, col: '#d8f03c' },
-  ];
-
-  icons.forEach((ic, i) => {
-    const badge = new THREE.Group();
-    badge.position.set(
-      pos[0] + Math.cos(ic.angle) * ic.rad,
-      localY + Math.sin(ic.angle * 2) * 0.4,
-      pos[2] + Math.sin(ic.angle) * ic.rad
-    );
-
-    const bg = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.42, 0.09), mats.chrome);
-    bg.castShadow = true;
-    badge.add(bg);
-
-    const glyph = new THREE.Mesh(
-      new THREE.SphereGeometry(0.13, 16, 16),
-      new THREE.MeshStandardMaterial({
-        color: ic.col,
-        emissive: new THREE.Color(ic.col),
-        emissiveIntensity: 2.0,
-      })
-    );
-    glyph.position.z = 0.07;
-    badge.add(glyph);
-
-    badge.name = `st04-icon-${i}`;
-    group.add(badge);
-  });
-}
-
-/* ── Station 05: Mobile App – Titanium Smartphone Monolith ───────── */
-
-function buildStation05(scene: THREE.Scene, group: THREE.Group, mats: ReturnType<typeof createMaterials>) {
-  const pos = STATIONS[4].position;
-  const platformY = buildTerracedPlatform(scene, mats, pos, 3.3, 0.5, true);
-
-  const phoneW = 1.4;
-  const phoneH = 2.85;
-  const phoneD = 0.15;
-  const localY = platformY + phoneH / 2 + 0.32;
-
-  // Titanium gold chassis
-  const phone = new THREE.Mesh(new THREE.BoxGeometry(phoneW, phoneH, phoneD), mats.chrome);
-  phone.position.set(pos[0], localY, pos[2]);
-  phone.castShadow = true;
-  phone.name = 'st05-phone';
-  group.add(phone);
-
-  // Black bezel + vibrant blue screen
-  const screen = new THREE.Mesh(
-    new THREE.PlaneGeometry(phoneW - 0.1, phoneH - 0.14),
-    new THREE.MeshStandardMaterial({
-      color: '#061128',
-      emissive: new THREE.Color('#1044cc'),
-      emissiveIntensity: 0.95,
-      roughness: 0.08,
-    })
-  );
-  screen.position.set(pos[0], localY, pos[2] + phoneD / 2 + 0.005);
-  screen.name = 'st05-screen';
-  group.add(screen);
-
-  // Camera Dynamic Island pill
-  const island = new THREE.Mesh(
-    new THREE.BoxGeometry(0.34, 0.08, 0.02),
-    new THREE.MeshBasicMaterial({ color: '#000000' })
-  );
-  island.position.set(pos[0], localY + phoneH / 2 - 0.19, pos[2] + phoneD / 2 + 0.01);
-  group.add(island);
-
-  // Floating blue particle field
-  const pGeo = new THREE.BufferGeometry();
-  const count = 80;
-  const positions = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    positions[i * 3] = pos[0] + (Math.random() - 0.5) * 1.9;
-    positions[i * 3 + 1] = localY + (Math.random() - 0.5) * 2.3;
-    positions[i * 3 + 2] = pos[2] + phoneD + Math.random() * 0.95;
-  }
-  pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  const particles = new THREE.Points(
-    pGeo,
-    new THREE.PointsMaterial({ color: '#7ab0ff', size: 0.06, transparent: true, opacity: 0.88 })
-  );
-  particles.name = 'st05-particles';
-  group.add(particles);
-}
-
-/* ── Station 06: Software Development – Geometric Modular Cubes ──── */
-
-function buildStation06(scene: THREE.Scene, group: THREE.Group, mats: ReturnType<typeof createMaterials>) {
-  const pos = STATIONS[5].position;
-  const platformY = buildTerracedPlatform(scene, mats, pos, 3.5, 0.45);
-
-  const blocks = [
-    { size: [1.25, 1.45, 1.25], offset: [-0.65, 0.72, -0.4], mat: mats.frostedGlass },
-    { size: [1.45, 2.15, 1.15], offset: [0.65, 1.08, 0.12], mat: mats.cobalt },
-    { size: [0.95, 1.15, 1.35], offset: [-0.22, 0.58, 0.85], mat: mats.crystalGlass },
-    { size: [1.15, 1.95, 0.95], offset: [1.45, 0.98, -0.65], mat: mats.platformTop },
-    { size: [0.75, 2.65, 0.75], offset: [-1.25, 1.32, 0.22], mat: mats.frostedGlass },
-    { size: [1.35, 0.85, 1.15], offset: [0.12, 0.42, -0.95], mat: mats.chrome },
-    { size: [0.85, 1.55, 0.85], offset: [-0.85, 1.95, 0.42], mat: mats.neonBlue },
-  ];
-
-  blocks.forEach((b, i) => {
-    const geo = new THREE.BoxGeometry(...(b.size as [number, number, number]));
-    const mesh = new THREE.Mesh(geo, b.mat);
-    mesh.position.set(pos[0] + b.offset[0], platformY + b.offset[1], pos[2] + b.offset[2]);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    mesh.name = `st06-cube-${i}`;
-    group.add(mesh);
-
-    const wire = new THREE.LineSegments(
-      new THREE.EdgesGeometry(geo),
-      new THREE.LineBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.45 })
-    );
-    mesh.add(wire);
-  });
-}
-
-/* ── Monoliths & Foliage ─────────────────────────────────────────── */
-
-function buildEnvironmentDetails(scene: THREE.Scene, mats: ReturnType<typeof createMaterials>) {
-  const monoliths: [number, number, number, number, number][] = [
-    [-3.8, 0.4, -4.8, 5.6, 4.4],
-    [13.8, 0.7, -3.8, 4.2, 5.4],
-    [-9.8, 0.2, -12.4, 4.6, 4.0],
-    [8.2, 0.5, -18.8, 5.6, 4.6],
-  ];
-
-  monoliths.forEach(([x, y, z, w, h]) => {
-    const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.4), mats.monolith);
-    wall.position.set(x, y + h / 2, z);
-    wall.receiveShadow = true;
-    wall.castShadow = true;
-    scene.add(wall);
-
-    const win = new THREE.Mesh(new THREE.BoxGeometry(w * 0.44, h * 0.58, 0.44), mats.neonBlue);
-    win.position.set(x, y + h * 0.58, z);
-    scene.add(win);
-  });
-
-  const foliageCenters: [number, number, number][] = [
-    [-10.2, 0.2, 5.2],
-    [-4.2, 0.6, 2.2],
-    [5.2, 1.2, 2.2],
-    [12.2, 1.5, 1.2],
-    [-2.2, 0.3, -8.2],
-    [7.2, 0.5, -9.2],
-    [15.2, 0.7, -13.2],
-  ];
-
-  foliageCenters.forEach(([fx, fy, fz]) => {
-    for (let i = 0; i < 4; i++) {
-      const r = 0.26 + Math.random() * 0.24;
-      const sphere = new THREE.Mesh(new THREE.SphereGeometry(r, 8, 8), mats.foliage);
-      sphere.position.set(
-        fx + (Math.random() - 0.5) * 0.75,
-        fy + r * 0.8,
-        fz + (Math.random() - 0.5) * 0.75
-      );
-      sphere.castShadow = true;
-      scene.add(sphere);
-    }
-  });
-}
-
-/* ── Public API ──────────────────────────────────────────────────── */
-
-export interface SceneResult {
-  scene: THREE.Scene;
-  stationGroup: THREE.Group;
-  updateTheme: (newTheme: CapabilitiesTheme) => void;
-  dispose: () => void;
-}
-
-export function buildCapabilitiesScene(renderer: THREE.WebGLRenderer, theme: CapabilitiesTheme = 'dark'): SceneResult {
+/* ── Main Scene Builder ──────────────────────────────────────────── */
+export function buildCapabilitiesScene(renderer: THREE.WebGLRenderer, theme: CapabilitiesTheme): SceneResult {
   const scene = new THREE.Scene();
   const t = THEMES[theme];
 
   scene.background = new THREE.Color(t.bg);
-  scene.fog = new THREE.FogExp2(t.fog, 0.012);
+  scene.fog = new THREE.FogExp2(t.bg, 0.018);
 
-  // Set studio reflections
   const envMap = createStudioEnvironment(renderer, theme);
   scene.environment = envMap;
 
-  let mats = createMaterials(theme);
+  /* ── Lighting ── */
+  const ambientLight = new THREE.AmbientLight(theme === 'dark' ? 0x0c1322 : 0xf1efe7, 1.8);
+  scene.add(ambientLight);
 
-  buildGroundAndWater(scene, mats);
-  buildLighting(scene, theme);
-  buildConnectingPathway(scene, mats);
-  buildEnvironmentDetails(scene, mats);
+  const keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
+  keyLight.position.set(-4, 7, 8);
+  keyLight.castShadow = true;
+  keyLight.shadow.mapSize.width = 1024;
+  keyLight.shadow.mapSize.height = 1024;
+  keyLight.shadow.bias = -0.0005;
+  scene.add(keyLight);
 
-  const stationGroup = new THREE.Group();
-  stationGroup.name = 'stations';
-  scene.add(stationGroup);
+  const rimLight = new THREE.DirectionalLight(0x1945f5, 3.2);
+  rimLight.position.set(6, 4, 3);
+  scene.add(rimLight);
 
-  buildStation01(scene, stationGroup, mats);
-  buildStation02(scene, stationGroup, mats);
-  buildStation03(scene, stationGroup, mats);
-  buildStation04(scene, stationGroup, mats);
-  buildStation05(scene, stationGroup, mats);
-  buildStation06(scene, stationGroup, mats);
+  const limeFill = new THREE.PointLight(0xd8f03c, 1.6, 12, 1.2);
+  limeFill.position.set(1.0, 0.6, 1.5);
+  scene.add(limeFill);
+
+  /* ── Shared Materials ── */
+  const chromeMat = new THREE.MeshStandardMaterial({
+    color: 0xe8eef8,
+    roughness: 0.06,
+    metalness: 0.96,
+    envMap,
+    envMapIntensity: 1.5,
+  });
+
+  const cobaltMat = new THREE.MeshStandardMaterial({
+    color: 0x1945f5,
+    roughness: 0.22,
+    metalness: 0.55,
+    emissive: new THREE.Color(0x1030b0),
+    emissiveIntensity: 0.4,
+  });
+
+  const frostedGlassMat = new THREE.MeshPhysicalMaterial({
+    color: 0x3b82f6,
+    transparent: true,
+    opacity: 0.72,
+    roughness: 0.08,
+    metalness: 0.12,
+    transmission: 0.86,
+    thickness: 0.6,
+    ior: 1.52,
+    side: THREE.DoubleSide,
+  });
+
+  const neonLimeMat = new THREE.MeshStandardMaterial({
+    color: 0xd8f03c,
+    emissive: new THREE.Color(0xd8f03c),
+    emissiveIntensity: 2.8,
+  });
+
+  /* ══════════════════════════════════════════════════════════════════
+     LAYER 0 & 1: Technical Grid Backdrop & Glowing Halo
+     ══════════════════════════════════════════════════════════════════ */
+  const bgGroup = new THREE.Group();
+  scene.add(bgGroup);
+
+  // Grid Backdrop Plane
+  const gridTex = loadSafeTexture('/assets/services/grid-backdrop.png');
+  gridTex.wrapS = THREE.RepeatWrapping;
+  gridTex.wrapT = THREE.RepeatWrapping;
+  gridTex.repeat.set(2, 2);
+
+  const gridMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(36, 22),
+    new THREE.MeshBasicMaterial({
+      map: gridTex,
+      transparent: true,
+      opacity: theme === 'dark' ? 0.95 : 0.35,
+    })
+  );
+  gridMesh.position.set(0, 0, -4.5);
+  bgGroup.add(gridMesh);
+
+  // Fluorescent Lime Radiant Halo behind Head
+  const haloTex = loadSafeTexture('/assets/services/halo-glow.png');
+  const haloMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(7.2, 7.2),
+    new THREE.MeshBasicMaterial({
+      map: haloTex,
+      transparent: true,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    })
+  );
+  haloMesh.position.set(1.0, 0.6, -3.2);
+  bgGroup.add(haloMesh);
+
+  // Wireframe Geodesic Sphere (upper background)
+  const sphereGeo = new THREE.IcosahedronGeometry(1.6, 2);
+  const sphereWireMat = new THREE.MeshBasicMaterial({
+    color: 0x2563eb,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.38,
+  });
+  const wireSphere = new THREE.Mesh(sphereGeo, sphereWireMat);
+  wireSphere.position.set(-1.4, 3.4, -3.0);
+  bgGroup.add(wireSphere);
+
+  /* ══════════════════════════════════════════════════════════════════
+     LAYER 2 & 3: Central Sculpture Head & Sliced Cloud Panels
+     ══════════════════════════════════════════════════════════════════ */
+  const headGroup = new THREE.Group();
+  scene.add(headGroup);
+
+  // 1. Sliced Cumulus Clouds Vertical Panels (staggered behind head)
+  const cloudTex = loadSafeTexture('/assets/hero/machine-cloud.webp');
+  const cloudSliceW = 1.6;
+  const cloudSliceH = 4.4;
+
+  [-0.2, 0.4, 1.0].forEach((xOff, i) => {
+    const cloudSlice = new THREE.Mesh(
+      new THREE.PlaneGeometry(cloudSliceW, cloudSliceH),
+      new THREE.MeshStandardMaterial({
+        map: cloudTex,
+        transparent: true,
+        opacity: 0.92,
+        roughness: 0.4,
+      })
+    );
+    cloudSlice.position.set(0.6 + xOff, 1.2, -1.2 + i * 0.25);
+    cloudSlice.rotation.y = -0.18;
+    cloudSlice.rotation.z = 0.04;
+    headGroup.add(cloudSlice);
+  });
+
+  // 2. Central Sculpture Portrait Plane
+  const headTex = loadSafeTexture('/assets/services/center-head-alpha.webp');
+  const headMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(3.8, 4.8),
+    new THREE.MeshStandardMaterial({
+      map: headTex,
+      transparent: true,
+      roughness: 0.65,
+      metalness: 0.08,
+      side: THREE.DoubleSide,
+    })
+  );
+  headMesh.position.set(0.6, 0.2, 0.1);
+  headMesh.castShadow = true;
+  headGroup.add(headMesh);
+
+  // 3. Flowing Cobalt Silk Ribbon (curving 3D tube across neck & behind head)
+  const silkCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-2.2, -0.6, -0.4),
+    new THREE.Vector3(-0.8, -0.2, 0.4),
+    new THREE.Vector3(0.4, 0.1, 0.6),
+    new THREE.Vector3(1.6, 0.6, 0.2),
+    new THREE.Vector3(2.4, 1.4, -0.4),
+    new THREE.Vector3(1.8, 2.2, -1.0),
+  ]);
+  const silkGeo = new THREE.TubeGeometry(silkCurve, 48, 0.22, 12, false);
+  const silkMesh = new THREE.Mesh(silkGeo, cobaltMat);
+  headGroup.add(silkMesh);
+
+  // 4. Complementary Liquid Chrome Ribbon
+  const chromeCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-1.8, -1.2, 0.2),
+    new THREE.Vector3(-0.6, -0.8, 0.8),
+    new THREE.Vector3(0.8, -0.4, 0.7),
+    new THREE.Vector3(2.0, 0.0, 0.3),
+    new THREE.Vector3(2.8, 0.8, -0.2),
+  ]);
+  const chromeGeo = new THREE.TubeGeometry(chromeCurve, 40, 0.14, 10, false);
+  const chromeRibbon = new THREE.Mesh(chromeGeo, chromeMat);
+  headGroup.add(chromeRibbon);
+
+  /* ══════════════════════════════════════════════════════════════════
+     LAYER 4: The 6 Capability Installations
+     ══════════════════════════════════════════════════════════════════ */
+  const stationGroup: THREE.Group[] = [];
+
+  // ────────────────────────────────────────────────────────────────
+  // Station 0: Digital Strategy (Tilted Wave Panel + Target Rings)
+  // ────────────────────────────────────────────────────────────────
+  const waveGroup = new THREE.Group();
+  const s0 = STATIONS[0];
+  waveGroup.position.set(s0.position[0], s0.position[1], s0.position[2]);
+
+  const waveTex = loadSafeTexture('/assets/services/panel-wave-alpha.webp');
+  const wavePanel = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.5, 2.0),
+    new THREE.MeshStandardMaterial({
+      map: waveTex,
+      transparent: true,
+      roughness: 0.25,
+      metalness: 0.15,
+      side: THREE.DoubleSide,
+    })
+  );
+  wavePanel.rotation.z = 0.06;
+  wavePanel.rotation.y = 0.18;
+  waveGroup.add(wavePanel);
+
+  // Wireframe Target Rings
+  const targetRingGeo1 = new THREE.RingGeometry(0.75, 0.78, 36);
+  const targetRing1 = new THREE.Mesh(targetRingGeo1, neonLimeMat);
+  targetRing1.position.set(0.4, 0.2, 0.08);
+  targetRing1.rotation.y = 0.18;
+  waveGroup.add(targetRing1);
+
+  const targetRingGeo2 = new THREE.RingGeometry(0.4, 0.43, 32);
+  const targetRing2 = new THREE.Mesh(targetRingGeo2, cobaltMat);
+  targetRing2.position.set(0.4, 0.2, 0.1);
+  targetRing2.rotation.y = 0.18;
+  waveGroup.add(targetRing2);
+
+  // Target Crosshair
+  const crossGeo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(-0.9, 0, 0), new THREE.Vector3(0.9, 0, 0),
+    new THREE.Vector3(0, -0.9, 0), new THREE.Vector3(0, 0.9, 0),
+  ]);
+  const crossMat = new THREE.LineBasicMaterial({ color: 0xd8f03c, transparent: true, opacity: 0.8 });
+  const crossLines = new THREE.LineSegments(crossGeo, crossMat);
+  crossLines.position.set(0.4, 0.2, 0.12);
+  crossLines.rotation.y = 0.18;
+  waveGroup.add(crossLines);
+
+  scene.add(waveGroup);
+  stationGroup.push(waveGroup);
+
+  // ────────────────────────────────────────────────────────────────
+  // Station 1: Web Development (3D Browser Frame + Code Badge)
+  // ────────────────────────────────────────────────────────────────
+  const browserGroup = new THREE.Group();
+  const s1 = STATIONS[1];
+  browserGroup.position.set(s1.position[0], s1.position[1], s1.position[2]);
+
+  const browserTex = loadSafeTexture('/assets/services/panel-browser-alpha.webp');
+  const browserPanel = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.6, 2.0),
+    new THREE.MeshStandardMaterial({
+      map: browserTex,
+      transparent: true,
+      roughness: 0.15,
+      metalness: 0.25,
+      side: THREE.DoubleSide,
+    })
+  );
+  browserPanel.rotation.y = -0.15;
+  browserPanel.rotation.z = -0.04;
+  browserGroup.add(browserPanel);
+
+  // 3D Browser Titanium Outer Frame Bevel
+  const frameGeo = new THREE.BoxGeometry(2.7, 2.1, 0.08);
+  const frameMat = new THREE.MeshStandardMaterial({
+    color: 0x182438,
+    roughness: 0.35,
+    metalness: 0.85,
+    wireframe: false,
+  });
+  const browserFrameMesh = new THREE.Mesh(frameGeo, frameMat);
+  browserFrameMesh.position.set(0, 0, -0.05);
+  browserFrameMesh.rotation.y = -0.15;
+  browserFrameMesh.rotation.z = -0.04;
+  browserGroup.add(browserFrameMesh);
+
+  // Code bracket badge </>
+  const badgeGeo = new THREE.BoxGeometry(0.65, 0.32, 0.08);
+  const codeBadge = new THREE.Mesh(badgeGeo, cobaltMat);
+  codeBadge.position.set(0.6, 0.75, 0.12);
+  codeBadge.rotation.y = -0.15;
+  browserGroup.add(codeBadge);
+
+  scene.add(browserGroup);
+  stationGroup.push(browserGroup);
+
+  // ────────────────────────────────────────────────────────────────
+  // Station 2: UI/UX Design (Layered Glass Sheets + Toggle + Cursor)
+  // ────────────────────────────────────────────────────────────────
+  const uiuxGroup = new THREE.Group();
+  const s2 = STATIONS[2];
+  uiuxGroup.position.set(s2.position[0], s2.position[1], s2.position[2]);
+
+  const uiuxTex = loadSafeTexture('/assets/services/panel-uiux-alpha.webp');
+
+  // Rear glass backing sheet
+  const glassSheetRear = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.0), frostedGlassMat);
+  glassSheetRear.position.set(0, 0, -0.18);
+  glassSheetRear.rotation.y = -0.22;
+  glassSheetRear.rotation.z = 0.05;
+  uiuxGroup.add(glassSheetRear);
+
+  // Middle main panel
+  const uiuxPanel = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.5, 1.9),
+    new THREE.MeshStandardMaterial({
+      map: uiuxTex,
+      transparent: true,
+      roughness: 0.1,
+      metalness: 0.2,
+      side: THREE.DoubleSide,
+    })
+  );
+  uiuxPanel.rotation.y = -0.22;
+  uiuxPanel.rotation.z = 0.05;
+  uiuxGroup.add(uiuxPanel);
+
+  // 3D Fluorescent Lime Toggle Switch
+  const toggleTrackGeo = new THREE.CapsuleGeometry(0.12, 0.36, 12, 16);
+  toggleTrackGeo.rotateZ(Math.PI / 2);
+  const toggleTrack = new THREE.Mesh(toggleTrackGeo, neonLimeMat);
+  toggleTrack.position.set(-0.35, 0.45, 0.1);
+  toggleTrack.rotation.y = -0.22;
+  uiuxGroup.add(toggleTrack);
+
+  const toggleKnobGeo = new THREE.SphereGeometry(0.14, 16, 16);
+  const toggleKnob = new THREE.Mesh(toggleKnobGeo, chromeMat);
+  toggleKnob.position.set(-0.24, 0.45, 0.15);
+  toggleKnob.rotation.y = -0.22;
+  uiuxGroup.add(toggleKnob);
+
+  // Crisp 3D Pointer Cursor
+  const cursorTex = loadSafeTexture('/assets/services/pointer-cursor.png');
+  const cursorMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.65, 0.65),
+    new THREE.MeshBasicMaterial({
+      map: cursorTex,
+      transparent: true,
+      depthTest: true,
+      side: THREE.DoubleSide,
+    })
+  );
+  cursorMesh.position.set(0.15, -0.15, 0.26);
+  cursorMesh.rotation.y = -0.15;
+  uiuxGroup.add(cursorMesh);
+
+  scene.add(uiuxGroup);
+  stationGroup.push(uiuxGroup);
+
+  // ────────────────────────────────────────────────────────────────
+  // Station 3: Social Media (Sphere + Orbital Rings + Floating Badges)
+  // ────────────────────────────────────────────────────────────────
+  const socialGroup = new THREE.Group();
+  const s3 = STATIONS[3];
+  socialGroup.position.set(s3.position[0], s3.position[1], s3.position[2]);
+
+  // Dark Textured Cratered Sphere
+  const socialTex = loadSafeTexture('/assets/services/panel-social-alpha.webp');
+  const globeGeo = new THREE.SphereGeometry(1.05, 36, 36);
+  const globeMat = new THREE.MeshStandardMaterial({
+    color: 0x181e28,
+    map: socialTex,
+    roughness: 0.45,
+    metalness: 0.5,
+  });
+  const globeMesh = new THREE.Mesh(globeGeo, globeMat);
+  socialGroup.add(globeMesh);
+
+  // Glowing Yellow Orbital Ring
+  const ringGeo = new THREE.TorusGeometry(1.48, 0.035, 16, 64);
+  const ringMat = new THREE.MeshStandardMaterial({
+    color: 0xd8f03c,
+    emissive: new THREE.Color(0xd8f03c),
+    emissiveIntensity: 2.2,
+  });
+  const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+  ringMesh.rotation.x = Math.PI / 2.8;
+  ringMesh.rotation.y = 0.35;
+  socialGroup.add(ringMesh);
+
+  // Floating Social Pill Badges (Play, Heart, Chat)
+  const badgePillGeo = new THREE.BoxGeometry(0.48, 0.36, 0.08);
+  const badgeWhiteMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    roughness: 0.15,
+    metalness: 0.1,
+  });
+
+  const badgePlay = new THREE.Mesh(badgePillGeo, badgeWhiteMat);
+  badgePlay.position.set(0.9, 0.9, 0.6);
+  socialGroup.add(badgePlay);
+
+  const badgeHeart = new THREE.Mesh(badgePillGeo, badgeWhiteMat);
+  badgeHeart.position.set(1.2, -0.2, 0.8);
+  socialGroup.add(badgeHeart);
+
+  const badgeChat = new THREE.Mesh(badgePillGeo, badgeWhiteMat);
+  badgeChat.position.set(-0.8, -0.6, 0.7);
+  socialGroup.add(badgeChat);
+
+  scene.add(socialGroup);
+  stationGroup.push(socialGroup);
+
+  // ────────────────────────────────────────────────────────────────
+  // Station 4: Mobile App Development (Titanium Phone + Glass Card Fan)
+  // ────────────────────────────────────────────────────────────────
+  const phoneGroup = new THREE.Group();
+  const s4 = STATIONS[4];
+  phoneGroup.position.set(s4.position[0], s4.position[1], s4.position[2]);
+
+  // Phone Chassis (rounded box)
+  const phoneChassisGeo = new THREE.BoxGeometry(1.35, 2.7, 0.12);
+  const phoneChassisMat = new THREE.MeshStandardMaterial({
+    color: 0x1b2029,
+    roughness: 0.28,
+    metalness: 0.88,
+    envMap,
+    envMapIntensity: 1.4,
+  });
+  const phoneChassis = new THREE.Mesh(phoneChassisGeo, phoneChassisMat);
+  phoneChassis.rotation.y = 0.22;
+  phoneChassis.rotation.z = -0.06;
+  phoneGroup.add(phoneChassis);
+
+  // Phone Screen
+  const mobileTex = loadSafeTexture('/assets/services/panel-mobile-alpha.webp');
+  const screenGeo = new THREE.PlaneGeometry(1.22, 2.5);
+  const screenMat = new THREE.MeshStandardMaterial({
+    map: mobileTex,
+    roughness: 0.08,
+    metalness: 0.2,
+    emissive: new THREE.Color(0x0a2266),
+    emissiveIntensity: 0.4,
+  });
+  const phoneScreen = new THREE.Mesh(screenGeo, screenMat);
+  phoneScreen.position.set(0, 0, 0.07);
+  phoneScreen.rotation.y = 0.22;
+  phoneScreen.rotation.z = -0.06;
+  phoneGroup.add(phoneScreen);
+
+  // Fanning Translucent Glass Card Slices
+  [-0.6, -0.2, 0.3, 0.7].forEach((xOff, i) => {
+    const cardSlice = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 1.8), frostedGlassMat);
+    cardSlice.position.set(xOff + 0.8, -0.1, -0.3 + i * 0.15);
+    cardSlice.rotation.y = 0.35 + i * 0.05;
+    cardSlice.rotation.z = -0.05;
+    phoneGroup.add(cardSlice);
+  });
+
+  scene.add(phoneGroup);
+  stationGroup.push(phoneGroup);
+
+  // ────────────────────────────────────────────────────────────────
+  // Station 5: Software Development (Modular Isometric Cubes + Golden Seams)
+  // ────────────────────────────────────────────────────────────────
+  const cubesGroup = new THREE.Group();
+  const s5 = STATIONS[5];
+  cubesGroup.position.set(s5.position[0], s5.position[1], s5.position[2]);
+
+  const softwareTex = loadSafeTexture('/assets/services/panel-software-alpha.webp');
+  const cubeGeo = new THREE.BoxGeometry(0.65, 0.65, 0.65);
+
+  const concreteMat = new THREE.MeshStandardMaterial({
+    color: 0x222934,
+    roughness: 0.75,
+    metalness: 0.05,
+  });
+
+  const blueAcrylicMat = new THREE.MeshStandardMaterial({
+    color: 0x1945f5,
+    roughness: 0.15,
+    metalness: 0.4,
+    emissive: new THREE.Color(0x1945f5),
+    emissiveIntensity: 0.65,
+    transparent: true,
+    opacity: 0.88,
+  });
+
+  // 8 Isometric Cubes in structured cluster
+  const cubeOffsets: [number, number, number, number][] = [
+    [-0.5, 0.4, 0, 0], // blue acrylic
+    [0.2, 0.4, 0.2, 1], // glass
+    [-0.5, -0.3, 0.3, 2], // concrete
+    [0.3, -0.3, 0, 0], // blue acrylic
+    [-0.1, 0.1, 0.6, 0], // blue acrylic
+    [0.7, 0.1, 0.4, 1], // glass
+    [-0.8, 0.1, -0.3, 2], // concrete
+    [0.1, 0.8, -0.2, 1], // glass
+  ];
+
+  cubeOffsets.forEach(([cx, cy, cz, type]) => {
+    const mat = type === 0 ? blueAcrylicMat : type === 1 ? frostedGlassMat : concreteMat;
+    const cMesh = new THREE.Mesh(cubeGeo, mat);
+    cMesh.position.set(cx, cy, cz);
+    cMesh.rotation.x = 0.35;
+    cMesh.rotation.y = 0.45;
+    cubesGroup.add(cMesh);
+  });
+
+  // Central glowing </> code glyph
+  const glyphGeo = new THREE.PlaneGeometry(0.8, 0.8);
+  const glyphMat = new THREE.MeshBasicMaterial({
+    map: softwareTex,
+    transparent: true,
+    side: THREE.DoubleSide,
+  });
+  const glyphMesh = new THREE.Mesh(glyphGeo, glyphMat);
+  glyphMesh.position.set(0, 0, 0.7);
+  cubesGroup.add(glyphMesh);
+
+  scene.add(cubesGroup);
+  stationGroup.push(cubesGroup);
+
+  /* ══════════════════════════════════════════════════════════════════
+     LAYER 5: Sweeping Cream Foreground Typography Ribbon
+     ══════════════════════════════════════════════════════════════════ */
+  const ribbonTex = loadSafeTexture('/assets/services/ribbon-texture.png');
+  ribbonTex.wrapS = THREE.RepeatWrapping;
+  ribbonTex.wrapT = THREE.ClampToEdgeWrapping;
+  ribbonTex.repeat.set(1, 1);
+
+  const ribbonCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-6.5, -2.4, 2.5),
+    new THREE.Vector3(-4.0, -2.8, 2.8),
+    new THREE.Vector3(-1.0, -2.9, 2.6),
+    new THREE.Vector3(2.2, -2.5, 2.0),
+    new THREE.Vector3(4.8, -1.8, 1.2),
+    new THREE.Vector3(6.2, -0.8, 0.2),
+    new THREE.Vector3(5.6, 0.4, -0.8),
+  ]);
+
+  // Create ribbon as an extruded strip with normal facing camera
+  const ribbonPoints = ribbonCurve.getPoints(80);
+  const ribbonGeom = new THREE.BufferGeometry();
+  const vertices: number[] = [];
+  const uvs: number[] = [];
+  const indices: number[] = [];
+  const ribbonWidth = 0.48;
+
+  for (let i = 0; i < ribbonPoints.length; i++) {
+    const p = ribbonPoints[i];
+    const u = i / (ribbonPoints.length - 1);
+
+    // Tangent and normal vectors
+    const nextP = ribbonPoints[Math.min(i + 1, ribbonPoints.length - 1)];
+    const prevP = ribbonPoints[Math.max(i - 1, 0)];
+    const tangent = new THREE.Vector3().subVectors(nextP, prevP).normalize();
+    const up = new THREE.Vector3(0, 1, 0.2).normalize();
+    const normal = new THREE.Vector3().crossVectors(tangent, up).normalize().multiplyScalar(ribbonWidth);
+
+    vertices.push(p.x - normal.x, p.y - normal.y, p.z - normal.z);
+    uvs.push(u, 0);
+
+    vertices.push(p.x + normal.x, p.y + normal.y, p.z + normal.z);
+    uvs.push(u, 1);
+
+    if (i < ribbonPoints.length - 1) {
+      const idx = i * 2;
+      indices.push(idx, idx + 1, idx + 2);
+      indices.push(idx + 1, idx + 3, idx + 2);
+    }
+  }
+
+  ribbonGeom.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  ribbonGeom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  ribbonGeom.setIndex(indices);
+  ribbonGeom.computeVertexNormals();
+
+  const ribbonMat = new THREE.MeshStandardMaterial({
+    map: ribbonTex,
+    roughness: 0.4,
+    metalness: 0.1,
+    side: THREE.DoubleSide,
+  });
+
+  const ribbonMesh = new THREE.Mesh(ribbonGeom, ribbonMat);
+  scene.add(ribbonMesh);
+
+  /* ── Cleanup Function ── */
+  const dispose = () => {
+    envMap.dispose();
+    scene.clear();
+  };
 
   return {
     scene,
     stationGroup,
-    updateTheme: (newTheme: CapabilitiesTheme) => {
-      const nt = THEMES[newTheme];
-      scene.background = new THREE.Color(nt.bg);
-      if (scene.fog) scene.fog.color.set(nt.fog);
-      envMap.dispose();
-      scene.environment = createStudioEnvironment(renderer, newTheme);
-    },
-    dispose: () => {
-      envMap.dispose();
-      scene.traverse((obj) => {
-        if (obj instanceof THREE.Mesh) {
-          obj.geometry.dispose();
-          if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose());
-          else obj.material.dispose();
-        }
-      });
-    },
+    ribbonMesh,
+    headGroup,
+    bgGroup,
+    cursorMesh,
+    socialGroup,
+    phoneGroup,
+    cubesGroup,
+    dispose,
   };
 }

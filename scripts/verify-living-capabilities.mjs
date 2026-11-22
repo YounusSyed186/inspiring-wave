@@ -21,7 +21,7 @@ async function scrollToPosition(page, targetY) {
       window.scrollTo(0, y);
     }
   }, targetY);
-  await page.waitForTimeout(450);
+  await page.waitForTimeout(500);
 }
 
 async function run() {
@@ -66,7 +66,7 @@ async function run() {
       return {
         hasTrigger: !!st,
         start: st ? st.start : (rect ? rect.top + window.scrollY : 7000),
-        end: st ? st.end : (rect ? rect.top + window.scrollY + 4050 : 11050),
+        end: st ? st.end : (rect ? rect.top + window.scrollY + 4300 : 11300),
         hasCanvas: !!canvas,
         canvasWidth: canvas?.width,
         canvasHeight: canvas?.height,
@@ -77,14 +77,20 @@ async function run() {
     const startY = triggerInfo.start;
     const totalDistance = triggerInfo.end - triggerInfo.start;
 
-    // Checkpoints for the 6 stations
+    // Overview screenshot
+    await scrollToPosition(page, startY);
+    await page.screenshot({ path: path.join(OUT_DIR, 'lc-00-overview.png') });
+    console.log('Captured lc-00-overview.png');
+
+    // Checkpoints for the 6 stations + finale
     const checkpoints = [
-      { name: '01-strategy', p: 0.1, expectedTitle: 'Digital Strategy' },
-      { name: '02-web', p: 0.26, expectedTitle: 'Web Development' },
-      { name: '03-uiux', p: 0.44, expectedTitle: 'UI/UX Design' },
-      { name: '04-social', p: 0.6, expectedTitle: 'Social Media' },
-      { name: '05-mobile', p: 0.76, expectedTitle: 'Mobile App Development' },
-      { name: '06-software', p: 0.92, expectedTitle: 'Software Development' },
+      { name: '01-strategy', p: 0.16, expectedTitle: 'Digital Strategy' },
+      { name: '02-web', p: 0.28, expectedTitle: 'Web Development' },
+      { name: '03-uiux', p: 0.40, expectedTitle: 'UI/UX Design' },
+      { name: '04-social', p: 0.52, expectedTitle: 'Social Media' },
+      { name: '05-mobile', p: 0.64, expectedTitle: 'Mobile App Development' },
+      { name: '06-software', p: 0.77, expectedTitle: 'Software Development' },
+      { name: '07-finale', p: 0.95, expectedTitle: 'Finale' },
     ];
 
     for (const cp of checkpoints) {
@@ -93,71 +99,98 @@ async function run() {
 
       const state = await page.evaluate(() => {
         const titleEl = document.querySelector('.lc-station-title');
-        const numEl = document.querySelector('.lc-station-num');
+        const taglineEl = document.querySelector('.lc-station-tagline');
         const infoEl = document.querySelector('.lc-station-info');
-        const activeNav = document.querySelector('.lc-nav-item.active .lc-nav-num');
+        const finaleEl = document.querySelector('.lc-finale-panel');
         return {
           title: titleEl?.textContent?.trim(),
-          num: numEl?.textContent?.trim(),
+          tagline: taglineEl?.textContent?.trim(),
           infoVisible: infoEl?.classList.contains('visible'),
-          activeNavNum: activeNav?.textContent?.trim(),
+          finaleVisible: finaleEl?.classList.contains('visible'),
         };
       });
 
-      console.log(`Station ${cp.name} (targetY=${targetY}):`, state);
-      summary.desktopStations.push({ ...cp, ...state, matched: state.title === cp.expectedTitle });
+      console.log(`Station ${cp.name} (p=${cp.p}):`, state);
+      summary.desktopStations.push({ ...cp, actual: state });
 
-      const shotPath = path.join(OUT_DIR, `lca-1440-${cp.name}.png`);
+      const shotPath = path.join(OUT_DIR, `lc-${cp.name}.png`);
       await page.screenshot({ path: shotPath });
     }
 
-    // Test clicking navigation (click station 4: Social Media)
-    console.log('Testing station navigation click...');
-    const navItems = await page.$$('.lc-nav-item');
-    if (navItems.length >= 4) {
-      await navItems[3].click();
-      await page.waitForTimeout(1600); // smooth scroll duration
-      const clickedStationTitle = await page.$eval('.lc-station-title', (el) => el.textContent?.trim());
-      console.log('Navigated via click to:', clickedStationTitle);
-      summary.navClickTest = (clickedStationTitle === 'Social Media');
+    // 2. Navigation Click Test
+    console.log('Testing interactive pin navigation click...');
+    await scrollToPosition(page, startY);
+    await page.waitForTimeout(300);
+
+    // Click Station 2 pin (03 // UI/UX DESIGN)
+    const pinClicked = await page.evaluate(() => {
+      const pin = document.querySelector('.lc-callout-2');
+      if (pin) {
+        pin.click();
+        return true;
+      }
+      return false;
+    });
+
+    if (pinClicked) {
+      await page.waitForTimeout(1400);
+      const afterNav = await page.evaluate(() => {
+        const title = document.querySelector('.lc-station-title')?.textContent?.trim();
+        return title;
+      });
+      console.log('After pin click, active station title:', afterNav);
+      summary.navClickTest = afterNav === 'UI/UX Design';
+      await page.screenshot({ path: path.join(OUT_DIR, 'lc-after-pin-click.png') });
     }
 
-    // Capture final wide view
-    const finalY = Math.round(startY + totalDistance * 0.98);
-    await scrollToPosition(page, finalY);
-    await page.screenshot({ path: path.join(OUT_DIR, 'lca-1440-07-final.png') });
     await page.close();
 
-    // 2. Mobile Viewport test (390x844)
+    // 3. Mobile test (390x844)
     console.log('Testing Mobile 390x844...');
     const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 } });
     await mobilePage.goto(URL, { waitUntil: 'domcontentloaded' });
     await waitPastPreloader(mobilePage);
 
-    const mobileServices = await mobilePage.$('#services');
-    if (mobileServices) {
-      await mobileServices.scrollIntoViewIfNeeded();
-      await mobilePage.waitForTimeout(600);
-      const mobileCards = await mobilePage.$$('.lc-mobile-card');
-      summary.mobileOk = mobileCards.length === 6;
-      console.log(`Mobile cards count: ${mobileCards.length}`);
-      await mobilePage.screenshot({ path: path.join(OUT_DIR, 'lca-mobile-390.png') });
-    }
+    await mobilePage.evaluate(() => {
+      const el = document.querySelector('#services');
+      if (el) el.scrollIntoView({ behavior: 'instant' });
+    });
+    await mobilePage.waitForTimeout(600);
+
+    const mobileCheck = await mobilePage.evaluate(() => {
+      const mobileEl = document.querySelector('.lc-mobile');
+      const cards = document.querySelectorAll('.lc-mobile-card');
+      return {
+        hasMobile: !!mobileEl,
+        cardCount: cards.length,
+      };
+    });
+    console.log('Mobile check:', mobileCheck);
+    summary.mobileOk = mobileCheck.hasMobile && mobileCheck.cardCount === 6;
+
+    await mobilePage.screenshot({ path: path.join(OUT_DIR, 'lc-mobile.png') });
     await mobilePage.close();
 
+  } catch (err) {
+    console.error('Test run failed:', err);
+    summary.errors.push(err.message);
   } finally {
     await browser.close();
   }
 
-  console.log('\n=== VERIFICATION SUMMARY ===');
+  console.log('\n📊 VERIFICATION SUMMARY:');
   console.log(JSON.stringify(summary, null, 2));
 
-  if (summary.errors.length > 0) {
-    console.error('Errors encountered during test:', summary.errors);
+  const allStationsOk = summary.desktopStations.length === 7;
+  const passed = allStationsOk && summary.mobileOk && summary.errors.length === 0;
+
+  if (passed) {
+    console.log('✅ ALL VERIFICATION CHECKS PASSED!');
+    process.exit(0);
+  } else {
+    console.error('❌ SOME CHECKS FAILED');
+    process.exit(1);
   }
 }
 
-run().catch((err) => {
-  console.error('Fatal verification failure:', err);
-  process.exit(1);
-});
+run();

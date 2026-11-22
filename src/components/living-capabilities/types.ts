@@ -6,6 +6,7 @@ export interface StationConfig {
   index: number;
   slug: string;
   title: string;
+  tagline: string;
   summary: string;
   deliverables: string[];
   /** World-space position for the installation */
@@ -46,8 +47,8 @@ export const THEMES = {
     neonYellow: '#d8f03c',
     textPrimary: '#f1efe7',
     textSecondary: 'rgba(241, 239, 231, 0.72)',
-    cardBg: 'rgba(12, 16, 22, 0.85)',
-    cardBorder: 'rgba(25, 69, 245, 0.3)',
+    cardBg: 'rgba(12, 16, 22, 0.88)',
+    cardBorder: 'rgba(25, 69, 245, 0.35)',
   },
   cream: {
     bg: '#f5f2ea',
@@ -66,7 +67,7 @@ export const THEMES = {
     neonYellow: '#d8f03c',
     textPrimary: '#080a0b',
     textSecondary: 'rgba(8, 10, 11, 0.75)',
-    cardBg: 'rgba(245, 242, 234, 0.88)',
-    cardBorder: 'rgba(25, 69, 245, 0.18)',
+    cardBg: 'rgba(245, 242, 234, 0.92)',
+    cardBorder: 'rgba(25, 69, 245, 0.22)',
   },
 } as const;

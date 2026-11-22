@@ -7,7 +7,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import * as THREE from 'three';
 import { buildCapabilitiesScene, type SceneResult } from './scene';
-import { updateCamera, animateStations } from './animations';
+import { updateCamera, animateCollage } from './animations';
 import { DESKTOP_MIN } from './config';
 import type { CapabilitiesTheme } from './types';
 
@@ -52,11 +52,11 @@ export function CapabilitiesCanvas({ progress, theme, containerRef }: Props) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!isDesktop || reducedMotion) return;
 
-    // Camera setup
-    const camera = new THREE.PerspectiveCamera(44, container.clientWidth / container.clientHeight, 0.1, 200);
+    // Camera setup - wide angle 42deg for cinematic editorial composition
+    const camera = new THREE.PerspectiveCamera(42, container.clientWidth / container.clientHeight, 0.1, 100);
     cameraRef.current = camera;
 
-    // Renderer setup with soft shadows and studio tone mapping
+    // Renderer setup
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
@@ -66,11 +66,11 @@ export function CapabilitiesCanvas({ progress, theme, containerRef }: Props) {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = theme === 'dark' ? 1.25 : 1.15;
+    renderer.toneMappingExposure = 1.2;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     rendererRef.current = renderer;
 
-    // Build scene with environment reflections
+    // Build editorial collage scene
     const sceneResult = buildCapabilitiesScene(renderer, theme);
     sceneRef.current = sceneResult;
 
@@ -86,7 +86,7 @@ export function CapabilitiesCanvas({ progress, theme, containerRef }: Props) {
       const p = progressRef.current;
 
       updateCamera(camera, p);
-      animateStations(sceneResult.stationGroup, time, p);
+      animateCollage(sceneResult, time, p);
       renderer.render(sceneResult.scene, camera);
     };
     rafRef.current = requestAnimationFrame(animate);
@@ -97,21 +97,10 @@ export function CapabilitiesCanvas({ progress, theme, containerRef }: Props) {
     return () => {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
-      renderer.dispose();
       sceneResult.dispose();
-      rendererRef.current = null;
-      cameraRef.current = null;
-      sceneRef.current = null;
+      renderer.dispose();
     };
-  }, [resize, containerRef, theme]);
+  }, [theme, resize, containerRef]);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="lc-canvas"
-      aria-hidden="true"
-    />
-  );
+  return <canvas ref={canvasRef} className="lc-canvas" aria-hidden="true" />;
 }
-
-export default CapabilitiesCanvas;
