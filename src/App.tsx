@@ -7,6 +7,7 @@ import { zoomParallaxImages } from '@/components/ui/demo';
 import { AnimatedMarqueeHero } from '@/components/ui/hero-3';
 import { ArtisticMethodSection } from '@/components/ui/artistic-method-section';
 import { CreativeMachineHero } from '@/components/creative-machine/CreativeMachineHero';
+import { LivingCapabilities } from '@/components/living-capabilities/LivingCapabilities';
 import { TestimonialSlider, Review } from '@/components/ui/testimonial-slider-1';
 import { CtaSlider } from '@/components/ui/cta-slider';
 import DoodleCrewFooter from '@/components/ui/doodle-crew-footer';
@@ -127,85 +128,7 @@ const serviceImages = [
 ];
 
 function Capabilities() {
-  const [active, setActive] = useState(0);
-
-  return <AnimatedSection className="capabilities section" id="services" animation="fade-up">
-    <Marker n="04">SERVICES</Marker>
-    <Reveal className="cap-intro">
-      <h2>
-        <AnimatedWords text="WHAT WE" /> <em><AnimatedWords text="move." delay={0.08} /></em>
-      </h2>
-      <p>
-        <AnimatedWords text="Six connected disciplines. One focused studio." delay={0.12} />
-      </p>
-    </Reveal>
-    <div className="service-layout">
-      <div className="service-list">
-        {services.map((s, i) => {
-          const isActive = active === i;
-          return (
-            <article
-              className={`service-row ${isActive ? 'active' : ''}`}
-              key={s.slug}
-            >
-              <button
-                type="button"
-                onClick={() => setActive(i)}
-                onMouseEnter={() => setActive(i)}
-                onFocus={() => setActive(i)}
-                aria-expanded={isActive}
-              >
-                <b>{String(i + 1).padStart(2, '0')}</b>
-                <h3>{s.title}</h3>
-                <motion.span
-                  animate={{ rotate: isActive ? 45 : 0 }}
-                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  ↗
-                </motion.span>
-              </button>
-              <AnimatePresence initial={false}>
-                {isActive && (
-                  <motion.div
-                    key="content"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                    className="service-expand"
-                  >
-                    <p>{s.summary}</p>
-                    <Link to={`/services/${s.slug}`}>EXPLORE SERVICE →</Link>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </article>
-          );
-        })}
-      </div>
-
-      <div className="service-stage" aria-hidden="true">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={active}
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.01 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute inset-0 w-full h-full"
-          >
-            <img
-              src={serviceImages[active] || serviceImages[0]}
-              alt=""
-              className="w-full h-full object-cover"
-            />
-            <div className="stage-number">0{active + 1}</div>
-            <div className="stage-grid" />
-          </motion.div>
-        </AnimatePresence>
-      </div>
-    </div>
-  </AnimatedSection>;
+  return <LivingCapabilities />;
 }
 
 function Method() {
