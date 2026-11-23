@@ -1,0 +1,6 @@
+{
+  "/studio/generate/page": "app/studio/generate/page.js",
+  "/api/jobs/route": "app/api/jobs/route.js",
+  "/api/generate/route": "app/api/generate/route.js",
+  "/api/tasks/route": "app/api/tasks/route.js"
+}

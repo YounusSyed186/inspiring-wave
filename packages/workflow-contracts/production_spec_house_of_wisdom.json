@@ -1,0 +1,51 @@
+{
+  "project": "Inspiring Wave Autonomous Production",
+  "channel": "Islamic Hystory",
+  "category": "History & Education",
+  "title": "The House of Wisdom: Baghdad's Golden Age of Science",
+  "target_duration_seconds": 50,
+  "hook": "Long before the Renaissance in Europe, an intellectual explosion in ninth-century Baghdad laid the foundation for modern mathematics, optics, and astronomy.",
+  "scenes": [
+    {
+      "scene_number": 1,
+      "name": "Prologue & Hook",
+      "duration_seconds": 12,
+      "narration": "Long before the Renaissance in Europe, an intellectual explosion in ninth-century Baghdad laid the foundation for modern mathematics, optics, and astronomy.",
+      "visual_style": "impasto",
+      "visual_concept": "Atmospheric golden dawn over ancient Islamic architecture and library halls, celestial astrolabe glinting in the light.",
+      "camera": "Slow cinematic push-in through arched colonnades",
+      "on_screen_text": "BAGHDAD, 830 CE • THE INTELLECTUAL EXPLOSION"
+    },
+    {
+      "scene_number": 2,
+      "name": "The House of Wisdom & Algebra",
+      "duration_seconds": 14,
+      "narration": "At the center of it all stood Bayt al-Hikma—the House of Wisdom. Here, polymath Al-Khwarizmi developed the principles of algebra and algorithmic computation.",
+      "visual_style": "chalkboard",
+      "visual_concept": "Intricate Arabic geometric manuscripts, algebraic formulas resolving across parchment, calligraphy and mathematical proofs.",
+      "camera": "Top-down overhead macro scan with glowing golden glyphs",
+      "on_screen_text": "AL-KHWARIZMI • THE BIRTH OF ALGEBRA"
+    },
+    {
+      "scene_number": 3,
+      "name": "The Optics Revolution",
+      "duration_seconds": 12,
+      "narration": "In physics and optics, Ibn al-Haytham overturned ancient beliefs, proving that light travels in straight lines and pioneering the modern empirical scientific method.",
+      "visual_style": "satellite-briefing",
+      "visual_concept": "Light rays refracting through glass prisms, focal optics diagrams, camera obscura schematic with beam vectors.",
+      "camera": "Orbital tracking shot with volumetric light beams",
+      "on_screen_text": "IBN AL-HAYTHAM • FOUNDER OF MODERN OPTICS"
+    },
+    {
+      "scene_number": 4,
+      "name": "Mapping the Cosmos",
+      "duration_seconds": 12,
+      "narration": "Observatories mapped celestial coordinates with astonishing precision, constructing brass astrolabes that guided explorers across uncharted deserts and oceans.",
+      "visual_style": "blueprint",
+      "visual_concept": "Intricate brass astrolabe mechanism rotating over stellar sky maps and celestial coordinates.",
+      "camera": "Slow rotational tilt with deep midnight blue aesthetic",
+      "on_screen_text": "MAPPING THE STARS • THE PRECISION ASTROLABE"
+    }
+  ],
+  "full_voiceover_script": "Long before the Renaissance in Europe, an intellectual explosion in ninth-century Baghdad laid the foundation for modern mathematics, optics, and astronomy. At the center of it all stood Bayt al-Hikma—the House of Wisdom. Here, polymath Al-Khwarizmi developed the principles of algebra and algorithmic computation. In physics and optics, Ibn al-Haytham overturned ancient beliefs, proving that light travels in straight lines and pioneering the modern empirical scientific method. Observatories mapped celestial coordinates with astonishing precision, constructing brass astrolabes that guided explorers across uncharted deserts and oceans. This is the golden legacy that reshaped human civilization."
+}

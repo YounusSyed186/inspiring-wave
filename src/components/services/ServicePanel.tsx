@@ -45,10 +45,10 @@ export const ServicePanel: React.FC<ServicePanelProps> = ({
             zIndex: layout.id === 'strategy' ? 10 : layout.id === 'uiux' ? 12 : 8,
           }
           : {
-              position: 'relative',
-              width: '100%',
-              aspectRatio: `${layout.width} / ${layout.height}`,
-            }
+            position: 'relative',
+            width: '100%',
+            aspectRatio: `${layout.width} / ${layout.height}`,
+          }
       }
     >
       {/* Layer 1: SVG Defs for ObjectBoundingBox Clip Path */}
@@ -233,11 +233,11 @@ export const ServicePanel: React.FC<ServicePanelProps> = ({
             : layout.id === 'strategy'
               ? 'px-[11%] pt-[11%] pb-[8%]'
               : layout.id === 'social'
-              ? 'px-[11%] pt-[10%] pb-[8%]'
-              : layout.id === 'software'
-              ? 'px-[9%] pt-[9%] pb-[8%]'
-              : 'px-[8%] pt-[8%] pb-[8%]'
-          } flex flex-col justify-between`}
+                ? 'px-[11%] pt-[10%] pb-[8%]'
+                : layout.id === 'software'
+                  ? 'px-[9%] pt-[9%] pb-[8%]'
+                  : 'px-[8%] pt-[8%] pb-[8%]'
+            } flex flex-col justify-between`}
           style={{ color: textColor }}
         >
           {/* Eyebrow Label & Specific Card Vector Accents */}
@@ -292,16 +292,15 @@ export const ServicePanel: React.FC<ServicePanelProps> = ({
 
             {/* Service Title */}
             <h3
-              className={`panel-title font-display font-black uppercase italic leading-[0.88] tracking-[-0.035em] mt-0.5 ${
-                layout.id === 'uiux'
-                  ? 'text-[clamp(32px,5.4cqi,92px)] flex items-center gap-4'
-                  : layout.id === 'strategy' || layout.id === 'web'
+              className={`panel-title font-display font-black uppercase italic leading-[0.88] tracking-[-0.035em] mt-0.5 ${layout.id === 'uiux'
+                ? 'text-[clamp(32px,5.4cqi,92px)] flex items-center gap-4'
+                : layout.id === 'strategy' || layout.id === 'web'
                   ? 'text-[clamp(22px,3.6cqi,58px)] max-w-[50%]'
                   : layout.id === 'mobile'
-                  ? 'text-[clamp(14px,1.9cqi,30px)] max-w-[50%]'
-                  : layout.id === 'software'
-                  ? 'text-[clamp(15px,2.05cqi,32px)] max-w-[50%]'
-                  : 'text-[clamp(19px,2.8cqi,44px)] max-w-[46%]'
+                    ? 'text-[clamp(14px,1.9cqi,30px)] max-w-[50%]'
+                    : layout.id === 'software'
+                      ? 'text-[clamp(15px,2.05cqi,32px)] max-w-[50%]'
+                      : 'text-[clamp(19px,2.8cqi,44px)] max-w-[46%]'
                 }`}
             >
               {layout.id === 'uiux' ? (
@@ -374,9 +373,8 @@ export const ServicePanel: React.FC<ServicePanelProps> = ({
           {/* Lower Zone: Circular Arrow Link Indicator */}
           <div className={`panel-footer-zone ${layout.id === 'strategy' ? 'mt-auto mb-[15%]' : 'mt-auto'}`}>
             <div
-              className={`panel-arrow-button w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 ease-out ${
-                isCream ? 'bg-[#111110] text-[#FFFDF5]' : 'border-2 border-[#FFFDF5] text-[#FFFDF5] bg-transparent'
-              }`}
+              className={`panel-arrow-button w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 ease-out ${isCream ? 'bg-[#111110] text-[#FFFDF5]' : 'border-2 border-[#FFFDF5] text-[#FFFDF5] bg-transparent'
+                }`}
               style={{
                 transform: isHovered ? 'scale(1.08) translate3d(3px, 0, 0)' : 'scale(1)',
               }}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useMemo, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
 import { ArrowUpRight, Compass, Crosshair, Layers, Cpu, Rocket, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -257,13 +257,41 @@ export function ArtisticMethodSection() {
 
   const PHASE_ICONS = [Compass, Crosshair, Layers, Cpu, Rocket];
 
+  // 3D Scroll Reveal Physics (Awwwards-style spatial perspective entrance)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "start 25%"],
+  });
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 85,
+    damping: 24,
+    restDelta: 0.001,
+  });
+
+  const sectionRotateX = useTransform(smoothProgress, [0, 1], [14, 0]);
+  const sectionRotateY = useTransform(smoothProgress, [0, 1], [-3, 0]);
+  const sectionScale = useTransform(smoothProgress, [0, 1], [0.93, 1]);
+  const sectionZ = useTransform(smoothProgress, [0, 1], [-60, 0]);
+  const sectionOpacity = useTransform(smoothProgress, [0, 0.35, 1], [0.45, 0.85, 1]);
+
   return (
     <section
       ref={sectionRef}
       id="method"
-      className="method section dark relative bg-[#080a0b] text-[#f1efe7] pt-32 pb-36 md:pt-40 md:pb-44"
+      className="method section dark relative bg-[#080a0b] text-[#f1efe7] pt-32 pb-36 md:pt-40 md:pb-44 [perspective:1400px] [perspective-origin:50%_25%]"
       style={{ "--stage": active, overflow: "visible" } as React.CSSProperties}
     >
+      <motion.div
+        style={{
+          rotateX: sectionRotateX,
+          rotateY: sectionRotateY,
+          scale: sectionScale,
+          z: sectionZ,
+          opacity: sectionOpacity,
+          transformStyle: "preserve-3d",
+        }}
+        className="w-full"
+      >
       {/* Decorative Clipped Background Wrapper (keeps section overflow:visible so sticky works!) */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
         {/* 1. Torn-Paper Top Edge (rips from ivory 04 / SERVICES above into dark 05 / METHOD) */}
@@ -393,11 +421,10 @@ export function ArtisticMethodSection() {
         ref={gridRef}
         className="artistic-method-grid relative z-10 w-full max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start"
       >
-        {/* Left Column (7 of 12 cols): Big, Commanding, Uncluttered Scroll-Following Image Stage */}
+        {/* Left Column (7 of 12 cols): Big, Commanding, Uncluttered Sticky Image Stage */}
         <div
           ref={stageColRef}
-          className="artistic-method-sticky-col lg:col-span-7 self-start will-change-transform w-full"
-          style={{ transform: `translate3d(0, ${pinY}px, 0)` }}
+          className="artistic-method-sticky-col lg:col-span-7 self-start w-full lg:sticky lg:top-28 z-20"
         >
           <div className="artistic-method-stage relative w-full h-[54vh] sm:h-[64vh] lg:h-[76vh] min-h-[520px] max-h-[780px] rounded-2xl overflow-hidden border border-white/15 bg-[#050709] shadow-[0_32px_80px_rgba(0,0,0,0.85)]">
             {/* Clean High-Resolution Phase Photograph (Full Bleed, Unobstructed) */}
@@ -594,6 +621,7 @@ export function ArtisticMethodSection() {
           </div>
         </ol>
       </div>
+      </motion.div>
 
       {/* 5. Torn-Paper Bottom Edge (rips cleanly into ivory 06 / STUDIO below) */}
       <div

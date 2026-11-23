@@ -22,7 +22,7 @@ export class GeminiClient {
 
   constructor(config: GeminiClientConfig = {}) {
     this.apiKey = config.apiKey || process.env.GEMINI_API_KEY || '';
-    this.defaultModel = config.defaultModel || 'gemini-2.5-flash';
+    this.defaultModel = config.defaultModel || process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
     this.freeOnlyMode = config.freeOnlyMode ?? true;
   }
 

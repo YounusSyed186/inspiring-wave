@@ -103,12 +103,17 @@ export class LemoOpuscarAdapter {
       outputMp4Path
     ];
 
+    const gyanBin = 'C:\\Users\\DELL\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.1-full_build\\bin';
+    const envPath = `${gyanBin};${process.env.PATH || ''};${process.env.Path || ''}`;
+
     return new Promise((resolve, reject) => {
       const child = spawn(process.execPath, args, {
         cwd: this.libPath,
         stdio: ['ignore', 'pipe', 'pipe'],
         env: {
           ...process.env,
+          PATH: envPath,
+          Path: envPath,
           NODE_PATH: path.join(this.libPath, 'node_modules')
         }
       });

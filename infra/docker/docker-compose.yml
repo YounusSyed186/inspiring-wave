@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # --------------------------------------------------------------------------
+  # 1. Next.js Studio Web Dashboard & Server APIs
+  # --------------------------------------------------------------------------
+  web:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.web
+    container_name: studio_web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://supabase-db:54321}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-anon_key}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - studio_storage:/app/local_storage
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+  # --------------------------------------------------------------------------
+  # 2. Video Rendering & ML Processing Worker
+  # --------------------------------------------------------------------------
+  worker:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.worker
+    container_name: studio_worker
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-studio}
+      - STORAGE_DIR=/workspace/local_storage
+    volumes:
+      - studio_storage:/workspace/local_storage
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+  # --------------------------------------------------------------------------
+  # 3. PostgreSQL Database
+  # --------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: studio_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-studio}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../migrations/001_initial_schema.sql:/docker-entrypoint-initdb.d/001_initial_schema.sql:ro
+    restart: unless-stopped
+
+volumes:
+  studio_storage:
+  postgres_data:

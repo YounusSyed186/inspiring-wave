@@ -572,6 +572,21 @@ export const AnimatedMarqueeHero: React.FC<AnimatedMarqueeHeroProps> = ({
   const velocityFactor = useTransform(smoothVelocity, [-1800, 0, 1800], [-3.2, 0, 3.2]);
   const marqueeSkew = useTransform(smoothVelocity, [-1800, 0, 1800], [5, 0, -5]);
 
+  // 3D Scroll Reveal Physics (Awwwards-style cylindrical contact-sheet unroll)
+  const { scrollYProgress: enterProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "start 25%"],
+  });
+  const smoothEnter = useSpring(enterProgress, {
+    stiffness: 85,
+    damping: 24,
+    restDelta: 0.001,
+  });
+  const sectionRotateX = useTransform(smoothEnter, [0, 1], [14, 0]);
+  const sectionZ = useTransform(smoothEnter, [0, 1], [-60, 0]);
+  const sectionScale = useTransform(smoothEnter, [0, 1], [0.94, 1]);
+  const sectionOpacity = useTransform(smoothEnter, [0, 0.35, 1], [0.4, 0.85, 1]);
+
   const baseX = useMotionValue(0);
   useAnimationFrame((_t, delta) => {
     const dt = Math.min(delta, 64) / 1000;
@@ -599,7 +614,7 @@ export const AnimatedMarqueeHero: React.FC<AnimatedMarqueeHeroProps> = ({
       onPointerMove={handlePointerMove}
       onClick={handleStageClick}
       className={cn(
-        "relative w-full min-h-[105svh] overflow-hidden bg-[#080c12] text-[#f1efe7] flex flex-col items-center justify-between text-center px-4 pt-28 pb-16 md:pt-36 md:pb-24 select-none cursor-crosshair",
+        "relative w-full min-h-[105svh] overflow-hidden bg-[#080c12] text-[#f1efe7] flex flex-col items-center justify-between text-center px-4 pt-28 pb-16 md:pt-36 md:pb-24 select-none cursor-crosshair [perspective:1400px]",
         className
       )}
     >
@@ -618,7 +633,18 @@ export const AnimatedMarqueeHero: React.FC<AnimatedMarqueeHeroProps> = ({
         </svg>
       </div>
 
-      {/* 2. Blueprint Vector Grid & Ambient Glows */}
+      {/* 3D Cylindrical Contact-Sheet Unroll Canvas */}
+      <motion.div
+        style={{
+          rotateX: sectionRotateX,
+          z: sectionZ,
+          scale: sectionScale,
+          opacity: sectionOpacity,
+          transformStyle: "preserve-3d",
+        }}
+        className="relative w-full flex flex-col items-center flex-1"
+      >
+        {/* 2. Blueprint Vector Grid & Ambient Glows */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-[0.14]"
@@ -972,6 +998,7 @@ export const AnimatedMarqueeHero: React.FC<AnimatedMarqueeHeroProps> = ({
           })}
         </motion.div>
       </div>
-    </div>
-  );
+    </motion.div>
+  </div>
+);
 };

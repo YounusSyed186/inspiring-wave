@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -62,80 +62,92 @@ export function ServicesSection() {
 
       // Desktop and large screens entrance timeline
       media.add('(min-width: 960px) and (prefers-reduced-motion: no-preference)', () => {
+        const stage = stageRef.current;
+        if (!stage) return;
+
+        // Stage 3D Entrance & Spatial Unfolding
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: section,
-            start: 'top 75%',
-            end: 'bottom 85%',
+            start: 'top 82%',
+            end: 'top 20%',
             toggleActions: 'play none none none',
             once: true,
           },
           defaults: { ease: 'power3.out' },
         });
 
-        // 1. Blue sun & clouds scale in
+        // 1. Stage container 3D unroll & perspective alignment
+        tl.fromTo(
+          stage,
+          { rotateX: 10, rotateY: -2, scale: 0.94, z: -70, transformOrigin: '50% 10%' },
+          { rotateX: 0, rotateY: 0, scale: 1, z: 0, duration: 1.15, ease: 'power2.out' },
+          0,
+        );
+
+        // 2. Blue sun & clouds scale in with depth
         if (sunRef.current) {
           tl.fromTo(
             sunRef.current,
-            { scale: 0.75, opacity: 0 },
-            { scale: 1, opacity: 1, duration: 0.9, ease: 'back.out(1.15)' },
-            0,
+            { scale: 0.65, z: -90, opacity: 0 },
+            { scale: 1, z: 0, opacity: 1, duration: 1.0, ease: 'back.out(1.2)' },
+            0.05,
           );
         }
 
-        // 2. Grayscale worktable collage unmasks
+        // 3. Grayscale worktable collage unmasks with paper layer elevation
         if (worktableRef.current) {
           tl.fromTo(
             worktableRef.current,
-            { y: 24, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.85 },
-            0.1,
+            { y: 35, rotateX: 14, z: -40, opacity: 0 },
+            { y: 0, rotateX: 0, z: 10, opacity: 1, duration: 0.95 },
+            0.12,
           );
         }
 
-        // 3. Headline lines come up through shallow overflow masks
+        // 4. Headline lines come up through shallow overflow masks
         if (headlineRef.current) {
           const lines = headlineRef.current.querySelectorAll('.headline-text-inner');
           tl.fromTo(
             lines,
-            { y: 22, opacity: 0 },
-            { y: 0, opacity: 1, stagger: 0.06, duration: 0.65, ease: 'power3.out' },
-            0.15,
+            { y: 28, z: 15, opacity: 0 },
+            { y: 0, z: 0, opacity: 1, stagger: 0.07, duration: 0.7, ease: 'power3.out' },
+            0.18,
           );
         }
 
-        // 4. Cobalt name strip rises
+        // 5. Cobalt name strip rises with tactile 3D slant
         if (stripRef.current) {
           tl.fromTo(
             stripRef.current,
-            { scale: 0.92, opacity: 0, rotate: -4 },
-            { scale: 1, opacity: 1, rotate: -2.2, duration: 0.75, ease: 'back.out(1.2)' },
-            0.25,
+            { scale: 0.88, z: 25, opacity: 0, rotate: -6 },
+            { scale: 1, z: 0, opacity: 1, rotate: -2.2, duration: 0.8, ease: 'back.out(1.25)' },
+            0.28,
           );
         }
 
-        // 5. Draw the hand-drawn cobalt underline
+        // 6. Draw the hand-drawn cobalt underline
         if (underlineRef.current) {
           const pathLen = underlineRef.current.getTotalLength?.() || 200;
           tl.fromTo(
             underlineRef.current,
             { strokeDasharray: pathLen, strokeDashoffset: pathLen },
-            { strokeDashoffset: 0, duration: 0.7, ease: 'power2.inOut' },
-            0.4,
+            { strokeDashoffset: 0, duration: 0.75, ease: 'power2.inOut' },
+            0.42,
           );
         }
 
-        // 6. Breaking wave crest rises subtly while ribbon reveals
+        // 7. Breaking Great Wave surges forward with spatial momentum
         if (waveRef.current) {
           tl.fromTo(
             waveRef.current,
-            { y: 28, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.95 },
-            0.2,
+            { y: 45, z: -50, scale: 0.88, rotateX: 12, rotateY: 6, opacity: 0 },
+            { y: 0, z: 24, scale: 1, rotateX: 0, rotateY: 0, opacity: 1, duration: 1.15, ease: 'power3.out' },
+            0.22,
           );
         }
 
-        // 7. Staggered reveal of the 6 uneven service boxes:
+        // 8. Staggered 3D reveal of the 6 uneven service boxes:
         // Top row (Strategy, Web) -> Middle band (UI/UX) -> Lower row (Social, Mobile, Software)
         const panelStrategy = section.querySelector('.panel-strategy');
         const panelWeb = section.querySelector('.panel-web');
@@ -144,21 +156,96 @@ export function ServicesSection() {
         const panelMobile = section.querySelector('.panel-mobile');
         const panelSoftware = section.querySelector('.panel-software');
 
-        const cardSequence = [
-          panelStrategy,
-          panelWeb,
-          panelUiux,
-          panelSocial,
-          panelMobile,
-          panelSoftware,
-        ].filter(Boolean);
+        if (panelStrategy && panelWeb) {
+          tl.fromTo(
+            [panelStrategy, panelWeb],
+            { rotateX: 16, rotateY: -3, z: -40, y: 30, opacity: 0 },
+            { rotateX: 0, rotateY: 0, z: 0, y: 0, opacity: 1, stagger: 0.08, duration: 0.85, ease: 'power3.out' },
+            0.32,
+          );
+        }
 
-        tl.fromTo(
-          cardSequence,
-          { y: 18, opacity: 0 },
-          { y: 0, opacity: 1, stagger: 0.055, duration: 0.75, ease: 'power3.out' },
-          0.32,
-        );
+        if (panelUiux) {
+          tl.fromTo(
+            panelUiux,
+            { scale: 0.93, z: 40, rotateX: -8, y: 32, opacity: 0 },
+            { scale: 1, z: 0, rotateX: 0, y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' },
+            0.42,
+          );
+        }
+
+        const bottomRow = [panelSocial, panelMobile, panelSoftware].filter(Boolean);
+        if (bottomRow.length > 0) {
+          tl.fromTo(
+            bottomRow,
+            { rotateX: 14, rotateY: 3, z: -30, y: 36, opacity: 0 },
+            { rotateX: 0, rotateY: 0, z: 0, y: 0, opacity: 1, stagger: 0.07, duration: 0.85, ease: 'power3.out' },
+            0.5,
+          );
+        }
+
+        // Enhanced continuous 3D Parallax Depth on scroll
+        if (waveRef.current) {
+          gsap.to(waveRef.current, {
+            y: -24,
+            z: 32,
+            scrollTrigger: {
+              trigger: section,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 1.2,
+            },
+          });
+        }
+
+        if (sunRef.current) {
+          gsap.to(sunRef.current, {
+            y: 18,
+            z: -30,
+            scrollTrigger: {
+              trigger: section,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 1.5,
+            },
+          });
+        }
+
+        if (worktableRef.current) {
+          gsap.to(worktableRef.current, {
+            y: -12,
+            z: 15,
+            scrollTrigger: {
+              trigger: section,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 1.3,
+            },
+          });
+        }
+
+        gsap.to('.panel-uiux', {
+          y: -14,
+          z: 20,
+          scrollTrigger: {
+            trigger: section,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1.4,
+          },
+        });
+
+        if (bottomRow.length > 0) {
+          gsap.to(bottomRow, {
+            y: -8,
+            scrollTrigger: {
+              trigger: section,
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: 1.6,
+            },
+          });
+        }
       });
 
       return () => media.revert();
@@ -180,13 +267,39 @@ export function ServicesSection() {
     PANELS_CONFIG.software,
   ];
 
+  const loc = useLocation();
+  const isServicesRoute = loc.pathname === '/services' || loc.pathname.startsWith('/services/');
+
   return (
     <section
       ref={sectionRef}
       id="services"
-      className="editorial-services-section"
+      className="editorial-services-section relative"
       aria-label="Inspiring Wave Services Overview"
     >
+      {/* Torn-Paper Top Transition: Organic deckle edge rising from dark #work above into cream #FAF4E9 (only on homepage) */}
+      {!isServicesRoute && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-1 left-0 right-0 w-full overflow-hidden leading-none z-30"
+        >
+          <svg
+            viewBox="0 0 1440 68"
+            preserveAspectRatio="none"
+            className="w-full h-8 sm:h-12 md:h-16 block drop-shadow-[0_8px_14px_rgba(0,0,0,0.5)]"
+          >
+            <path
+              d="M0 0 L1440 0 L1440 32 L1320 20 L1200 42 L1080 18 L960 38 L840 16 L720 36 L600 22 L480 44 L360 20 L240 38 L120 22 L0 32 Z"
+              fill="#080a0b"
+            />
+            <path
+              d="M0 32 L120 22 L240 38 L360 20 L480 44 L600 22 L720 36 L840 16 L960 38 L1080 18 L1200 42 L1320 20 L1440 32 L1440 68 L0 68 Z"
+              fill="#FAF4E9"
+            />
+          </svg>
+        </div>
+      )}
+
       {/* Background print paper grain */}
       <div className="services-paper-texture" aria-hidden="true" />
 

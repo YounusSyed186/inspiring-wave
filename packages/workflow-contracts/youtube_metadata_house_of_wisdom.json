@@ -1,0 +1,23 @@
+{
+  "youtube_metadata": {
+    "title": "The House of Wisdom: Baghdad's Lost Golden Age of Science",
+    "description": "Long before the European Renaissance, an intellectual revolution unfolded in 9th-century Baghdad that laid the groundwork for modern mathematics, physics, and astronomy.\n\nIn this documentary, we explore the legendary House of Wisdom (Bayt al-Hikma), where scholars like Al-Khwarizmi developed algebra and algorithms, Ibn al-Haytham founded empirical optics, and master astronomers mapped the celestial coordinates using precision astrolabes.\n\nCHAPTERS:\n00:00 - Prologue: The 9th-Century Intellectual Explosion\n00:12 - Bayt al-Hikma: Al-Khwarizmi and the Birth of Algebra\n00:24 - Ibn al-Haytham: Revolutionizing Physics and Optics\n00:35 - Mapping the Cosmos: The Precision Astrolabe\n00:43 - The Golden Legacy\n\nChannel: Islamic Hystory\nProduced autonomously by Antigravity AI Studio\nResolution: 1080p 24fps • Broadcast Audio (-14.0 LUFS)\nLicense: Standard YouTube License",
+    "tags": [
+      "House of Wisdom",
+      "Islamic Civilization",
+      "Baghdad History",
+      "Al-Khwarizmi",
+      "Ibn al-Haytham",
+      "Golden Age of Science",
+      "History of Mathematics",
+      "Astronomy History",
+      "Astrolabe",
+      "History Documentary"
+    ],
+    "category_id": "27",
+    "default_language": "en",
+    "default_audio_language": "en",
+    "video_file": "apps/web/public/storage/the_house_of_wisdom_master_documentary.mp4",
+    "thumbnail_file": "apps/web/public/storage/the_house_of_wisdom_thumb.jpg"
+  }
+}

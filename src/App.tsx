@@ -1,6 +1,6 @@
 import { createContext, FormEvent, Fragment, useEffect, useRef, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring, useTransform } from 'framer-motion';
 import { processSteps, services, testimonials } from './data';
 import { ZoomParallax } from '@/components/ui/zoom-parallax';
 import { zoomParallaxImages } from '@/components/ui/demo';
@@ -9,8 +9,10 @@ import { ArtisticMethodSection } from '@/components/ui/artistic-method-section';
 import { CreativeMachineHero } from '@/components/creative-machine/CreativeMachineHero';
 import { CustomScrollbar } from '@/components/ui/custom-scrollbar';
 import { ServicesSection } from '@/components/services/ServicesSection';
-import { TestimonialSlider, Review } from '@/components/ui/testimonial-slider-1';
-import { CtaSlider } from '@/components/ui/cta-slider';
+import { StudioSection } from '@/components/sections/StudioSection';
+import { TrustSection } from '@/components/sections/TrustSection';
+import { PerspectivesSection } from '@/components/sections/PerspectivesSection';
+import { FinaleSection } from '@/components/sections/FinaleSection';
 import DoodleCrewFooter from '@/components/ui/doodle-crew-footer';
 import {
   MotionProvider,
@@ -135,39 +137,27 @@ function Method() {
 }
 
 function Studio() {
-  return <AnimatedSection className="studio section" animation="fade-up">
-    <Marker n="06">STUDIO</Marker>
-    <Reveal className="studio-title">
-      <h2>
-        <AnimatedLines lines={["GOOD PEOPLE.", "BIG IDEAS."]} dataAttribute="data-studio-line" as="span" />
-        <em data-studio-line>
-          <AnimatedWords text="No ordinary work." delay={0.2} />
-        </em>
-      </h2>
-    </Reveal>
-    <div className="studio-layout">
-      <figure>
-        <img src="/assets/studio/studio-collaboration.webp" alt="Conceptual studio scene showing a creative team collaborating around a table" />
-        <figcaption><Mono>CONCEPTUAL STUDIO IMAGE / NON-IDENTIFYING</Mono></figcaption>
-      </figure>
-      <Reveal className="studio-copy" delay={0.16}>
-        <Mono>BEHIND THE WAVE</Mono>
-        <p>
-          <AnimatedWords
-            text="We listen before we create. Then we combine creative thinking with technology and data to turn ambitious ideas into useful, memorable experiences."
-            delay={0.12}
-            stagger={0.025}
-          />
-        </p>
-        <Link to="/about">ABOUT THE STUDIO ↗</Link>
-      </Reveal>
-    </div>
-  </AnimatedSection>;
+  return <StudioSection />;
 }
 
 function ParallaxShowcase() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "start 25%"],
+  });
+  const smooth = useSpring(scrollYProgress, {
+    stiffness: 85,
+    damping: 24,
+    restDelta: 0.001,
+  });
+  const introRotateX = useTransform(smooth, [0, 1], [14, 0]);
+  const introZ = useTransform(smooth, [0, 1], [-70, 0]);
+  const introScale = useTransform(smooth, [0, 1], [0.93, 1]);
+  const introOpacity = useTransform(smooth, [0, 0.4, 1], [0.35, 0.85, 1]);
+
   return (
-    <section className="parallax-showcase dark relative bg-[#030506] text-[#f1efe7] pt-28 md:pt-36" id="dimensions">
+    <section ref={sectionRef} className="parallax-showcase dark relative bg-[#030506] text-[#f1efe7] pt-28 md:pt-36 [perspective:1400px]" id="dimensions">
       {/* Torn-Paper Top Edge from ivory 06 / STUDIO above */}
       <div
         aria-hidden="true"
@@ -192,7 +182,16 @@ function ParallaxShowcase() {
 
       <Marker n="07" light>DIMENSIONS</Marker>
 
-      <div className="dimensions-intro relative z-20 max-w-[1380px] mx-auto px-6 sm:px-12 md:pl-[12vw] pb-10">
+      <motion.div
+        style={{
+          rotateX: introRotateX,
+          z: introZ,
+          scale: introScale,
+          opacity: introOpacity,
+          transformStyle: "preserve-3d",
+        }}
+        className="dimensions-intro relative z-20 max-w-[1380px] mx-auto px-6 sm:px-12 md:pl-[12vw] pb-10"
+      >
         <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-3.5 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-[#d8f03c] mb-5">
           <span>VISUAL DYNAMICS // IMMERSIVE EXPANSION</span>
         </div>
@@ -227,176 +226,45 @@ function ParallaxShowcase() {
         <p className="parallax-hint mt-5 font-mono text-xs uppercase tracking-[0.18em] text-[#f1efe7]/65">
           SCROLL DOWN TO EXPAND THE 7-LAYER VISUAL FIELD ↓
         </p>
-      </div>
+      </motion.div>
 
       <ZoomParallax images={zoomParallaxImages} />
     </section>
   );
 }
 
-const clientReviews: Review[] = [
-  {
-    id: 1,
-    name: 'Yeshashwini Kadiri',
-    affiliation: 'Principal Architect, Y&M Archiplanners',
-    quote: 'Their dedication has truly impressed me and I will continue to use Inspiring Wave as my choice.',
-    imageSrc: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=900&q=80',
-    thumbnailSrc: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80',
-  },
-  {
-    id: 2,
-    name: 'Aruna V',
-    affiliation: 'Director, Sirgrace Technologies Pvt. Ltd.',
-    quote: 'The way the team handled the issues and executed the work is impressive.',
-    imageSrc: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=900&q=80',
-    thumbnailSrc: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=300&q=80',
-  },
-  {
-    id: 3,
-    name: 'Sandeep Koneri',
-    affiliation: 'Director, Creative Eye',
-    quote: 'They made a clean, smart and effective website and work closely with us on digital marketing.',
-    imageSrc: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=80',
-    thumbnailSrc: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
-  },
-  {
-    id: 4,
-    name: 'Ratna Kalluri',
-    affiliation: 'Founder, Rad Studio',
-    quote: 'A strong team who deliver services with utmost dedication.',
-    imageSrc: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=80',
-    thumbnailSrc: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-  },
-  {
-    id: 5,
-    name: 'Aruna V',
-    affiliation: 'Managing Partner, Jagannatha Packaging',
-    quote: 'From the design to the menus and features, they have done an excellent job.',
-    imageSrc: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=900&q=80',
-    thumbnailSrc: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=300&q=80',
-  },
-];
-
 function Trust() {
-  return <AnimatedSection className="trust section" animation="fade-up">
-    <Marker n="08">TRUST</Marker>
-    <Reveal className="trust-title">
-      <h2>
-        <AnimatedLines lines={["GREAT WORK"]} as="span" />
-        <br />
-        <em><AnimatedWords text="begins with trust." delay={0.1} /></em>
-      </h2>
-    </Reveal>
-    <div className="client-line">
-      {['Y&M ARCHIPLANNERS', 'SIRGRACE TECHNOLOGIES', 'CREATIVE EYE', 'RAD STUDIO', 'JAGANNATHA PACKAGING'].map((client, idx) => (
-        <motion.span
-          key={client}
-          initial={{ opacity: 0, y: 22 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.65, delay: idx * 0.08, ease: EASINGS.power4Out }}
-        >
-          {client}
-        </motion.span>
-      ))}
-    </div>
-    <div className="trust-slider-wrap mt-8 md:mt-14">
-      <TestimonialSlider
-        reviews={clientReviews}
-        className="rounded-2xl border border-black/10 dark:border-white/10 shadow-sm bg-transparent"
-      />
-    </div>
-  </AnimatedSection>;
+  return <TrustSection />;
 }
 
 function Perspectives() {
-  return <AnimatedSection className="journal section dark" animation="fade-up">
-    <Marker n="09" light>PERSPECTIVES</Marker>
-    <Reveal className="section-title">
-      <h2>
-        <AnimatedLines lines={["THOUGHTS IN"]} as="span" />
-        <br />
-        <em><AnimatedWords text="motion." delay={0.1} /></em>
-      </h2>
-    </Reveal>
-    <div className="journal-grid">
-      <Reveal className="featured" delay={0.14}>
-        <Mono>INSIGHT / 17.03.2026</Mono>
-        <h3>
-          <AnimatedWords text="Transforming Ideas into Digital Success" delay={0.08} />
-        </h3>
-        <p>Why an online presence is only the beginning—and how creativity, technology and strategy turn ideas into business impact.</p>
-        <a href="https://inspiringwave.in/digital_success/" target="_blank" rel="noreferrer">READ ON THE JOURNAL ↗</a>
-      </Reveal>
-      <div className="journal-visual"><div className="orbit"><i /><i /><i /></div><Mono>ONE IDEA / GAINING ENERGY</Mono></div>
-    </div>
-  </AnimatedSection>;
+  return <PerspectivesSection />;
 }
 
 function Finale() {
-  return <AnimatedSection className="finale finale-cta-section section dark" animation="fade-up">
-    <div className="finale-ambient-glow" aria-hidden="true" />
-    <Marker n="10" light>MAKE WAVES</Marker>
-    <div className="finale-container md:pl-[10vw]">
-      <Reveal className="finale-id-head mb-10 md:mb-14">
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-3.5 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-[#d8f03c] mb-5">
-          <span>10 // INITIATE COLLABORATION</span>
-        </div>
-        <h2 className="m-0 flex flex-wrap items-baseline gap-x-5 gap-y-3 leading-none">
-          <span className="relative inline-block px-3.5 py-1.5 border border-[#5676ff]/65 bg-[#1945f5]/[0.06] font-display font-black uppercase tracking-[-0.04em] text-6xl sm:text-8xl md:text-9xl text-[#f1efe7] leading-[0.86]">
-            <i className="pointer-events-none absolute -top-1.5 -left-1.5 w-2.5 h-2.5 bg-[#f1efe7] border border-[#1945f5]" />
-            <i className="pointer-events-none absolute -top-1.5 -right-1.5 w-2.5 h-2.5 bg-[#f1efe7] border border-[#1945f5]" />
-            <i className="pointer-events-none absolute -bottom-1.5 -left-1.5 w-2.5 h-2.5 bg-[#f1efe7] border border-[#1945f5]" />
-            <i className="pointer-events-none absolute -bottom-1.5 -right-1.5 w-2.5 h-2.5 bg-[#f1efe7] border border-[#1945f5]" />
-            LET'S MAKE
-          </span>
-          <span
-            className="relative inline-block -rotate-2 px-6 py-2 bg-[#f1efe7] text-[#080a0b] shadow-[0_18px_40px_rgba(0,0,0,0.75)]"
-            style={{
-              clipPath:
-                'polygon(1.6% 2.8%, 49% 1.1%, 98.6% 3.1%, 99.2% 51%, 98.1% 97.6%, 52% 98.9%, 1.5% 97.1%, 0.9% 48%)',
-            }}
-          >
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute -top-2.5 left-1/2 -translate-x-1/2 w-16 h-4 bg-[#d8f03c]/90 rotate-2 shadow-sm"
-            />
-            <em className="font-serif italic font-normal lowercase text-5xl sm:text-7xl md:text-8xl text-[#1945f5] tracking-[-0.02em] leading-none block">
-              waves{"\u00A0"}together.
-            </em>
-          </span>
-        </h2>
-        <p className="mt-6 max-w-2xl font-sans text-base sm:text-lg text-[#f1efe7]/75 leading-relaxed">
-          <AnimatedWords text="Select an engagement track below. Every transformational digital presence begins with a focused conversation." delay={0.12} />
-        </p>
-      </Reveal>
-      <div className="finale-slider-wrap mt-8 md:mt-10">
-        <CtaSlider />
-      </div>
-    </div>
-  </AnimatedSection>;
+  return <FinaleSection />;
 }
 
 function Footer() {
-  return <DoodleCrewFooter
-    wordmark="INSPIRING"
-    brand="Inspiring Wave"
-    blurb="Strategy, design and technology for a world in motion. We build expressive digital experiences from Hyderabad to everywhere."
-    tagline="Independent minds, moving together to make work with real momentum."
-    columns={[
-      { title: 'Explore', links: [{ label: 'Selected work', href: '/work' }, { label: 'Services', href: '/services' }, { label: 'Studio', href: '/about' }] },
-      { title: 'Thinking', links: [{ label: 'Journal', href: '/journal' }, { label: 'Our approach', href: '/about' }, { label: 'Capabilities', href: '/services' }] },
-      { title: 'Connect', links: [{ label: 'Start a project', href: '/contact' }, { label: 'info@inspiringwave.in', href: 'mailto:info@inspiringwave.in' }, { label: '+91 78938 01806', href: 'tel:+917893801806' }] },
-      { title: 'Social', links: [{ label: 'LinkedIn', href: 'https://www.linkedin.com/company/inspiringwave/' }, { label: 'Hyderabad, India' }] },
-    ]}
-    actions={[
-      { label: 'Write to us', href: 'mailto:info@inspiringwave.in', icon: 'plane', variant: 'outline' },
-      { label: 'Start a project', href: '/contact', icon: 'sparkle', variant: 'solid' },
-    ]}
-    copyright={`© ${new Date().getFullYear()} Inspiring Wave Digitech Pvt. Ltd.`}
-    legal={[{ label: 'Terms', href: 'https://inspiringwave.in/terms/' }]}
-    socials={[{ label: 'LinkedIn', href: 'https://www.linkedin.com/company/inspiringwave/' }]}
-  />;
+  return (
+    <DoodleCrewFooter
+      wordmark="INSPIRING"
+      brand="Inspiring Wave"
+      blurb="Strategy, design and technology for a world in motion. We build expressive digital experiences from Hyderabad to everywhere."
+      tagline="Independent minds, moving together to make work with real momentum."
+      columns={[
+        { title: 'Explore', links: [{ label: 'Selected work', href: '/work' }, { label: 'Services', href: '/services' }, { label: 'Studio', href: '/about' }] },
+        { title: 'Thinking', links: [{ label: 'Journal', href: '/journal' }, { label: 'Our approach', href: '/about' }, { label: 'Capabilities', href: '/services' }] },
+        { title: 'Connect', links: [{ label: 'Start a project', href: '/contact' }, { label: 'info@inspiringwave.in', href: 'mailto:info@inspiringwave.in' }, { label: '+91 78938 01806', href: 'tel:+917893801806' }] },
+        { title: 'Social', links: [{ label: 'LinkedIn', href: 'https://www.linkedin.com/company/inspiringwave/' }, { label: 'Hyderabad, India' }] },
+      ]}
+      actions={[
+        { label: 'Write to us', href: 'mailto:info@inspiringwave.in', icon: 'plane', variant: 'outline' },
+        { label: 'Start a project', href: '/contact', icon: 'sparkle', variant: 'solid' },
+      ]}
+      copyright={`© ${new Date().getFullYear()} Inspiring Wave Digitech Pvt. Ltd.`}
+    />
+  );
 }
 
 function Home() {
