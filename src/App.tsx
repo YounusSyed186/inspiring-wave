@@ -32,6 +32,9 @@ export const IntroActive = createContext(false);
 
 function Header({ menu, setMenu }: { menu: boolean; setMenu: (v: boolean) => void }) {
   const loc = useLocation();
+  const isServices = loc.pathname === '/services' || loc.pathname.startsWith('/services/');
+  const isWork = loc.pathname === '/work' || loc.pathname.startsWith('/work/');
+  const isAbout = loc.pathname === '/about' || loc.pathname.startsWith('/about/');
   useEffect(() => { setMenu(false); }, [loc.pathname]);
   useEffect(() => {
     if (!menu) return;
@@ -42,7 +45,11 @@ function Header({ menu, setMenu }: { menu: boolean; setMenu: (v: boolean) => voi
   return <>
     <header className="header">
       <Link className="wordmark" to="/" aria-label="Inspiring Wave home"><i />INSPIRING WAVE</Link>
-      <nav className="desktop-nav" aria-label="Primary"><Link to="/work">WORK</Link><Link to="/services">SERVICES</Link><Link to="/about">STUDIO</Link></nav>
+      <nav className="desktop-nav" aria-label="Primary">
+        <Link to="/work" className={isWork ? 'active-nav-link' : ''}>WORK</Link>
+        <Link to="/services" className={isServices ? 'active-nav-link' : ''}>SERVICES</Link>
+        <Link to="/about" className={isAbout ? 'active-nav-link' : ''}>STUDIO</Link>
+      </nav>
       <div className="header-end"><Link to="/contact">LET'S TALK <span>↗</span></Link><button className="menu-button" onClick={() => setMenu(!menu)} aria-expanded={menu} aria-controls="main-menu">{menu ? 'CLOSE' : 'MENU'}<b>{menu ? '×' : '≡'}</b></button></div>
     </header>
     <div id="main-menu" className={`menu-overlay ${menu ? 'is-open' : ''}`} aria-hidden={!menu}>
@@ -518,6 +525,16 @@ function Contact() {
   </main>;
 }
 
+function ServicesPage() {
+  const main = useRef<HTMLElement>(null);
+  usePageMotion(main);
+  return (
+    <main ref={main} id="main" className="services-page-wrap bg-[#FAF4E9] pt-[66px]">
+      <ServicesSection />
+    </main>
+  );
+}
+
 function App() {
   const [menu, setMenu] = useState(false);
   return <MotionProvider>
@@ -527,7 +544,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/work" element={<Listing kind="work" />} />
         <Route path="/work/:slug" element={<DetailPage type="work" />} />
-        <Route path="/services" element={<Listing kind="services" />} />
+        <Route path="/services" element={<ServicesPage />} />
         <Route path="/services/:slug" element={<DetailPage type="service" />} />
         <Route path="/about" element={<Listing kind="about" />} />
         <Route path="/journal" element={<Listing kind="journal" />} />

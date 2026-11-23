@@ -19,9 +19,17 @@ const preloaderThemes: RemixThemesInput = {
 };
 
 export default function AppRoot() {
-  const [loading, setLoading] = useState(
-    () => !preloaderStartedForDocument && !preloaderCompletedForDocument,
-  );
+  const [loading, setLoading] = useState(() => {
+    if (
+      typeof window !== 'undefined' &&
+      (new URLSearchParams(window.location.search).has('nopreload') ||
+        window.location.pathname.startsWith('/services'))
+    ) {
+      preloaderCompletedForDocument = true;
+      return false;
+    }
+    return !preloaderStartedForDocument && !preloaderCompletedForDocument;
+  });
   const completionHandled = useRef(false);
 
   useEffect(() => {

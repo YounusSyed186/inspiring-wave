@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import { PANELS_CONFIG, PanelLayout } from './panelGeometry';
+import { ServicePanel } from './ServicePanel';
 import { SERVICES_DATA, ServiceItem } from './services-data';
 import './services.css';
 
@@ -10,14 +12,13 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 export function ServicesSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const leftColRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
-  const sunRef = useRef<HTMLDivElement>(null);
-  const thinkerRef = useRef<HTMLDivElement>(null);
-  const characterRef = useRef<HTMLDivElement>(null);
-  const waveRef = useRef<HTMLDivElement>(null);
-  const bannerRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
+  const stripRef = useRef<HTMLDivElement>(null);
+  const underlineRef = useRef<SVGPathElement>(null);
+  const waveRef = useRef<HTMLDivElement>(null);
+  const sunRef = useRef<HTMLDivElement>(null);
+  const worktableRef = useRef<HTMLDivElement>(null);
 
   const [activeModal, setActiveModal] = useState<ServiceItem | null>(null);
 
@@ -35,7 +36,7 @@ export function ServicesSection() {
     };
   }, [activeModal]);
 
-  // GSAP Coordinated Entrance Timeline & ScrollTrigger
+  // Coordinated Entrance Motion System
   useGSAP(
     () => {
       const section = sectionRef.current;
@@ -43,123 +44,121 @@ export function ServicesSection() {
 
       const media = gsap.matchMedia();
 
+      // Reduced motion fallback
       media.add('(prefers-reduced-motion: reduce)', () => {
         gsap.set(
           [
             sunRef.current,
-            thinkerRef.current,
-            characterRef.current,
+            worktableRef.current,
             waveRef.current,
-            bannerRef.current,
             headlineRef.current,
-            '.service-editorial-card',
+            stripRef.current,
+            underlineRef.current,
+            '.service-panel-bounding-box',
           ],
           { opacity: 1, clearProps: 'all' },
         );
       });
 
-      media.add('(min-width: 901px) and (prefers-reduced-motion: no-preference)', () => {
+      // Desktop and large screens entrance timeline
+      media.add('(min-width: 960px) and (prefers-reduced-motion: no-preference)', () => {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: section,
             start: 'top 75%',
             end: 'bottom 85%',
-            toggleActions: 'play none none reverse',
+            toggleActions: 'play none none none',
+            once: true,
           },
           defaults: { ease: 'power3.out' },
         });
 
-        // 1. Blue sun scales in
+        // 1. Blue sun & clouds scale in
         if (sunRef.current) {
           tl.fromTo(
             sunRef.current,
-            { scale: 0.65, opacity: 0, y: 30 },
-            { scale: 1, opacity: 1, y: 0, duration: 1.1, ease: 'back.out(1.2)' },
+            { scale: 0.75, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 0.9, ease: 'back.out(1.15)' },
             0,
           );
         }
 
-        // 2. Creative thinker photo unmasks
-        if (thinkerRef.current) {
+        // 2. Grayscale worktable collage unmasks
+        if (worktableRef.current) {
           tl.fromTo(
-            thinkerRef.current,
-            { clipPath: 'inset(100% 0 0 0)', opacity: 0, y: 25 },
-            { clipPath: 'inset(0% 0 0 0)', opacity: 1, y: 0, duration: 1.0 },
-            0.15,
-          );
-        }
-
-        // 3. Anime character emerges from waves
-        if (characterRef.current) {
-          tl.fromTo(
-            characterRef.current,
-            { y: 80, opacity: 0, scale: 0.94 },
-            { y: 0, opacity: 1, scale: 1, duration: 1.25, ease: 'power4.out' },
-            0.2,
-          );
-        }
-
-        // 4. Wave rises
-        if (waveRef.current) {
-          tl.fromTo(
-            waveRef.current,
-            { y: 60, opacity: 0 },
-            { y: 0, opacity: 1, duration: 1.0 },
+            worktableRef.current,
+            { y: 24, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.85 },
             0.1,
           );
         }
 
-        // 5. Headline words reveal
+        // 3. Headline lines come up through shallow overflow masks
         if (headlineRef.current) {
-          tl.from(
-            headlineRef.current.querySelectorAll('.editorial-title-line'),
-            {
-              y: 50,
-              opacity: 0,
-              stagger: 0.1,
-              duration: 0.85,
-              ease: 'power3.out',
-            },
+          const lines = headlineRef.current.querySelectorAll('.headline-text-inner');
+          tl.fromTo(
+            lines,
+            { y: 22, opacity: 0 },
+            { y: 0, opacity: 1, stagger: 0.06, duration: 0.65, ease: 'power3.out' },
+            0.15,
+          );
+        }
+
+        // 4. Cobalt name strip rises
+        if (stripRef.current) {
+          tl.fromTo(
+            stripRef.current,
+            { scale: 0.92, opacity: 0, rotate: -4 },
+            { scale: 1, opacity: 1, rotate: -2.2, duration: 0.75, ease: 'back.out(1.2)' },
             0.25,
           );
         }
 
-        // 6. Inspiring Wave Banner sweeps across
-        if (bannerRef.current) {
+        // 5. Draw the hand-drawn cobalt underline
+        if (underlineRef.current) {
+          const pathLen = underlineRef.current.getTotalLength?.() || 200;
           tl.fromTo(
-            bannerRef.current,
-            { scaleX: 0, opacity: 0, transformOrigin: 'left center' },
-            { scaleX: 1, opacity: 1, duration: 0.85, ease: 'back.out(1.15)' },
-            0.35,
+            underlineRef.current,
+            { strokeDasharray: pathLen, strokeDashoffset: pathLen },
+            { strokeDashoffset: 0, duration: 0.7, ease: 'power2.inOut' },
+            0.4,
           );
         }
 
-        // 7. Staggered Service Cards assembly from varied angles
-        const cards = section.querySelectorAll<HTMLElement>('.service-editorial-card');
-        tl.from(
-          cards,
-          {
-            y: (idx) => (idx % 2 === 0 ? 70 : 90),
-            x: (idx) => (idx === 0 ? -40 : idx === 1 ? 40 : 0),
-            opacity: 0,
-            scale: 0.96,
-            stagger: 0.08,
-            duration: 1.0,
-            ease: 'power3.out',
-          },
-          0.4,
-        );
-
-        // Ambient wave drift
+        // 6. Breaking wave crest rises subtly while ribbon reveals
         if (waveRef.current) {
-          gsap.to(waveRef.current, {
-            y: 8,
-            duration: 3.5,
-            repeat: -1,
-            yoyo: true,
-            ease: 'sine.inOut',
-          });
+          tl.fromTo(
+            waveRef.current,
+            { y: 28, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.95 },
+            0.2,
+          );
         }
+
+        // 7. Staggered reveal of the 6 uneven service boxes:
+        // Top row (Strategy, Web) -> Middle band (UI/UX) -> Lower row (Social, Mobile, Software)
+        const panelStrategy = section.querySelector('.panel-strategy');
+        const panelWeb = section.querySelector('.panel-web');
+        const panelUiux = section.querySelector('.panel-uiux');
+        const panelSocial = section.querySelector('.panel-social');
+        const panelMobile = section.querySelector('.panel-mobile');
+        const panelSoftware = section.querySelector('.panel-software');
+
+        const cardSequence = [
+          panelStrategy,
+          panelWeb,
+          panelUiux,
+          panelSocial,
+          panelMobile,
+          panelSoftware,
+        ].filter(Boolean);
+
+        tl.fromTo(
+          cardSequence,
+          { y: 18, opacity: 0 },
+          { y: 0, opacity: 1, stagger: 0.055, duration: 0.75, ease: 'power3.out' },
+          0.32,
+        );
       });
 
       return () => media.revert();
@@ -167,430 +166,312 @@ export function ServicesSection() {
     { scope: sectionRef },
   );
 
-  const handleCardClick = useCallback((service: ServiceItem) => {
-    setActiveModal(service);
+  const handleCardClick = useCallback((slug: string) => {
+    const item = SERVICES_DATA.find((s) => s.slug === slug);
+    if (item) setActiveModal(item);
   }, []);
+
+  const panels = [
+    PANELS_CONFIG.strategy,
+    PANELS_CONFIG.web,
+    PANELS_CONFIG.uiux,
+    PANELS_CONFIG.social,
+    PANELS_CONFIG.mobile,
+    PANELS_CONFIG.software,
+  ];
 
   return (
     <section
       ref={sectionRef}
       id="services"
       className="editorial-services-section"
-      aria-label="Our Services — What We Create"
+      aria-label="Inspiring Wave Services Overview"
     >
-      <div className="services-canvas-container">
-        {/* Top Monospace Section Marker */}
-        <div className="services-meta-tag">
-          <span>SERVICES / 001 — 006</span>
-        </div>
+      {/* Background print paper grain */}
+      <div className="services-paper-texture" aria-hidden="true" />
 
-        {/* Master Editorial Layout: Left Zone + Right Collage */}
-        <div className="services-editorial-grid">
-          {/* ================================================================
-              LEFT EDITORIAL COLUMN
-             ================================================================ */}
-          <div ref={leftColRef} className="editorial-left-col">
-            <div className="editorial-headline-group">
-              <h2 ref={headlineRef} className="editorial-main-title">
-                <span className="editorial-title-line">WHAT WE</span>
-                <span className="editorial-title-line">CREATE AT</span>
-              </h2>
-
-              <div ref={bannerRef} className="editorial-banner-wrap">
-                <div className="editorial-banner-box">
-                  <span>INSPIRING WAVE</span>
-                </div>
-                {/* Hand-drawn Energy Marks */}
-                <svg
-                  className="banner-energy-marks"
-                  viewBox="0 0 50 50"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <line x1="8" y1="12" x2="2" y2="4" stroke="#101010" strokeWidth="2.5" strokeLinecap="round" />
-                  <line x1="22" y1="8" x2="22" y2="1" stroke="#101010" strokeWidth="2.5" strokeLinecap="round" />
-                  <line x1="36" y1="12" x2="44" y2="5" stroke="#101010" strokeWidth="2.5" strokeLinecap="round" />
-                </svg>
-              </div>
-
-              <p className="editorial-intro-copy">
-                A full-spectrum digital studio turning essential ideas into scalable, real-world experiences.
-              </p>
-
-              <Link
-                to="/services"
-                className="editorial-action-btn"
-                aria-label="Explore all services"
-              >
-                <span>→</span>
-              </Link>
-            </div>
-
-            {/* Background Graphic Layers: Sun, Clouds, Thinker, Manga Character, Waves */}
-            <div className="left-art-collage" aria-hidden="true">
-              {/* Electric Blue Sun */}
-              <div ref={sunRef} className="art-blue-sun">
-                <svg
-                  className="sun-flying-birds"
-                  viewBox="0 0 60 45"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path d="M2 14 Q10 4 18 14 Q26 4 34 14" stroke="#101010" strokeWidth="2.5" strokeLinecap="round" />
-                  <path d="M24 28 Q30 20 36 28 Q42 20 48 28" stroke="#101010" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </div>
-
-              {/* Hand-drawn Clouds */}
-              <svg
-                className="sun-clouds-svg"
-                viewBox="0 0 240 100"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M10 80 Q30 40 70 50 Q110 20 150 55 Q190 35 230 75"
-                  stroke="#101010"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M40 75 Q60 55 90 60 Q120 45 150 70"
-                  stroke="#101010"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeDasharray="4 4"
-                />
+      <div className="services-editorial-wrap">
+        {/* ==================================================================
+            1. DESKTOP COMPOSITION (1672 x 875 Artboard Stage)
+           ================================================================== */}
+        <div ref={stageRef} className="services-desktop-stage" role="region" aria-label="Services Interactive Collage">
+          {/* Back Layer: Electric Cobalt Sun + Birds + Cloud */}
+          <div ref={sunRef} className="editorial-sun-cluster" aria-hidden="true">
+            <div className="editorial-cobalt-sun">
+              {/* Flying birds */}
+              <svg className="editorial-sun-birds" viewBox="0 0 60 45" fill="none">
+                <path d="M2 14 Q10 4 18 14 Q26 4 34 14" stroke="#111110" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M24 28 Q30 20 36 28 Q42 20 48 28" stroke="#111110" strokeWidth="2" strokeLinecap="round" />
               </svg>
+            </div>
+            {/* Cream cloud with loose cobalt contour */}
+            <svg className="editorial-sun-cloud" viewBox="0 0 200 80" fill="none">
+              <path
+                d="M20 60 C15 50, 25 35, 45 35 C50 20, 75 15, 95 25 C110 15, 140 18, 150 32 C170 32, 185 45, 180 60 Z"
+                fill="#FFFDF5"
+                stroke="#1738FF"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
 
-              {/* Creative Thinker (Torn-paper Photo Cutout) */}
-              <div ref={thinkerRef} className="art-thinker-photo-wrap">
-                <img
-                  src="/assets/services/creative-thinker.webp"
-                  alt=""
-                  loading="lazy"
-                />
-              </div>
-
-              {/* Anime / Manga Character with Headphones */}
-              <div ref={characterRef} className="art-character-wrap">
-                <img
-                  src="/assets/services/character-full-illustration.webp"
-                  alt=""
-                  loading="lazy"
-                />
-              </div>
-
-              {/* Layered Ocean Waves */}
-              <div ref={waveRef} className="art-bottom-wave">
-                <img
-                  src="/assets/services/sweeping-wave-bottom.webp"
-                  alt=""
-                  loading="lazy"
-                />
-              </div>
+          {/* Middle Layer: Grayscale Studio Worktable Collage */}
+          <div ref={worktableRef} className="editorial-worktable-collage" aria-hidden="true">
+            <div className="editorial-worktable-inner">
+              <img
+                src="/images/services/studio-worktable.webp"
+                alt=""
+                loading="lazy"
+              />
             </div>
           </div>
 
-          {/* ================================================================
-              RIGHT ASYMMETRIC COLLAGE: 6 EDITORIAL CARDS
-             ================================================================ */}
-          <div ref={cardsRef} className="services-cards-collage">
-            {/* --------------------------------------------------------------
-                CARD 01: DIGITAL STRATEGY
-               -------------------------------------------------------------- */}
-            <article
-              className="service-editorial-card card-theme-ivory card-01-strategy"
-              onClick={() => handleCardClick(SERVICES_DATA[0])}
-              onKeyDown={(e) => e.key === 'Enter' && handleCardClick(SERVICES_DATA[0])}
-              tabIndex={0}
-              role="button"
-              aria-label="View Digital Strategy details"
-            >
-              <div>
-                <div className="card-meta-head">
-                  <span>01 / STRATEGY</span>
-                </div>
-                <h3 className="card-title-text">
-                  DIGITAL<br />STRATEGY
-                </h3>
-                <div className="card-strategy-underline" />
+          {/* Headline Layer: Eyebrow + 2-line title + Blue Name Strip */}
+          <div className="editorial-headline-cluster">
+            <span className="editorial-meta-kicker">SERVICES / 001 — 006</span>
+
+            <h2 ref={headlineRef} className="editorial-big-heading relative">
+              {/* Three ink energy marks radiating from upper-left */}
+              <svg className="absolute -top-6 -left-3 w-9 h-9 pointer-events-none" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+                <line x1="24" y1="26" x2="14" y2="10" stroke="#111110" strokeWidth="2.5" strokeLinecap="round" />
+                <line x1="28" y1="22" x2="32" y2="6" stroke="#111110" strokeWidth="2.5" strokeLinecap="round" />
+                <line x1="20" y1="28" x2="6" y2="24" stroke="#111110" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+              <span className="headline-overflow-line">
+                <span className="headline-text-inner">WHAT WE</span>
+              </span>
+              <span className="headline-overflow-line">
+                <span className="headline-text-inner">CREATE AT</span>
+              </span>
+            </h2>
+
+            {/* Cobalt Printed Name Strip */}
+            <div ref={stripRef} className="editorial-name-strip-wrap">
+              <div className="editorial-name-strip">
+                <span>INSPIRING WAVE</span>
               </div>
 
-              {/* Vector Target with Arrow */}
-              <svg
-                className="card-strategy-target"
-                viewBox="0 0 120 120"
-                fill="none"
-                aria-hidden="true"
-              >
-                <circle cx="60" cy="60" r="54" stroke="#101010" strokeWidth="2.5" />
-                <circle cx="60" cy="60" r="42" fill="#2448f5" />
-                <circle cx="60" cy="60" r="30" fill="#faf8f2" stroke="#101010" strokeWidth="2" />
-                <circle cx="60" cy="60" r="18" fill="#2448f5" />
-                <circle cx="60" cy="60" r="7" fill="#101010" />
-                {/* Arrow embedded in bullseye */}
-                <path d="M96 24 L60 60" stroke="#101010" strokeWidth="3.5" strokeLinecap="round" />
-                <path d="M104 16 L92 20 L98 28 Z" fill="#101010" />
-                <path d="M108 20 L98 24 L102 32 Z" fill="#2448f5" />
-                {/* Speed ticks */}
-                <line x1="84" y1="18" x2="76" y2="10" stroke="#101010" strokeWidth="2" strokeLinecap="round" />
-                <line x1="94" y1="36" x2="102" y2="44" stroke="#101010" strokeWidth="2" strokeLinecap="round" />
+              {/* Three ink energy marks radiating from upper-right */}
+              <svg className="name-strip-sparks" viewBox="0 0 50 50" fill="none" aria-hidden="true">
+                <line x1="8" y1="12" x2="2" y2="4" stroke="#111110" strokeWidth="2.5" strokeLinecap="round" />
+                <line x1="22" y1="8" x2="22" y2="1" stroke="#111110" strokeWidth="2.5" strokeLinecap="round" />
+                <line x1="36" y1="12" x2="44" y2="5" stroke="#111110" strokeWidth="2.5" strokeLinecap="round" />
               </svg>
 
-              {/* Mountain Ridge Cutout */}
-              <div className="card-strategy-mountains">
-                <img
-                  src="/assets/services/strategy-mountain.webp"
-                  alt=""
-                  loading="lazy"
+              {/* Hand-drawn cobalt underline */}
+              <svg className="name-strip-underline" viewBox="0 0 280 14" fill="none" aria-hidden="true">
+                <path
+                  ref={underlineRef}
+                  d="M4 6 Q90 2, 180 8 T276 5"
+                  stroke="#1738FF"
+                  strokeWidth="3.2"
+                  strokeLinecap="round"
                 />
-              </div>
-
-              <div className="card-arrow-pill" aria-hidden="true">
-                <span>→</span>
-              </div>
-            </article>
-
-            {/* --------------------------------------------------------------
-                CARD 02: WEB DEVELOPMENT
-               -------------------------------------------------------------- */}
-            <article
-              className="service-editorial-card card-theme-black card-02-web"
-              onClick={() => handleCardClick(SERVICES_DATA[1])}
-              onKeyDown={(e) => e.key === 'Enter' && handleCardClick(SERVICES_DATA[1])}
-              tabIndex={0}
-              role="button"
-              aria-label="View Web Development details"
-            >
-              <div>
-                <div className="card-meta-head">
-                  <span>02 / DEVELOPMENT</span>
-                </div>
-                <h3 className="card-title-text">
-                  WEB<br />DEVELOPMENT
-                </h3>
-              </div>
-
-              {/* Code Brackets */}
-              <div className="card-web-code-tag" aria-hidden="true">
-                <span>&lt;/&gt;</span>
-              </div>
-
-              {/* Laptop Photo with Website Preview */}
-              <div className="card-web-laptop">
-                <img
-                  src="/assets/services/web-laptop.webp"
-                  alt="Laptop displaying scalable website product"
-                  loading="lazy"
-                />
-              </div>
-
-              <div className="card-arrow-pill" aria-hidden="true">
-                <span>→</span>
-              </div>
-            </article>
-
-            {/* --------------------------------------------------------------
-                CARD 03: UI/UX DESIGN (PROMINENT CENTER BANNER)
-               -------------------------------------------------------------- */}
-            <article
-              className="service-editorial-card card-theme-blue card-03-uiux"
-              onClick={() => handleCardClick(SERVICES_DATA[2])}
-              onKeyDown={(e) => e.key === 'Enter' && handleCardClick(SERVICES_DATA[2])}
-              tabIndex={0}
-              role="button"
-              aria-label="View UI/UX Design details"
-            >
-              <div>
-                <div className="card-meta-head">
-                  <span>03 / EXPERIENCE</span>
-                </div>
-                <h3 className="card-title-text">
-                  UI/UX DESIGN
-                </h3>
-              </div>
-
-              {/* Typography Tool Frame [T] + Cursor */}
-              <div className="card-uiux-tool-frame" aria-hidden="true">
-                <span>T</span>
-                <svg
-                  className="card-uiux-cursor-arrow"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path d="M4 4 L11 20 L14 13 L21 10 Z" fill="#ffffff" stroke="#101010" strokeWidth="1.5" />
-                </svg>
-              </div>
-
-              {/* Tablet & Wireframe Hands Photo */}
-              <div className="card-uiux-tablet">
-                <img
-                  src="/assets/services/uiux-tablet.webp"
-                  alt="Hands sketching wireframe layouts on tablet"
-                  loading="lazy"
-                />
-              </div>
-
-              <div className="card-arrow-pill" aria-hidden="true">
-                <span>→</span>
-              </div>
-            </article>
-
-            {/* --------------------------------------------------------------
-                CARD 04: SOCIAL MEDIA
-               -------------------------------------------------------------- */}
-            <article
-              className="service-editorial-card card-theme-ivory card-04-social"
-              onClick={() => handleCardClick(SERVICES_DATA[3])}
-              onKeyDown={(e) => e.key === 'Enter' && handleCardClick(SERVICES_DATA[3])}
-              tabIndex={0}
-              role="button"
-              aria-label="View Social Media details"
-            >
-              <div>
-                <div className="card-meta-head">
-                  <span>04 / SOCIAL</span>
-                </div>
-                <h3 className="card-title-text">
-                  SOCIAL<br />MEDIA
-                </h3>
-              </div>
-
-              {/* Social Badges: Instagram + Likes */}
-              <div className="card-social-badges" aria-hidden="true">
-                <div className="social-badge-insta">
-                  <span>📷</span>
-                </div>
-                <div className="social-badge-likes">
-                  <span>♥ 1.2K</span>
-                </div>
-              </div>
-
-              {/* Illustrated Megaphone with Sound Waves */}
-              <svg
-                className="card-social-megaphone"
-                viewBox="0 0 80 60"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path d="M12 28 L28 22 L52 14 L52 46 L28 38 L12 32 Z" fill="#ffffff" stroke="#101010" strokeWidth="2.5" />
-                <path d="M24 38 L22 52 L30 52 L32 38" fill="#101010" />
-                <ellipse cx="52" cy="30" rx="4" ry="16" fill="#2448f5" stroke="#101010" strokeWidth="2" />
-                {/* Sound waves */}
-                <path d="M62 20 Q68 30 62 40" stroke="#101010" strokeWidth="2" strokeLinecap="round" />
-                <path d="M70 14 Q78 30 70 46" stroke="#2448f5" strokeWidth="2.5" strokeLinecap="round" />
               </svg>
+            </div>
+          </div>
 
-              {/* Creative Woman Portrait */}
-              <div className="card-social-portrait">
-                <img
-                  src="/assets/services/social-woman.webp"
-                  alt="Editorial portrait of creative woman with sunglasses"
-                  loading="lazy"
-                />
-              </div>
-
-              <div className="card-arrow-pill" aria-hidden="true">
-                <span>→</span>
-              </div>
-            </article>
-
-            {/* --------------------------------------------------------------
-                CARD 05: MOBILE APP DEVELOPMENT
-               -------------------------------------------------------------- */}
-            <article
-              className="service-editorial-card card-theme-black card-05-mobile"
-              onClick={() => handleCardClick(SERVICES_DATA[4])}
-              onKeyDown={(e) => e.key === 'Enter' && handleCardClick(SERVICES_DATA[4])}
-              tabIndex={0}
-              role="button"
-              aria-label="View Mobile App Development details"
+          {/* Body Copy & Circular Action Button */}
+          <div className="editorial-intro-cluster">
+            <p className="editorial-intro-text">
+              A full-spectrum digital studio turning essential ideas into scalable, real-world experiences.
+            </p>
+            <Link
+              to="/services"
+              className="editorial-intro-arrow-btn"
+              aria-label="Explore all services"
             >
-              <div>
-                <div className="card-meta-head">
-                  <span>05 / MOBILE</span>
-                </div>
-                <h3 className="card-title-text">
-                  MOBILE APP<br />DEVELOPMENT
-                </h3>
-              </div>
-
-              {/* Smartphone in Hand Photo */}
-              <div className="card-mobile-phone">
-                <img
-                  src="/assets/services/mobile-phone.webp"
-                  alt="Smartphone displaying mobile app interface in hand"
-                  loading="lazy"
-                />
-              </div>
-
-              <div className="card-arrow-pill" aria-hidden="true">
-                <span>→</span>
-              </div>
-            </article>
-
-            {/* --------------------------------------------------------------
-                CARD 06: SOFTWARE DEVELOPMENT
-               -------------------------------------------------------------- */}
-            <article
-              className="service-editorial-card card-theme-ivory card-06-software"
-              onClick={() => handleCardClick(SERVICES_DATA[5])}
-              onKeyDown={(e) => e.key === 'Enter' && handleCardClick(SERVICES_DATA[5])}
-              tabIndex={0}
-              role="button"
-              aria-label="View Software Development details"
-            >
-              <div>
-                <div className="card-meta-head">
-                  <span>06 / ENGINEERING</span>
-                </div>
-                <h3 className="card-title-text">
-                  SOFTWARE<br />DEVELOPMENT
-                </h3>
-              </div>
-
-              {/* Dual Interlocking Blue Gears */}
-              <svg
-                className="card-software-gears"
-                viewBox="0 0 64 64"
-                fill="none"
-                aria-hidden="true"
-              >
-                {/* Large gear */}
-                <g stroke="#2448f5" strokeWidth="2.5">
-                  <circle cx="26" cy="26" r="14" fill="#faf8f2" />
-                  <circle cx="26" cy="26" r="6" fill="#2448f5" />
-                  <path d="M26 6 L26 12 M26 40 L26 46 M6 26 L12 26 M40 26 L46 26 M12 12 L16 16 M36 36 L40 40 M12 40 L16 36 M36 16 L40 12" strokeLinecap="round" />
-                </g>
-                {/* Small gear */}
-                <g stroke="#2448f5" strokeWidth="2">
-                  <circle cx="48" cy="48" r="9" fill="#faf8f2" />
-                  <circle cx="48" cy="48" r="4" fill="#2448f5" />
-                  <path d="M48 35 L48 39 M48 57 L48 61 M35 48 L39 48 M57 48 L61 48" strokeLinecap="round" />
-                </g>
+              <svg className="w-5 h-5 text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
               </svg>
+            </Link>
+          </div>
 
-              {/* Laptop Photo with Code Editor */}
-              <div className="card-software-laptop">
-                <img
-                  src="/assets/services/software-laptop.webp"
-                  alt="Laptop displaying code IDE and mountains"
-                  loading="lazy"
-                />
-              </div>
+          {/* Foreground Layer: Breaking Wave anchored to lower-left corner */}
+          <div ref={waveRef} className="editorial-wave-crest" aria-hidden="true">
+            <img
+              src="/images/services/wave-crest.webp"
+              alt=""
+              loading="lazy"
+            />
+          </div>
 
-              <div className="card-arrow-pill" aria-hidden="true">
-                <span>→</span>
+          {/* Sweeping Bottom Wave Foundation under Cards 04, 05, 06 */}
+          <svg
+            className="editorial-sweeping-bottom-wave"
+            viewBox="0 0 1200 90"
+            fill="none"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <defs>
+              <pattern id="wave-halftone-pattern" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="1.2" fill="#111110" opacity="0.32" />
+                <circle cx="6" cy="6" r="1.2" fill="#111110" opacity="0.32" />
+              </pattern>
+            </defs>
+            {/* 1. Base Cobalt Blue Wave Ribbon */}
+            <path
+              d="M0 65 C120 45, 240 75, 360 48 C480 20, 600 68, 740 40 C880 16, 1040 55, 1200 42 L1200 90 L0 90 Z"
+              fill="#1738FF"
+            />
+            {/* 2. Halftone Dot Shading on Lower Swell */}
+            <path
+              d="M0 72 C120 54, 240 80, 360 58 C480 34, 600 74, 740 50 C880 28, 1040 62, 1200 52 L1200 90 L0 90 Z"
+              fill="url(#wave-halftone-pattern)"
+            />
+            {/* 3. Deep Ink Engraved Wave Curves */}
+            <path
+              d="M0 65 C120 45, 240 75, 360 48 C480 20, 600 68, 740 40 C880 16, 1040 55, 1200 42"
+              stroke="#111110"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M50 72 C160 55, 270 78, 380 56 C500 32, 620 72, 760 48 C890 28, 1050 60, 1180 50"
+              stroke="#111110"
+              strokeWidth="1.6"
+              strokeDasharray="4 6"
+            />
+            {/* 4. Warm Ivory Foam Crest Ribbons */}
+            <path
+              d="M20 62 C80 48, 160 58, 220 50 C280 42, 340 38, 370 46 C340 52, 260 58, 200 64 C140 70, 70 72, 20 62 Z"
+              fill="#FFFDF5"
+              stroke="#111110"
+              strokeWidth="1.8"
+            />
+            <path
+              d="M400 44 C460 28, 540 38, 620 32 C700 24, 760 32, 780 42 C740 48, 660 52, 580 56 C500 60, 440 54, 400 44 Z"
+              fill="#FFFDF5"
+              stroke="#111110"
+              strokeWidth="1.8"
+            />
+            <path
+              d="M800 36 C860 22, 940 32, 1020 28 C1100 24, 1160 36, 1190 44 C1150 48, 1080 52, 1000 54 C920 56, 850 48, 800 36 Z"
+              fill="#FFFDF5"
+              stroke="#111110"
+              strokeWidth="1.8"
+            />
+            {/* 5. Second Parallel Undulating Ribbon along the very bottom */}
+            <path
+              d="M0 80 C150 72, 320 84, 490 75 C660 65, 840 82, 1020 74 C1110 70, 1160 76, 1200 78 L1200 90 L0 90 Z"
+              fill="#111110"
+              opacity="0.85"
+            />
+          </svg>
+
+          {/* Canvas Decorative Marks (Stars and Rays) */}
+          <svg className="canvas-spark-star spark-top-right" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">
+            <path d="M16 0 L19 13 L32 16 L19 19 L16 32 L13 19 L0 16 L13 13 Z" />
+          </svg>
+
+          <svg className="canvas-spark-star spark-rays-top" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+            <line x1="8" y1="20" x2="2" y2="20" stroke="#1738FF" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="12" y1="12" x2="6" y2="6" stroke="#1738FF" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="20" y1="8" x2="20" y2="2" stroke="#1738FF" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+
+          {/* The Six Uneven Service Panels */}
+          {panels.map((panel) => (
+            <ServicePanel
+              key={panel.id}
+              layout={panel}
+              onClick={() => handleCardClick(panel.slug)}
+            />
+          ))}
+        </div>
+
+        {/* ==================================================================
+            2. TABLET RESPONSIVE FLOW (641px - 959px)
+           ================================================================== */}
+        <div className="services-tablet-flow">
+          <div className="tablet-intro-banner">
+            <div>
+              <span className="editorial-meta-kicker">SERVICES / 001 — 006</span>
+              <h2 className="editorial-big-heading !text-5xl">
+                <span>WHAT WE</span>
+                <span>CREATE AT</span>
+              </h2>
+              <div className="editorial-name-strip-wrap">
+                <div className="editorial-name-strip !text-3xl !py-2 !px-4">
+                  <span>INSPIRING WAVE</span>
+                </div>
               </div>
-            </article>
+              <p className="editorial-intro-text mt-4">
+                A full-spectrum digital studio turning essential ideas into scalable, real-world experiences.
+              </p>
+            </div>
+
+            <div className="relative">
+              <img
+                src="/images/services/wave-crest.webp"
+                alt=""
+                className="w-full h-auto max-h-[240px] object-contain"
+              />
+            </div>
+          </div>
+
+          <div className="tablet-cards-grid">
+            <div className="tablet-card-strategy">
+              <ServicePanel layout={PANELS_CONFIG.strategy} isDesktop={false} onClick={() => handleCardClick(PANELS_CONFIG.strategy.slug)} />
+            </div>
+            <div className="tablet-card-web">
+              <ServicePanel layout={PANELS_CONFIG.web} isDesktop={false} onClick={() => handleCardClick(PANELS_CONFIG.web.slug)} />
+            </div>
+            <div className="tablet-card-uiux">
+              <ServicePanel layout={PANELS_CONFIG.uiux} isDesktop={false} onClick={() => handleCardClick(PANELS_CONFIG.uiux.slug)} />
+            </div>
+            <div className="tablet-card-social">
+              <ServicePanel layout={PANELS_CONFIG.social} isDesktop={false} onClick={() => handleCardClick(PANELS_CONFIG.social.slug)} />
+            </div>
+            <div className="tablet-card-mobile">
+              <ServicePanel layout={PANELS_CONFIG.mobile} isDesktop={false} onClick={() => handleCardClick(PANELS_CONFIG.mobile.slug)} />
+            </div>
+            <div className="tablet-card-software">
+              <ServicePanel layout={PANELS_CONFIG.software} isDesktop={false} onClick={() => handleCardClick(PANELS_CONFIG.software.slug)} />
+            </div>
+          </div>
+        </div>
+
+        {/* ==================================================================
+            3. MOBILE RESPONSIVE FLOW (< 640px)
+           ================================================================== */}
+        <div className="services-mobile-flow">
+          <div className="mobile-intro-section">
+            <span className="editorial-meta-kicker">SERVICES / 001 — 006</span>
+            <h2 className="mobile-main-title">
+              WHAT WE<br />CREATE AT
+            </h2>
+            <div className="mobile-name-strip">
+              INSPIRING WAVE
+            </div>
+            <p className="mobile-intro-copy">
+              A full-spectrum digital studio turning essential ideas into scalable, real-world experiences.
+            </p>
+            <img
+              src="/images/services/wave-crest.webp"
+              alt=""
+              className="mobile-wave-thumb"
+            />
+          </div>
+
+          <div className="mobile-cards-stack">
+            {panels.map((panel) => (
+              <ServicePanel
+                key={panel.id}
+                layout={panel}
+                isDesktop={false}
+                onClick={() => handleCardClick(panel.slug)}
+              />
+            ))}
           </div>
         </div>
       </div>
 
       {/* ====================================================================
-          EXPANDED EDITORIAL DETAIL MODAL
+          ACCESSIBLE EDITORIAL DETAIL MODAL
          ==================================================================== */}
       {activeModal && (
         <div
@@ -615,37 +496,42 @@ export function ServicesSection() {
 
             <div className="modal-grid-layout">
               <div className="modal-content-col">
-                <span className="card-meta-head">
+                <span className="font-mono text-xs uppercase tracking-widest block mb-2 opacity-80">
                   {activeModal.number} // {activeModal.category}
                 </span>
 
-                <h3 id="modal-service-title">
+                <h3 id="modal-service-title" className="font-display font-black text-4xl sm:text-5xl uppercase italic mb-3">
                   {activeModal.title}
                 </h3>
 
-                <p className="modal-tagline">
+                <p className="text-base sm:text-lg font-sans mb-4 opacity-90 leading-snug">
                   {activeModal.tagline}
                 </p>
 
-                <p className="modal-description">
+                <p className="text-sm font-sans mb-6 opacity-80 leading-relaxed">
                   {activeModal.description}
                 </p>
 
-                <ul className="modal-capabilities-list" aria-label="Key deliverables">
-                  {activeModal.capabilities.map((cap) => (
-                    <li key={cap}>
-                      <span aria-hidden="true" />
-                      <strong>{cap}</strong>
-                    </li>
-                  ))}
-                </ul>
+                <div className="mb-6">
+                  <span className="font-mono text-xs uppercase tracking-wider block mb-2 font-bold">
+                    Key Deliverables:
+                  </span>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm font-mono">
+                    {activeModal.capabilities.map((cap) => (
+                      <li key={cap} className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                        <span>{cap}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
 
                 <Link
                   to="/contact"
-                  className={`modal-cta-link ${
+                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-mono text-xs uppercase tracking-wider font-bold transition-transform hover:scale-105 ${
                     activeModal.theme === 'ivory'
-                      ? 'bg-[#101010] text-[#f3f0e8]'
-                      : 'bg-[#ffffff] text-[#101010]'
+                      ? 'bg-[#111110] text-[#FAF4E9]'
+                      : 'bg-[#FFFDF5] text-[#111110]'
                   }`}
                   onClick={() => setActiveModal(null)}
                 >
@@ -654,10 +540,11 @@ export function ServicesSection() {
                 </Link>
               </div>
 
-              <div className="modal-image-col">
+              <div className="modal-image-col flex items-center justify-center p-4">
                 <img
                   src={activeModal.image}
                   alt={activeModal.imageAlt}
+                  className="max-h-[260px] w-auto object-contain filter drop-shadow-xl"
                 />
               </div>
             </div>
