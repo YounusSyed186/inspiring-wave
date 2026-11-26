@@ -1,0 +1,72 @@
+/* ==========================================================================
+   INSPIRING WAVE — GLOBAL TYPOGRAPHY SYSTEM
+   Anton (Display) · Instrument Sans (UI/Body) · Instrument Serif (Editorial) · IBM Plex Mono (Meta)
+   ========================================================================== */
+
+:root {
+  --font-display: 'Anton', Impact, sans-serif;
+  --font-sans: 'Instrument Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+
+  --display: var(--font-display);
+  --sans: var(--font-sans);
+  --serif: var(--font-serif);
+  --mono: var(--font-mono);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+/* Reusable semantic typography utilities */
+.type-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-style: normal;
+  font-synthesis: none;
+  text-transform: uppercase;
+  line-height: 0.92;
+  letter-spacing: 0.005em;
+}
+
+.type-heading {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-style: normal;
+  font-synthesis: none;
+  text-transform: uppercase;
+  line-height: 0.96;
+  letter-spacing: 0.01em;
+}
+
+.type-body {
+  font-family: var(--font-sans);
+  font-size: clamp(14.5px, 1.05vw, 17px);
+  font-weight: 400;
+  line-height: 1.58;
+  letter-spacing: -0.005em;
+}
+
+.type-editorial {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+.type-meta {
+  font-family: var(--font-mono);
+  font-size: clamp(10.5px, 0.78vw, 12.5px);
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}

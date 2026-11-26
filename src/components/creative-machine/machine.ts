@@ -123,6 +123,19 @@ export class CreativeMachine {
   private ribbonN: number
   private ribbonA: THREE.Vector3[] = []
   private ribbonB: THREE.Vector3[] = []
+  private ribbonPts: THREE.Vector3[] = []
+  private ribbonScratch = {
+    axisY: new THREE.Vector3(0, 1, 0),
+    axisZ: new THREE.Vector3(0, 0, 1),
+    axis: new THREE.Vector3(),
+    p: new THREE.Vector3(),
+    prev: new THREE.Vector3(),
+    next: new THREE.Vector3(),
+    tan: new THREE.Vector3(),
+    w: new THREE.Vector3(),
+    n: new THREE.Vector3(),
+    q: new THREE.Quaternion(),
+  }
   private ribbonBlend = -1
 
   constructor(private layout: Layout, onAsset?: () => void) {
@@ -456,6 +469,7 @@ export class CreativeMachine {
       this.ribbonB.push(
         new THREE.Vector3(3.55 * Math.cos(th + Math.PI / 2), TUNNEL_Y + 3.95 * Math.sin(th + Math.PI / 2) * 0.98, 2.2 + 0.55 * Math.sin(2 * th)),
       )
+      this.ribbonPts.push(new THREE.Vector3())
     }
     const verts = (N + 1) * 4
     const geo = new THREE.BufferGeometry()
@@ -505,16 +519,10 @@ export class CreativeMachine {
     const nor = this.ribbonGeo.attributes.normal as THREE.BufferAttribute
     const W = 0.78
     const TH = 0.035
-    const axis = new THREE.Vector3(0, 1, 0).lerp(new THREE.Vector3(0, 0, 1), s).normalize()
-    const p = new THREE.Vector3()
-    const prev = new THREE.Vector3()
-    const next = new THREE.Vector3()
-    const tan = new THREE.Vector3()
-    const w = new THREE.Vector3()
-    const n = new THREE.Vector3()
-    const q = new THREE.Quaternion()
-    const pts: THREE.Vector3[] = []
-    for (let i = 0; i <= N; i++) pts.push(new THREE.Vector3().lerpVectors(this.ribbonA[i], this.ribbonB[i], s))
+    const { axisY, axisZ, axis, p, prev, next, tan, w, n, q } = this.ribbonScratch
+    axis.lerpVectors(axisY, axisZ, s).normalize()
+    const pts = this.ribbonPts
+    for (let i = 0; i <= N; i++) pts[i].lerpVectors(this.ribbonA[i], this.ribbonB[i], s)
     for (let i = 0; i <= N; i++) {
       p.copy(pts[i])
       prev.copy(pts[i === 0 ? N - 1 : i - 1])
@@ -537,7 +545,6 @@ export class CreativeMachine {
     }
     pos.needsUpdate = true
     nor.needsUpdate = true
-    this.ribbonGeo.computeBoundingSphere()
   }
 
   /* ------------------------------------------------------------------ */

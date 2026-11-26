@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { scrollMotion, ScrollMotionState } from './scroll-engine';
 import { waveConfig } from './wave-config';
+import { adaptiveQuality } from '@/lib/performance/AdaptiveQuality';
+import { sceneMetricsRegistry } from '@/lib/performance/SceneMetricsRegistry';
 
 const MEDIA_SELECTOR = [
   '.work-media img',
@@ -170,7 +172,7 @@ export function WaveMediaRenderer() {
 
     function resize() {
       if (disposed) return;
-      dpr = Math.min(devicePixelRatio || 1, waveConfig.maxDevicePixelRatio);
+      dpr = Math.min(waveConfig.maxDevicePixelRatio, adaptiveQuality.getEffectiveDpr(innerWidth, innerHeight));
       const width = Math.round(innerWidth * dpr);
       const height = Math.round(innerHeight * dpr);
       if (bufferWidth === width && bufferHeight === height) return;
@@ -344,9 +346,24 @@ export function WaveMediaRenderer() {
       if (drewMedia) media.forEach(plane => {
         if (plane.active) plane.image.classList.add('wave-media-source');
       });
+      sceneMetricsRegistry.update({
+        id: 'wave-media',
+        active: drewMedia,
+        drawCalls: drewMedia ? media.size + 1 : 0,
+        triangles: drewMedia ? media.size * 2 + 1 : 0,
+        geometries: 1,
+        textures: media.size + 1,
+        width: canvas.width,
+        height: canvas.height,
+        dpr,
+      });
     }
 
     const onResize = () => { dirty = true; render(scrollMotion.state, true); };
+    const unsubQuality = adaptiveQuality.subscribe(() => {
+      dirty = true;
+      render(scrollMotion.state, true);
+    });
     const onPointer = (event: PointerEvent) => {
       const target = event.target;
       if (target instanceof Element && target.closest('.work-item')) animateUntil = performance.now() + 1300;
@@ -376,7 +393,9 @@ export function WaveMediaRenderer() {
 
     return () => {
       disposed = true;
+      unsubQuality();
       unsubscribe();
+      sceneMetricsRegistry.remove('wave-media');
       removeEventListener('resize', onResize);
       document.removeEventListener('pointerover', onPointer);
       document.removeEventListener('pointerout', onPointer);

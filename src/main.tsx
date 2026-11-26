@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import AppRoot from './AppRoot';
 import './tailwind.css';
 import './styles.css';
+import './styles/typography.css';
 import './reference.css';
 import './motion.css';
 

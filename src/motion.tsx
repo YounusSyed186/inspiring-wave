@@ -45,8 +45,17 @@ export function MotionProvider({ children }: MotionProviderProps) {
     const settleForRail = () => {
       if (lenis) lenis.scrollTo(lenis.animatedScroll, { immediate: true });
     };
+    const scrollToTop = (event: Event) => {
+      const immediate = Boolean((event as CustomEvent<{ immediate?: boolean }>)?.detail?.immediate);
+      if (lenis) {
+        lenis.scrollTo(0, { immediate, duration: immediate ? 0 : 1.15 });
+      } else {
+        window.scrollTo({ top: 0, behavior: immediate ? 'auto' : 'smooth' });
+      }
+    };
     lenis?.on('scroll', ScrollTrigger.update);
     window.addEventListener('iw:rail-enter', settleForRail);
+    window.addEventListener('iw:scroll-top', scrollToTop);
     gsap.ticker.add(update);
     gsap.ticker.lagSmoothing(0);
     if (lenis) document.documentElement.classList.add('lenis-active');
@@ -55,6 +64,7 @@ export function MotionProvider({ children }: MotionProviderProps) {
       document.documentElement.classList.remove('lenis-active');
       gsap.ticker.remove(update);
       window.removeEventListener('iw:rail-enter', settleForRail);
+      window.removeEventListener('iw:scroll-top', scrollToTop);
       lenis?.destroy();
       scrollMotion.reset();
     };
@@ -75,7 +85,19 @@ export function MotionProvider({ children }: MotionProviderProps) {
     const refresh = () => ScrollTrigger.refresh();
     document.fonts.ready.then(refresh);
     const timer = window.setTimeout(refresh, 250);
-    return () => window.clearTimeout(timer);
+    const timerLate = window.setTimeout(refresh, 1100);
+    let roTimer = 0;
+    const ro = new ResizeObserver(() => {
+      window.clearTimeout(roTimer);
+      roTimer = window.setTimeout(refresh, 140);
+    });
+    ro.observe(document.body);
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(timerLate);
+      window.clearTimeout(roTimer);
+      ro.disconnect();
+    };
   }, { dependencies: [location.pathname] });
 
   useEffect(() => {
@@ -198,6 +220,24 @@ export function useHomepageMotion(scope: RefObject<HTMLElement | null>) {
       });
     });
 
+    media.add('(max-width: 900px)', () => {
+      gsap.utils.toArray<HTMLElement>('.detail-media img').forEach(image => {
+        gsap.from(image, {
+          scale: 1.05,
+          ease: 'none',
+          scrollTrigger: { trigger: image.parentElement, start: 'top 90%', end: 'center 45%', scrub: true },
+        });
+      });
+      gsap.utils.toArray<HTMLElement>('.detail-image, .detail-media, .listing-work > a, .listing-editorial img').forEach((element) => {
+        gsap.from(element, {
+          y: 36,
+          opacity: 0,
+          duration: 0.7,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: element, start: 'top 90%', once: true },
+        });
+      });
+    });
     return () => media.revert();
   }, { scope });
 }
@@ -230,6 +270,24 @@ export function usePageMotion(scope: RefObject<HTMLElement | null>) {
           end: 'bottom 45%',
           onEnter: () => gsap.to(scope.current, { backgroundColor: element.dataset.chapterColor, duration: .55 }),
           onEnterBack: () => gsap.to(scope.current, { backgroundColor: element.dataset.chapterColor, duration: .55 }),
+        });
+      });
+    });
+    media.add('(max-width: 900px)', () => {
+      gsap.utils.toArray<HTMLElement>('.detail-media img').forEach(image => {
+        gsap.from(image, {
+          scale: 1.05,
+          ease: 'none',
+          scrollTrigger: { trigger: image.parentElement, start: 'top 90%', end: 'center 45%', scrub: true },
+        });
+      });
+      gsap.utils.toArray<HTMLElement>('.detail-image, .detail-media, .listing-work > a, .listing-editorial img').forEach((element) => {
+        gsap.from(element, {
+          y: 36,
+          opacity: 0,
+          duration: 0.7,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: element, start: 'top 90%', once: true },
         });
       });
     });

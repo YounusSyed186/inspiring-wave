@@ -1,19 +1,16 @@
 import { createContext, FormEvent, Fragment, useEffect, useRef, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { motion, AnimatePresence, useScroll, useSpring, useTransform } from 'framer-motion';
 import { processSteps, services, testimonials } from './data';
-import { ZoomParallax } from '@/components/ui/zoom-parallax';
-import { zoomParallaxImages } from '@/components/ui/demo';
-import { AnimatedMarqueeHero } from '@/components/ui/hero-3';
-import { ArtisticMethodSection } from '@/components/ui/artistic-method-section';
+import { ProjectsSection } from '@/components/projects/ProjectsSection';
+import { PORTFOLIO_PROJECTS } from '@/components/projects/data/projects';
+// import { ArtisticMethodSection } from '@/components/ui/artistic-method-section';
 import { CreativeMachineHero } from '@/components/creative-machine/CreativeMachineHero';
 import { CustomScrollbar } from '@/components/ui/custom-scrollbar';
+import { TornPaperSeam } from '@/components/ui/TornPaperSeam';
 import { ServicesSection } from '@/components/services/ServicesSection';
-import { StudioSection } from '@/components/sections/StudioSection';
-import { TrustSection } from '@/components/sections/TrustSection';
-import { PerspectivesSection } from '@/components/sections/PerspectivesSection';
+import { TestimonialsSection } from '@/components/testimonials/TestimonialsSection';
 import { FinaleSection } from '@/components/sections/FinaleSection';
-import DoodleCrewFooter from '@/components/ui/doodle-crew-footer';
+import InspiringWaveFooter from '@/components/footer/InspiringWaveFooter';
 import {
   MotionProvider,
   ScrollTrigger,
@@ -46,7 +43,13 @@ function Header({ menu, setMenu }: { menu: boolean; setMenu: (v: boolean) => voi
   }, [menu]);
   return <>
     <header className="header">
-      <Link className="wordmark" to="/" aria-label="Inspiring Wave home"><i />INSPIRING WAVE</Link>
+      <Link className="wordmark header-wordmark" to="/" aria-label="Inspiring Wave home">
+        <img
+          src="/assets/inspiring-wave-logo.png"
+          alt="INSPIRING WAVE"
+          className="header-logo-img transition-transform duration-300 hover:scale-[1.03]"
+        />
+      </Link>
       <nav className="desktop-nav" aria-label="Primary">
         <Link to="/work" className={isWork ? 'active-nav-link' : ''}>WORK</Link>
         <Link to="/services" className={isServices ? 'active-nav-link' : ''}>SERVICES</Link>
@@ -66,11 +69,6 @@ function Header({ menu, setMenu }: { menu: boolean; setMenu: (v: boolean) => voi
   </>;
 }
 
-function Marker({ n, children, light = false }: { n: string; children: React.ReactNode; light?: boolean }) {
-  return <div className={`marker ${light ? 'marker-light' : ''}`}><Mono>{n} /<br />{children}</Mono><i /></div>;
-}
-
-
 function Hero() {
   return <CreativeMachineHero />;
 }
@@ -79,7 +77,7 @@ function Manifesto() {
   return <section id="manifesto" className="manifesto-section cm-manifesto-overlap bg-[#f1efe7] text-[#080c12]" aria-label="Our manifesto">
     <TigerTearReveal
       word="NEITHER DO WE."
-      tagline="02 / MANIFESTO — THE WORLD DOESN’T STAND STILL."
+      tagline="THE WORLD DOESN’T STAND STILL."
       ink="#1945f5"
       paper="#f1efe7"
       taglineColor="#080c12"
@@ -88,10 +86,6 @@ function Manifesto() {
     />
     <div className="manifesto-statement-wrap bg-[#f1efe7] px-6 py-14 sm:py-20 border-t border-[#1945f5]/15">
       <div className="max-w-4xl mx-auto text-center">
-        <span className="inline-flex items-center gap-2 rounded-full bg-[#080c12] text-[#f1efe7] px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] mb-6">
-          <span className="w-2 h-2 rounded-full bg-[#d8f03c]" />
-          <span>02 // OUR MANIFESTO</span>
-        </span>
         <p className="manifesto-statement !p-0 !bg-transparent text-[#080c12]">
           A creative technology studio that brings strategy, design and engineering together to build{" "}
           <span className="inline-block -rotate-1 px-3 py-0.5 bg-[#1945f5] text-[#f1efe7] italic shadow-sm">
@@ -103,142 +97,31 @@ function Manifesto() {
   </section>;
 }
 
-const studies = [
-  { n: '01', title: 'Digital Architecture', tags: 'STRATEGY / DESIGN / DEVELOPMENT', image: '/assets/architecture.webp', className: 'work-a' },
-  { n: '02', title: 'Systems in Motion', tags: 'PRODUCT / EXPERIENCE / ENGINEERING', image: '/assets/process/process-sculpture.webp', className: 'work-b' },
-  { n: '03', title: 'Culture, Amplified', tags: 'CAMPAIGN / CONTENT / SOCIAL', image: '/assets/fabric.webp', className: 'work-c' }
-];
+const studies = PORTFOLIO_PROJECTS.map((p) => ({
+  n: p.number,
+  title: p.title,
+  tags: `${p.category} · ${p.services.join(' / ')}`,
+  image: p.coverImage,
+  description: p.description,
+  slug: p.caseStudyUrl?.replace('/work/', '') || p.title.toLowerCase().replaceAll(' ', '-'),
+}));
 
 function Work() {
-  return <section id="work" className="studio-projects" aria-labelledby="work-heading">
-    <AnimatedMarqueeHero
-      headingId="work-heading"
-      tagline="03 / SELECTED WORK — CONCEPT & CAPABILITY STUDIES"
-      title={
-        <>
-          Selected <em className="text-[#5676ff]">work.</em>
-        </>
-      }
-      description="Digital products, brand identities, and high-performance web platforms engineered for clarity, cultural momentum, and measurable business impact."
-      ctaText="View All Work"
-      ctaHref="/work"
-      images={studies.map(study => study.image)}
-      items={studies.map(study => ({ number: study.n, title: study.title, category: study.tags, image: study.image, href: "/work/" + study.title.toLowerCase().replaceAll(" ", "-") }))}
-    />
-  </section>;
+  return <ProjectsSection />;
 }
 
 function Capabilities() {
   return <ServicesSection />;
 }
 
+/*
 function Method() {
   return <ArtisticMethodSection />;
 }
-
-function Studio() {
-  return <StudioSection />;
-}
-
-function ParallaxShowcase() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "start 25%"],
-  });
-  const smooth = useSpring(scrollYProgress, {
-    stiffness: 85,
-    damping: 24,
-    restDelta: 0.001,
-  });
-  const introRotateX = useTransform(smooth, [0, 1], [14, 0]);
-  const introZ = useTransform(smooth, [0, 1], [-70, 0]);
-  const introScale = useTransform(smooth, [0, 1], [0.93, 1]);
-  const introOpacity = useTransform(smooth, [0, 0.4, 1], [0.35, 0.85, 1]);
-
-  return (
-    <section ref={sectionRef} className="parallax-showcase dark relative bg-[#030506] text-[#f1efe7] pt-28 md:pt-36 [perspective:1400px]" id="dimensions">
-      {/* Torn-Paper Top Edge from ivory 06 / STUDIO above */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute top-0 left-0 right-0 w-full overflow-hidden leading-none z-20"
-      >
-        <svg
-          viewBox="0 0 1440 72"
-          preserveAspectRatio="none"
-          className="w-full h-10 sm:h-14 md:h-16 block drop-shadow-[0_12px_18px_rgba(0,0,0,0.65)]"
-        >
-          <path
-            d="M0 0 L1440 0 L1440 44 L1320 32 L1200 50 L1080 28 L960 48 L840 26 L720 46 L600 30 L480 52 L360 28 L240 46 L120 32 L0 44 Z"
-            fill="#ffffff"
-            opacity="0.88"
-          />
-          <path
-            d="M0 0 L1440 0 L1440 36 L1320 24 L1200 42 L1080 20 L960 40 L840 18 L720 38 L600 22 L480 44 L360 20 L240 38 L120 24 L0 36 Z"
-            fill="#f1efe7"
-          />
-        </svg>
-      </div>
-
-      <Marker n="07" light>DIMENSIONS</Marker>
-
-      <motion.div
-        style={{
-          rotateX: introRotateX,
-          z: introZ,
-          scale: introScale,
-          opacity: introOpacity,
-          transformStyle: "preserve-3d",
-        }}
-        className="dimensions-intro relative z-20 max-w-[1380px] mx-auto px-6 sm:px-12 md:pl-[12vw] pb-10"
-      >
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-3.5 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-[#d8f03c] mb-5">
-          <span>VISUAL DYNAMICS // IMMERSIVE EXPANSION</span>
-        </div>
-
-        <Reveal className="section-title !m-0 !border-0 !p-0">
-          <h2 className="m-0 flex flex-wrap items-baseline gap-x-5 gap-y-2 leading-none">
-            <span className="relative inline-block px-3 py-1 border border-[#5676ff]/60 bg-[#1945f5]/[0.06] font-display font-black uppercase tracking-[-0.04em] text-6xl sm:text-8xl md:text-9xl text-[#f1efe7] leading-[0.86]">
-              <i className="pointer-events-none absolute -top-1.5 -left-1.5 w-2.5 h-2.5 bg-[#f1efe7] border border-[#1945f5]" />
-              <i className="pointer-events-none absolute -top-1.5 -right-1.5 w-2.5 h-2.5 bg-[#f1efe7] border border-[#1945f5]" />
-              <i className="pointer-events-none absolute -bottom-1.5 -left-1.5 w-2.5 h-2.5 bg-[#f1efe7] border border-[#1945f5]" />
-              <i className="pointer-events-none absolute -bottom-1.5 -right-1.5 w-2.5 h-2.5 bg-[#f1efe7] border border-[#1945f5]" />
-              IMPACT IN
-            </span>
-            <span
-              className="relative inline-block -rotate-2 px-6 py-2 bg-[#f1efe7] text-[#080a0b] shadow-[0_18px_40px_rgba(0,0,0,0.75)]"
-              style={{
-                clipPath:
-                  'polygon(1.8% 3.2%, 48% 1.2%, 98.4% 2.8%, 99.1% 52%, 97.8% 97.4%, 51% 98.8%, 1.4% 96.8%, 0.8% 49%)',
-              }}
-            >
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute -top-2.5 left-1/2 -translate-x-1/2 w-16 h-4 bg-[#d8f03c]/90 rotate-2 shadow-sm"
-              />
-              <em className="font-serif italic font-normal lowercase text-5xl sm:text-7xl md:text-8xl text-[#1945f5] tracking-[-0.02em] leading-none block">
-                perspective.
-              </em>
-            </span>
-          </h2>
-        </Reveal>
-
-        <p className="parallax-hint mt-5 font-mono text-xs uppercase tracking-[0.18em] text-[#f1efe7]/65">
-          SCROLL DOWN TO EXPAND THE 7-LAYER VISUAL FIELD ↓
-        </p>
-      </motion.div>
-
-      <ZoomParallax images={zoomParallaxImages} />
-    </section>
-  );
-}
+*/
 
 function Trust() {
-  return <TrustSection />;
-}
-
-function Perspectives() {
-  return <PerspectivesSection />;
+  return <TestimonialsSection />;
 }
 
 function Finale() {
@@ -247,21 +130,7 @@ function Finale() {
 
 function Footer() {
   return (
-    <DoodleCrewFooter
-      wordmark="INSPIRING"
-      brand="Inspiring Wave"
-      blurb="Strategy, design and technology for a world in motion. We build expressive digital experiences from Hyderabad to everywhere."
-      tagline="Independent minds, moving together to make work with real momentum."
-      columns={[
-        { title: 'Explore', links: [{ label: 'Selected work', href: '/work' }, { label: 'Services', href: '/services' }, { label: 'Studio', href: '/about' }] },
-        { title: 'Thinking', links: [{ label: 'Journal', href: '/journal' }, { label: 'Our approach', href: '/about' }, { label: 'Capabilities', href: '/services' }] },
-        { title: 'Connect', links: [{ label: 'Start a project', href: '/contact' }, { label: 'info@inspiringwave.in', href: 'mailto:info@inspiringwave.in' }, { label: '+91 78938 01806', href: 'tel:+917893801806' }] },
-        { title: 'Social', links: [{ label: 'LinkedIn', href: 'https://www.linkedin.com/company/inspiringwave/' }, { label: 'Hyderabad, India' }] },
-      ]}
-      actions={[
-        { label: 'Write to us', href: 'mailto:info@inspiringwave.in', icon: 'plane', variant: 'outline' },
-        { label: 'Start a project', href: '/contact', icon: 'sparkle', variant: 'solid' },
-      ]}
+    <InspiringWaveFooter
       copyright={`© ${new Date().getFullYear()} Inspiring Wave Digitech Pvt. Ltd.`}
     />
   );
@@ -270,14 +139,14 @@ function Footer() {
 function Home() {
   const main = useRef<HTMLElement>(null);
   useHomepageMotion(main);
-  return <main ref={main} id="main" className="home-cinematic"><Hero /><Manifesto /><Work /><Capabilities /><Method /><Studio /><ParallaxShowcase /><Trust /><Perspectives /><Finale /></main>;
+  return <main ref={main} id="main" className="home-cinematic"><Hero /><Manifesto /><Capabilities /><Work /><Trust /><Finale /></main>;
 }
 
 function DetailPage({ type }: { type: 'service' | 'work' }) {
   const { slug } = useParams(); const navigate = useNavigate(); const item = services.find(s => s.slug === slug); const title = item?.title || slug?.replaceAll('-', ' ') || type;
   const main = useRef<HTMLElement>(null);
   usePageMotion(main);
-  const study = studies.find(entry => entry.title.toLowerCase().replaceAll(' ', '-') === slug);
+  const study = studies.find(entry => entry.slug === slug || entry.title.toLowerCase().replaceAll(' ', '-') === slug);
   const primary = study?.image ?? '/assets/process/process-sculpture.webp';
   const secondary = type === 'service' ? '/assets/studio/studio-collaboration.webp' : '/assets/fabric.webp';
   return <main ref={main} id="main" className="detail-page">
@@ -397,7 +266,7 @@ function ServicesPage() {
   const main = useRef<HTMLElement>(null);
   usePageMotion(main);
   return (
-    <main ref={main} id="main" className="services-page-wrap bg-[#FAF4E9] pt-[66px]">
+    <main ref={main} id="main" className="services-page-wrap bg-[#040814] pt-[66px]">
       <ServicesSection />
     </main>
   );

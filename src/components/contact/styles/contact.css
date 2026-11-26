@@ -1,0 +1,732 @@
+/* ==========================================================================
+   INSPIRING WAVE — CINEMATIC GET IN TOUCH (VERTICAL RIGHT-TO-LEFT PAPER TEAR)
+   ========================================================================== */
+
+:root {
+  --contact-blue: #070B16;
+  --contact-blue-dark: #050911;
+  --contact-cream: #F8F0E4;
+  --contact-paper: #FFF7EB;
+  --contact-black: #0B101A;
+  --contact-ink: #151515;
+  --contact-lime: #D9FF00;
+  --contact-paper-edge: #E9E0D4;
+  --contact-line: rgba(21, 21, 21, 0.42);
+  --contact-muted: #5F625F;
+}
+
+.iw-get-in-touch {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--contact-paper);
+  color: var(--contact-ink);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.iw-get-in-touch *,
+.iw-get-in-touch *::before,
+.iw-get-in-touch *::after {
+  box-sizing: border-box;
+}
+
+.iw-get-in-touch :focus-visible {
+  outline: 2px solid var(--contact-blue);
+  outline-offset: 3px;
+}
+
+.iwc-stage {
+  position: relative;
+  width: 100%;
+  min-height: max(740px, 100vh);
+  display: grid;
+  grid-template-columns: 54% 46%;
+  background: var(--contact-paper);
+}
+
+/* --------------------------------------------------------------------------
+   Layer 1: Right Cream Stage & Form
+   -------------------------------------------------------------------------- */
+.iwc-cream-stage {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  z-index: 1;
+  background: radial-gradient(ellipse at 55% 45%, var(--contact-paper) 0%, var(--contact-cream) 100%);
+  padding: clamp(72px, 7.6vh, 102px) clamp(32px, 4.6vw, 76px) clamp(108px, 10vh, 140px)
+    clamp(76px, 7.6vw, 136px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iwc-cream-grain {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+  opacity: 0.16;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.iwc-form-bg-art {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.iwc-halftone-wave {
+  position: absolute;
+  right: 4%;
+  top: 7%;
+  width: clamp(160px, 16vw, 240px);
+  height: auto;
+  will-change: transform;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.iwc-lime-triangle {
+  position: absolute;
+  right: 9%;
+  top: 23%;
+  width: 24px;
+  height: 24px;
+  will-change: transform;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.iwc-fabric-accent {
+  position: absolute;
+  right: -4%;
+  bottom: -6%;
+  width: clamp(190px, 20vw, 310px);
+  height: auto;
+  opacity: 0.85;
+  transform: rotate(-6deg);
+  mix-blend-mode: multiply;
+  will-change: transform;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.iwc-form-shell {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 540px;
+}
+
+.iwc-form-header {
+  margin-bottom: clamp(22px, 2.8vh, 32px);
+}
+
+.iwc-form-heading {
+  margin: 0;
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-style: normal;
+  font-weight: 900;
+  font-size: clamp(36px, 3.35vw, 56px);
+  line-height: 0.88;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: var(--contact-ink);
+}
+
+.iwc-form-underline {
+  display: block;
+  width: clamp(160px, 15vw, 230px);
+  height: auto;
+  margin-top: 6px;
+  overflow: visible;
+}
+
+.iwc-form {
+  display: grid;
+  gap: 18px;
+}
+
+.iwc-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.iwc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.iwc-label {
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--contact-ink);
+}
+
+.iwc-label span {
+  color: var(--contact-blue);
+}
+
+.iwc-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--contact-line);
+  border-radius: 3px;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.iwc-input-wrap:focus-within {
+  border-color: var(--contact-black);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 3px 3px 0 var(--contact-lime);
+}
+
+.iwc-field.has-error .iwc-input-wrap {
+  border-color: #C92A2A;
+}
+
+.iwc-field-ico {
+  width: 16px;
+  height: 16px;
+  margin-left: 12px;
+  color: var(--contact-muted);
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.iwc-input-wrap:focus-within .iwc-field-ico {
+  color: var(--contact-blue);
+}
+
+.iwc-field-ico--top {
+  align-self: flex-start;
+  margin-top: 13px;
+}
+
+.iwc-input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 11px 12px 11px 10px;
+  font-family: var(--sans, 'Instrument Sans', system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--contact-ink);
+  outline: none;
+}
+
+.iwc-input::placeholder {
+  color: rgba(21, 21, 21, 0.48);
+}
+
+.iwc-select {
+  appearance: none;
+  padding-right: 34px;
+  cursor: pointer;
+}
+
+.iwc-select.is-placeholder {
+  color: rgba(21, 21, 21, 0.52);
+}
+
+.iwc-select-chevron {
+  position: absolute;
+  right: 12px;
+  width: 15px;
+  height: 15px;
+  color: var(--contact-ink);
+  pointer-events: none;
+  transition: transform 0.22s ease;
+}
+
+.iwc-select-wrap:focus-within .iwc-select-chevron {
+  transform: rotate(180deg);
+}
+
+.iwc-textarea-wrap {
+  align-items: flex-start;
+}
+
+.iwc-textarea {
+  resize: vertical;
+  min-height: 88px;
+  line-height: 1.45;
+}
+
+.iwc-error-msg {
+  margin: 0;
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 10.5px;
+  color: #B42318;
+  letter-spacing: 0.04em;
+}
+
+.iwc-form-alert {
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid #B42318;
+  background: rgba(180, 35, 24, 0.08);
+  color: #B42318;
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+}
+
+/* Angled Black Submit Button + Neon-Lime Offset Shadow */
+.iwc-submit-row {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.iwc-submit-stack {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 310px;
+}
+
+.iwc-submit-lime-offset {
+  position: absolute;
+  inset: 0;
+  background: var(--contact-lime);
+  transform: translate(6px, 6px) skewX(-6deg);
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.iwc-submit-btn {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 50px;
+  padding: 0 24px;
+  border: 0;
+  background: var(--contact-black);
+  color: var(--contact-cream);
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-weight: 800;
+  font-style: normal;
+  font-size: 20px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transform: skewX(-6deg);
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.22s ease;
+}
+
+.iwc-submit-btn:hover:not(:disabled) {
+  transform: translate(-2px, -2px) skewX(-6deg);
+  background: #141C2E;
+}
+
+.iwc-submit-stack:hover .iwc-submit-lime-offset {
+  transform: translate(9px, 9px) skewX(-6deg);
+}
+
+.iwc-submit-arrow {
+  font-style: normal;
+  font-size: 18px;
+  transition: transform 0.22s ease;
+}
+
+.iwc-submit-btn:hover:not(:disabled) .iwc-submit-arrow {
+  transform: translate(3px, -3px);
+}
+
+.iwc-submit-btn:disabled {
+  opacity: 0.72;
+  cursor: progress;
+}
+
+.iwc-reassurance {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 11px;
+  color: var(--contact-muted);
+  letter-spacing: 0.04em;
+}
+
+.iwc-shield-ico {
+  width: 15px;
+  height: 17px;
+  color: var(--contact-blue);
+  flex-shrink: 0;
+}
+
+/* Success Panel */
+.iwc-success-panel {
+  padding: 28px 24px;
+  border: 1.5px solid var(--contact-black);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 6px 6px 0 var(--contact-lime);
+}
+
+.iwc-success-badge {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  background: var(--contact-blue);
+  color: var(--contact-cream);
+  margin-bottom: 16px;
+}
+
+.iwc-check-ico {
+  width: 22px;
+  height: 22px;
+}
+
+.iwc-success-title {
+  margin: 0 0 8px;
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-style: normal;
+  font-weight: 900;
+  font-size: 36px;
+  line-height: 0.9;
+  color: var(--contact-ink);
+}
+
+.iwc-success-copy {
+  margin: 0 0 20px;
+  font-family: var(--sans, 'Instrument Sans', system-ui, sans-serif);
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: rgba(21, 21, 21, 0.84);
+}
+
+.iwc-reset-btn {
+  border: 1px solid var(--contact-black);
+  background: transparent;
+  color: var(--contact-black);
+  padding: 10px 18px;
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.iwc-reset-btn:hover {
+  background: var(--contact-black);
+  color: var(--contact-cream);
+}
+
+/* --------------------------------------------------------------------------
+   Layer 2: Procedural Vertical Cobalt Poster SVG
+   -------------------------------------------------------------------------- */
+.iwc-tear-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  display: block;
+  pointer-events: none;
+}
+
+.iwc-sheet-fill {
+  fill: var(--contact-blue);
+}
+
+/* --------------------------------------------------------------------------
+   Layer 3: Left Cobalt Poster Content
+   -------------------------------------------------------------------------- */
+.iwc-blue-poster {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  z-index: 3;
+  padding: clamp(72px, 7.6vh, 102px) clamp(24px, 3vw, 48px) clamp(88px, 8.8vh, 120px)
+    clamp(28px, 5.2vw, 84px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(22px, 3.2vh, 42px);
+  color: var(--contact-cream);
+  pointer-events: none;
+}
+
+.iwc-poster-kicker {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.iwc-kicker-line {
+  display: block;
+  width: 1px;
+  height: 54px;
+  background: rgba(248, 240, 228, 0.45);
+}
+
+.iwc-kicker-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 11.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.iwc-kicker-num {
+  color: rgba(248, 240, 228, 0.72);
+}
+
+.iwc-kicker-label {
+  color: var(--contact-cream);
+  font-weight: 600;
+}
+
+.iwc-kicker-underline {
+  width: 96px;
+  height: auto;
+  margin-top: 3px;
+  overflow: visible;
+}
+
+.iwc-poster-headline-zone {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.iwc-lime-ellipse {
+  position: absolute;
+  left: -7%;
+  top: -10%;
+  width: 108%;
+  height: 112%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.iwc-poster-eyebrow {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 10px 4px;
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-style: normal;
+  font-weight: 800;
+  font-size: clamp(22px, 2.2vw, 38px);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--contact-cream);
+  transform: rotate(-2.2deg);
+  transform-origin: left center;
+}
+
+.iwc-poster-headline {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-style: normal;
+  font-weight: 900;
+  font-size: clamp(66px, 7.6vw, 134px);
+  line-height: 0.84;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  transform: rotate(-2.8deg);
+  transform-origin: left center;
+}
+
+.iwc-line-mask {
+  display: block;
+  overflow: hidden;
+  padding: 0.03em 0.06em 0.05em 0.02em;
+}
+
+.iwc-line-inner {
+  display: block;
+  will-change: transform;
+}
+
+.iwc-it-real-wrap {
+  position: relative;
+  display: inline-block;
+  margin-top: 0.08em;
+  padding: 0.08em 0.22em 0.1em 0.16em;
+}
+
+.iwc-it-real-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--contact-cream);
+  clip-path: polygon(1.5% 4%, 100% 0%, 98.2% 96%, 0% 100%);
+  box-shadow: 0 16px 36px rgba(5, 11, 44, 0.42);
+  will-change: transform;
+}
+
+.iwc-it-real-text {
+  color: var(--contact-blue);
+}
+
+.iwc-poster-subline {
+  position: relative;
+  z-index: 1;
+  margin: clamp(18px, 2.6vh, 30px) 0 0 6px;
+  font-family: var(--sans, 'Instrument Sans', system-ui, sans-serif);
+  font-size: clamp(14px, 1.08vw, 18px);
+  line-height: 1.45;
+  color: rgba(248, 240, 228, 0.9);
+  max-width: 38ch;
+}
+
+/* --------------------------------------------------------------------------
+   Layer 4: PEEL ↗ Interactive Neon-Lime Tab
+   -------------------------------------------------------------------------- */
+.iwc-peel-tab {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 0;
+  background: var(--contact-lime);
+  color: var(--contact-black);
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(5, 10, 32, 0.42);
+  transition: opacity 0.25s ease, background-color 0.2s ease;
+}
+
+.iwc-peel-tab:hover:not(:disabled) {
+  background: #DCFF66;
+}
+
+.iwc-peel-tab:disabled {
+  cursor: wait;
+}
+
+.iwc-mobile-divider {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Tablet (768px – 1023px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .iwc-stage {
+    grid-template-columns: 48% 52%;
+    min-height: 700px;
+  }
+
+  .iwc-poster-headline {
+    font-size: clamp(50px, 6.4vw, 78px);
+  }
+
+  .iwc-cream-stage {
+    padding: 44px 28px 44px 36px;
+  }
+
+  .iwc-row-2 {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile Vertical Composition (<= 767px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 767px) {
+  .iwc-stage {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .iwc-tear-svg,
+  .iwc-peel-tab {
+    display: none;
+  }
+
+  .iwc-blue-poster {
+    grid-column: 1;
+    grid-row: 1;
+    background: var(--contact-blue);
+    padding: 88px 22px 44px;
+    gap: 20px;
+  }
+
+  .iwc-kicker-line {
+    height: 36px;
+  }
+
+  .iwc-poster-eyebrow {
+    font-size: 18px;
+  }
+
+  .iwc-poster-headline {
+    font-size: clamp(52px, 15vw, 72px);
+  }
+
+  .iwc-mobile-divider {
+    display: block;
+    position: relative;
+    grid-column: 1;
+    grid-row: 2;
+    height: 0;
+  }
+
+  .iwc-cream-stage {
+    grid-column: 1;
+    grid-row: 2;
+    padding: 52px 20px 112px;
+  }
+
+  .iwc-row-2 {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .iwc-halftone-wave {
+    opacity: 0.35;
+  }
+
+  .iwc-fabric-accent {
+    opacity: 0.22;
+    width: 140px;
+    right: -10px;
+    bottom: -18px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced Motion
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .iw-get-in-touch *,
+  .iw-get-in-touch *::before,
+  .iw-get-in-touch *::after {
+    animation: none !important;
+    transition-duration: 0.01s !important;
+  }
+}

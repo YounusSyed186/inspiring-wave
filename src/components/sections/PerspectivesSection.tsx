@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import { ArrowUpRight, BookOpen, Clock, Calendar, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Clock, Calendar, Sparkles } from 'lucide-react';
 
 export function PerspectivesSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -49,11 +49,6 @@ export function PerspectivesSection() {
       <div className="max-w-[1380px] mx-auto [transform-style:preserve-3d]">
         {/* Section Header */}
         <div className="mb-14 md:mb-20">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-3.5 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-[#d8f03c] mb-6">
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>09 // PERSPECTIVES — THOUGHTS IN MOTION</span>
-          </div>
-
           <h2 className="m-0 font-display font-black uppercase text-5xl sm:text-7xl md:text-8xl lg:text-[5.75rem] leading-[0.88] tracking-[-0.04em] text-[#f1efe7]">
             THOUGHTS IN
             <br />

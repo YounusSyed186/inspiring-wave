@@ -45,12 +45,7 @@ export function StudioSection() {
       />
 
       {/* Decorative top-left coordinate stamp */}
-      <div className="max-w-[1380px] mx-auto mb-10 md:mb-14 flex flex-wrap items-center justify-between gap-4">
-        <div className="inline-flex items-center gap-2 rounded-full bg-[#080c12] text-[#f1efe7] px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em]">
-          <span className="w-2 h-2 rounded-full bg-[#1945f5] animate-pulse" />
-          <span>06 // STUDIO — BEHIND THE WAVE</span>
-        </div>
-
+      <div className="max-w-[1380px] mx-auto mb-10 md:mb-14 flex flex-wrap items-center justify-end gap-4">
         <div className="font-mono text-xs uppercase tracking-[0.16em] text-[#080c12]/60 flex items-center gap-2">
           <MapPin className="w-3.5 h-3.5 text-[#1945f5]" />
           <span>HYDERABAD, INDIA · 17.3850° N, 78.4867° E</span>

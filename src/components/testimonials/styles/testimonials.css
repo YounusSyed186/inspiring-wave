@@ -1,0 +1,1140 @@
+/* ==========================================================================
+   INSPIRING WAVE — CINEMATIC INTERACTIVE TESTIMONIALS ("WORDS THAT STAY.")
+   ========================================================================== */
+
+:root {
+  --testimonial-bg: #070B16;
+  --testimonial-bg-secondary: #0C1325;
+  --testimonial-ivory: #F8F0E4;
+  --testimonial-paper: #FAF3E8;
+  --testimonial-ink: #111111;
+  --testimonial-muted: #9BA3B3;
+  --testimonial-blue: #173CFF;
+  --testimonial-blue-dark: #1232D4;
+  --testimonial-lime: #D7FF00;
+  --testimonial-line-light: rgba(248, 240, 228, 0.42);
+  --testimonial-line-dark: rgba(17, 17, 17, 0.2);
+}
+
+.tw-testimonials-section {
+  position: relative;
+  width: 100%;
+  min-height: max(820px, 100vh);
+  background: var(--testimonial-bg);
+  color: var(--testimonial-ivory);
+  padding: clamp(78px, 8.8vh, 102px) clamp(24px, 5vw, 88px) clamp(84px, 9vh, 112px);
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-top: 0;
+}
+
+.tw-testimonials-section *,
+.tw-testimonials-section *::before,
+.tw-testimonials-section *::after {
+  box-sizing: border-box;
+}
+
+.tw-testimonials-section :focus-visible {
+  outline: 2px solid var(--testimonial-lime);
+  outline-offset: 4px;
+}
+
+.tw-bg-atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 24% 54%, rgba(23, 60, 255, 0.12) 0%, transparent 34%),
+    radial-gradient(ellipse at 68% 52%, rgba(18, 50, 212, 0.08) 0%, transparent 46%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 84%, transparent 100%);
+}
+
+.tw-stage {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1680px;
+  margin: 0 auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* --------------------------------------------------------------------------
+   Top Bar + Zone A: WORDS THAT STAY.
+   -------------------------------------------------------------------------- */
+.tw-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.tw-eyebrow {
+  margin: 0;
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: clamp(11px, 0.8vw, 13.5px);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.tw-eyebrow-muted {
+  color: var(--testimonial-muted);
+}
+
+.tw-eyebrow-bright {
+  color: var(--testimonial-ivory);
+  font-weight: 600;
+}
+
+.tw-brand-stamp {
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-weight: 800;
+  font-size: clamp(18px, 1.32vw, 23px);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--testimonial-ivory);
+}
+
+.tw-brand-stamp sup {
+  font-size: 0.55em;
+  margin-left: 0.08em;
+}
+
+.tw-heading-zone {
+  position: relative;
+  margin-top: clamp(10px, 1.4vh, 20px);
+  width: fit-content;
+  z-index: 6;
+}
+
+.tw-lime-ellipse {
+  position: absolute;
+  left: -5.5%;
+  top: -24%;
+  width: 92%;
+  height: 152%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tw-headline {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.22em;
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(58px, 6.9vw, 122px);
+  line-height: 0.86;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: var(--testimonial-ivory);
+  transform: rotate(-3.4deg);
+  transform-origin: left center;
+}
+
+.tw-words-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.2em;
+}
+
+.tw-word-mask,
+.tw-stay-mask {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.05em 0.06em 0.08em 0.02em;
+}
+
+.tw-word-inner,
+.tw-stay-inner {
+  display: inline-block;
+  will-change: transform;
+}
+
+.tw-stay-banner-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.06em 0.24em 0.09em 0.2em;
+  margin-left: 0.04em;
+}
+
+.tw-stay-banner {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--testimonial-blue);
+  clip-path: polygon(5% 4%, 100% 0%, 95% 96%, 0% 100%);
+  box-shadow: 0 14px 32px rgba(4, 7, 18, 0.55);
+  will-change: transform;
+}
+
+.tw-stay-inner {
+  color: #FFFFFF;
+}
+
+.tw-cream-sparks {
+  position: absolute;
+  right: -46px;
+  top: -38px;
+  width: clamp(38px, 3.2vw, 56px);
+  height: auto;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Asymmetric Main Composition (Zone B Globe + Zone C Editorial Card Deck)
+   -------------------------------------------------------------------------- */
+.tw-main-composition {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(320px, 34%) 1fr;
+  align-items: center;
+  gap: clamp(16px, 2.2vw, 40px);
+  margin: clamp(0px, 0.4vh, 8px) 0 clamp(10px, 1.8vh, 22px);
+}
+
+/* Zone B: Interactive Cobe Globe */
+.tw-globe-zone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  will-change: transform, opacity;
+}
+
+.tw-globe-stage {
+  position: relative;
+  width: clamp(320px, 31.5vw, 540px);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.tw-globe-stage:active {
+  cursor: grabbing;
+}
+
+.tw-globe-rim {
+  position: absolute;
+  inset: 9.8%;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 34px rgba(23, 60, 255, 0.36),
+    0 0 42px rgba(23, 60, 255, 0.2);
+}
+
+.tw-globe-canvas-host,
+.tw-globe-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.tw-globe-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+.tw-globe-fallback-svg,
+.tw-globe-graticule {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.tw-globe-pins {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tw-globe-pin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  will-change: transform, opacity;
+}
+
+.tw-pin-dot {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border-radius: 50%;
+  background: rgba(23, 60, 255, 0.34);
+  border: 1.5px solid #3E68FF;
+  transition: transform 0.22s ease, background-color 0.22s ease;
+}
+
+.tw-pin-dot i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FFFFFF;
+}
+
+.tw-globe-pin:hover .tw-pin-dot,
+.tw-globe-pin.is-hovered .tw-pin-dot {
+  transform: scale(1.28);
+  background: rgba(23, 60, 255, 0.72);
+}
+
+.tw-pin-teardrop {
+  position: relative;
+  display: block;
+  width: 26px;
+  height: 34px;
+  margin: -32px 0 0 -13px;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.55));
+}
+
+.tw-pin-pulse {
+  position: absolute;
+  left: -14px;
+  top: -14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--testimonial-lime);
+  animation: tw-pulse-once 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  pointer-events: none;
+}
+
+.tw-pin-label {
+  position: absolute;
+  left: 12px;
+  top: 4px;
+  padding: 5px 10px;
+  background: var(--testimonial-lime);
+  color: #0B0E17;
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes tw-pulse-once {
+  0% {
+    transform: scale(0.65);
+    opacity: 0.9;
+  }
+  75%,
+  100% {
+    transform: scale(1.85);
+    opacity: 0;
+  }
+}
+
+.tw-globe-fallback-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.tw-fallback-chip {
+  padding: 5px 10px;
+  border: 1px solid rgba(248, 240, 228, 0.3);
+  background: rgba(12, 19, 37, 0.9);
+  color: var(--testimonial-ivory);
+  font-family: var(--mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.tw-fallback-chip.is-active {
+  border-color: var(--testimonial-lime);
+  background: var(--testimonial-lime);
+  color: #080D19;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   Zone C: Layered Editorial Testimonial Deck (5 Physical Layers)
+   -------------------------------------------------------------------------- */
+.tw-deck-zone {
+  position: relative;
+  z-index: 8;
+  padding-right: clamp(36px, 8.5vw, 148px);
+}
+
+.tw-deck-entrance {
+  position: relative;
+}
+
+.tw-bg-panel-wrap {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.tw-bg-panel {
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(10% 8%, 100% 0%, 90% 96%, 0% 100%);
+  transform: translate3d(var(--tw-px, 0px), var(--tw-py, 0px), 0);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tw-bg-panel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Layer 2: Cobalt offset sheet directly behind active cream card */
+.tw-panel-blue-pos {
+  inset: 12px -12px -14px 10px;
+  z-index: 4;
+}
+
+.tw-panel-blue {
+  background: var(--testimonial-blue);
+  clip-path: polygon(9.5% 18.5%, 100% 0%, 90.2% 96.2%, 0% 98.5%);
+}
+
+/* Layer 3: Cumulus sky editorial panel */
+.tw-panel-cloud-pos {
+  right: -7.8%;
+  top: 7.5%;
+  bottom: 7.5%;
+  width: 28%;
+  z-index: 3;
+}
+
+.tw-panel-cloud {
+  border: 1.5px solid rgba(248, 240, 228, 0.92);
+  background: #1032B8;
+  clip-path: polygon(10% 10%, 100% 0%, 90% 95%, 0% 100%);
+  box-shadow: 0 20px 44px rgba(2, 5, 14, 0.65);
+}
+
+/* Layer 4: Dark blue & ivory silk panel */
+.tw-panel-silk-pos {
+  right: -15.4%;
+  top: 23%;
+  bottom: 13%;
+  width: 24%;
+  z-index: 2;
+}
+
+.tw-panel-silk {
+  border: 1.5px solid rgba(248, 240, 228, 0.85);
+  background: #060912;
+  clip-path: polygon(10% 12%, 100% 0%, 90% 95%, 0% 100%);
+  box-shadow: 0 20px 44px rgba(2, 5, 14, 0.7);
+}
+
+/* Layer 5: Neon-lime top-right graphic accent */
+.tw-panel-lime-pos {
+  right: -14.2%;
+  top: 11.5%;
+  height: 22%;
+  width: 16%;
+  z-index: 1;
+}
+
+.tw-panel-lime {
+  background: var(--testimonial-lime);
+}
+
+/* Layer 1: Main Slanted Cream Editorial Paper Sheet */
+.tw-main-card-entrance {
+  position: relative;
+  z-index: 6;
+  will-change: transform, opacity;
+}
+
+.tw-card-swap-stage {
+  position: relative;
+}
+
+.tw-card-transition-layer.is-outgoing {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tw-paper-sheet {
+  position: relative;
+  background: linear-gradient(155deg, var(--testimonial-paper) 0%, var(--testimonial-ivory) 100%);
+  color: var(--testimonial-ink);
+  clip-path: polygon(9.5% 18.5%, 100% 0%, 90.2% 96.2%, 0% 98.5%);
+  padding: clamp(68px, 7.6vw, 118px) clamp(62px, 7vw, 108px) clamp(38px, 4.2vw, 62px)
+    clamp(68px, 7.6vw, 116px);
+  filter: drop-shadow(0 24px 48px rgba(2, 5, 15, 0.62));
+}
+
+.tw-paper-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.14;
+  background-image: radial-gradient(rgba(17, 17, 17, 0.25) 0.75px, transparent 0.75px);
+  background-size: 14px 14px;
+}
+
+.tw-paper-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.tw-quote-mark {
+  display: block;
+  width: clamp(46px, 4.2vw, 68px);
+  height: auto;
+  margin-bottom: clamp(10px, 1.2vw, 18px);
+}
+
+.tw-quote-text {
+  margin: 0;
+  font-family: var(--sans, 'Instrument Sans', system-ui, sans-serif);
+  font-weight: 700;
+  font-style: italic;
+  color: var(--testimonial-ink);
+  line-height: 1.09;
+  letter-spacing: -0.028em;
+  transform: rotate(-2.8deg);
+  transform-origin: left center;
+}
+
+.tw-quote--xl {
+  font-size: clamp(26px, 2.85vw, 46px);
+}
+
+.tw-quote--lg {
+  font-size: clamp(23px, 2.45vw, 40px);
+}
+
+.tw-quote--md {
+  font-size: clamp(20px, 2.15vw, 35px);
+}
+
+/* Attribution Row inside Cream Card */
+.tw-card-footer {
+  margin-top: clamp(24px, 2.6vw, 38px);
+  padding: 0;
+  background: transparent;
+  display: grid;
+  grid-template-columns: 1.3fr 1px 0.85fr;
+  align-items: center;
+  gap: clamp(16px, 2.2vw, 32px);
+  transform: rotate(-1.3deg);
+  transform-origin: left center;
+}
+
+.tw-author-cluster {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 1.5vw, 24px);
+}
+
+.tw-portrait-frame {
+  width: clamp(86px, 7.6vw, 122px);
+  height: clamp(86px, 7.6vw, 122px);
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #DFD8CA;
+  border: 1px solid rgba(17, 17, 17, 0.16);
+  transform: skewX(-4deg);
+}
+
+.tw-portrait-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.12);
+}
+
+.tw-portrait-monogram {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #161B29 0%, #0C101B 100%);
+  color: var(--testimonial-ivory);
+}
+
+.tw-monogram-grid {
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(248, 240, 228, 0.22);
+  background-image: linear-gradient(rgba(248, 240, 228, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(248, 240, 228, 0.06) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.tw-monogram-letters {
+  position: relative;
+  font-family: var(--display, 'Barlow Condensed', sans-serif);
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(34px, 3vw, 48px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--testimonial-ivory);
+}
+
+.tw-monogram-tag {
+  position: relative;
+  margin-top: 4px;
+  padding: 1px 6px;
+  background: var(--testimonial-blue);
+  color: #FFFFFF;
+  font-family: var(--mono, monospace);
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+}
+
+.tw-author-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.tw-author-name {
+  font-style: normal;
+  font-family: var(--sans, 'Instrument Sans', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: clamp(17px, 1.35vw, 23px);
+  line-height: 1.15;
+  color: var(--testimonial-ink);
+}
+
+.tw-author-role {
+  font-family: var(--sans, 'Instrument Sans', system-ui, sans-serif);
+  font-style: italic;
+  font-size: clamp(13px, 0.95vw, 15.5px);
+  color: rgba(17, 17, 17, 0.8);
+}
+
+.tw-author-company {
+  font-family: var(--sans, 'Instrument Sans', system-ui, sans-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(13px, 0.95vw, 15.5px);
+  color: var(--testimonial-ink);
+}
+
+.tw-location-pill {
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--testimonial-lime);
+  color: #111111;
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transform: skewX(-6deg);
+}
+
+.tw-loc-pin-ico {
+  width: 10px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.tw-footer-divider {
+  width: 1px;
+  height: 82px;
+  background: var(--testimonial-line-dark);
+  transform: rotate(10deg);
+}
+
+.tw-proof-cluster {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tw-stars-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.tw-star-ico {
+  width: 22px;
+  height: 22px;
+}
+
+.tw-rating-caption {
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(17, 17, 17, 0.82);
+}
+
+.tw-verified-scope {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tw-verified-seal-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.tw-verified-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--testimonial-blue);
+  box-shadow: 0 0 0 3px rgba(23, 60, 255, 0.16);
+}
+
+.tw-verified-badge-label {
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--testimonial-blue);
+}
+
+.tw-verified-scope-text {
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 10.5px;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  color: rgba(17, 17, 17, 0.78);
+}
+
+/* --------------------------------------------------------------------------
+   Zone D: Supporting Trust Pillars + Prev/Next Controls + Torn Bottom Edge
+   -------------------------------------------------------------------------- */
+.tw-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 6px;
+}
+
+.tw-pillars-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2vw, 32px);
+}
+
+.tw-pillar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.tw-pillar-head {
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-weight: 900;
+  font-size: clamp(28px, 2.5vw, 44px);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--testimonial-ivory);
+}
+
+.tw-pillar-sub {
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(248, 240, 228, 0.76);
+}
+
+.tw-pillar-slash {
+  display: block;
+  width: 2px;
+  height: 46px;
+  background: var(--testimonial-lime);
+  transform: rotate(21deg);
+}
+
+.tw-nav-cluster {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 2.6vw, 42px);
+}
+
+.tw-nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tw-nav-btn {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.22s ease,
+    border-color 0.22s ease, color 0.22s ease;
+}
+
+.tw-nav-btn--prev {
+  background: transparent;
+  border: 1.25px solid rgba(248, 240, 228, 0.52);
+  color: var(--testimonial-ivory);
+}
+
+.tw-nav-btn--prev:hover {
+  border-color: var(--testimonial-lime);
+  color: var(--testimonial-lime);
+  transform: scale(1.06);
+}
+
+.tw-nav-btn--next {
+  background: var(--testimonial-ivory);
+  border: 1.25px solid var(--testimonial-ivory);
+  color: var(--testimonial-bg);
+}
+
+.tw-nav-btn--next:hover {
+  background: var(--testimonial-lime);
+  border-color: var(--testimonial-lime);
+  transform: scale(1.06);
+}
+
+.tw-nav-arrow {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.22s ease;
+}
+
+.tw-nav-btn--prev:hover .tw-nav-arrow {
+  transform: translateX(-2px);
+}
+
+.tw-nav-btn--next:hover .tw-nav-arrow {
+  transform: translateX(2px);
+}
+
+.tw-nav-counter {
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: rgba(248, 240, 228, 0.76);
+  min-width: 66px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.tw-explore-voices {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--testimonial-ivory);
+  text-decoration: none;
+  transition: color 0.22s ease;
+}
+
+.tw-explore-voices i {
+  font-style: normal;
+  transition: transform 0.22s ease;
+}
+
+.tw-explore-voices:hover {
+  color: var(--testimonial-lime);
+}
+
+.tw-explore-voices:hover i {
+  transform: translate(3px, -3px);
+}
+
+/* Restrained Bottom Torn-Paper Strip */
+.tw-torn-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: clamp(26px, 3vw, 44px);
+  z-index: 4;
+  pointer-events: none;
+}
+
+.tw-torn-edge-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Desktop 1280px & Tablet 768px–1023px
+   -------------------------------------------------------------------------- */
+@media (max-width: 1360px) {
+  .tw-deck-zone {
+    padding-right: clamp(24px, 6vw, 88px);
+  }
+  .tw-paper-sheet {
+    padding: 44px 54px 36px 64px;
+  }
+}
+
+@media (max-width: 1099px) and (min-width: 768px) {
+  .tw-testimonials-section {
+    min-height: auto;
+    padding: 48px 32px 96px;
+  }
+
+  .tw-main-composition {
+    grid-template-columns: 34% 1fr;
+    gap: 24px;
+    margin: 24px 0 28px;
+  }
+
+  .tw-globe-stage {
+    width: min(100%, 330px);
+  }
+
+  .tw-deck-zone {
+    padding-right: 28px;
+  }
+
+  .tw-panel-silk-pos,
+  .tw-panel-lime-pos {
+    display: none;
+  }
+
+  .tw-paper-sheet {
+    clip-path: polygon(4% 6%, 100% 0%, 96% 97%, 0% 99%);
+    padding: 36px 38px 30px 44px;
+  }
+
+  .tw-card-footer {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .tw-footer-divider {
+    display: none;
+  }
+
+  .tw-bottom-bar {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile Art Direction (<= 767px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 767px) {
+  .tw-testimonials-section {
+    min-height: auto;
+    padding: 36px 18px 82px;
+  }
+
+  .tw-brand-stamp {
+    font-size: 16px;
+  }
+
+  .tw-heading-zone {
+    margin-top: 14px;
+  }
+
+  .tw-headline {
+    font-size: clamp(46px, 13.5vw, 66px);
+    transform: rotate(-2.2deg);
+  }
+
+  .tw-cream-sparks {
+    right: -28px;
+    top: -24px;
+    width: 30px;
+  }
+
+  .tw-main-composition {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    margin: 18px 0 24px;
+  }
+
+  .tw-globe-stage {
+    width: clamp(235px, 68vw, 290px);
+  }
+
+  .tw-deck-zone {
+    padding-right: 0;
+  }
+
+  .tw-panel-cloud-pos,
+  .tw-panel-silk-pos,
+  .tw-panel-lime-pos {
+    display: none;
+  }
+
+  .tw-panel-blue-pos {
+    inset: 8px -6px -8px 8px;
+  }
+
+  .tw-panel-blue,
+  .tw-paper-sheet {
+    clip-path: polygon(2.2% 3%, 100% 0%, 97.8% 98%, 0% 100%);
+  }
+
+  .tw-paper-sheet {
+    padding: 28px 22px 26px 24px;
+  }
+
+  .tw-quote-mark {
+    width: 34px;
+    margin-bottom: 10px;
+  }
+
+  .tw-quote-text {
+    font-size: clamp(20px, 5.6vw, 26px);
+    transform: rotate(-1deg);
+  }
+
+  .tw-card-footer {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: 20px;
+  }
+
+  .tw-portrait-frame {
+    width: 72px;
+    height: 72px;
+  }
+
+  .tw-footer-divider {
+    display: none;
+  }
+
+  .tw-bottom-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .tw-pillars-row {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .tw-pillar-head {
+    font-size: 24px;
+  }
+
+  .tw-pillar-sub {
+    font-size: 9px;
+  }
+
+  .tw-pillar-slash {
+    height: 32px;
+  }
+
+  .tw-nav-cluster {
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .tw-explore-voices {
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced Motion Accessibility
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .tw-testimonials-section *,
+  .tw-testimonials-section *::before,
+  .tw-testimonials-section *::after {
+    animation: none !important;
+    transition-duration: 0.01s !important;
+  }
+}
+
+/* Desktop reference composition */
+@media (min-width: 1100px) and (min-height: 760px) {
+  .tw-testimonials-section {
+    height: 100svh;
+    min-height: 820px;
+    max-height: 1000px;
+    padding: 52px clamp(70px, 5vw, 88px) 82px;
+  }
+
+  .tw-stage { display: block; }
+  .tw-heading-zone { position: absolute; left: 0; top: 49px; margin: 0; }
+  .tw-headline { font-size: clamp(96px, 7.5vw, 126px); }
+  .tw-main-composition {
+    position: absolute;
+    inset: 140px 0 88px;
+    grid-template-columns: minmax(390px, 32%) 1fr;
+    gap: clamp(16px, 1.8vw, 30px);
+    margin: 0;
+  }
+  .tw-globe-zone { transform: translateY(38px); }
+  .tw-deck-zone { transform: translateY(-5px); }
+  .tw-globe-stage { width: clamp(440px, 31vw, 520px); }
+  .tw-deck-zone { padding-right: clamp(92px, 8vw, 134px); }
+  .tw-paper-sheet {
+    min-height: 575px;
+    padding: clamp(74px, 6.3vw, 106px) clamp(70px, 6vw, 100px) clamp(42px, 3.2vw, 54px)
+      clamp(78px, 6.4vw, 108px);
+  }
+  .tw-bottom-bar { position: absolute; left: 0; right: 0; bottom: 0; }
+  .tw-pillar-head { font-size: clamp(35px, 2.8vw, 47px); }
+}

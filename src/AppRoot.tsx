@@ -1,12 +1,32 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import TypeRemixPreloader, { RemixThemesInput } from '@/components/ui/type-remix-preloader';
+import { PerformanceDiagnostics } from '@/components/performance/PerformanceDiagnostics';
 import App, { IntroActive } from './App';
 
-// These values live for the lifetime of the loaded JavaScript document. A full
-// refresh evaluates this module again, while client-side routing does not.
-let preloaderStartedForDocument = false;
-let preloaderCompletedForDocument = false;
+const HAS_VISITED_KEY = 'iw_preloader_seen_v1';
+
+function checkHasVisited(): boolean {
+  if (typeof window === 'undefined') return true;
+  try {
+    return !!(
+      sessionStorage.getItem(HAS_VISITED_KEY) ||
+      localStorage.getItem(HAS_VISITED_KEY)
+    );
+  } catch {
+    return false;
+  }
+}
+
+function markAsVisited(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    sessionStorage.setItem(HAS_VISITED_KEY, 'true');
+    localStorage.setItem(HAS_VISITED_KEY, 'true');
+  } catch {
+    // Ignore storage restrictions
+  }
+}
 
 const preloaderThemes: RemixThemesInput = {
   sticker: { bg: '#080a0b', ink: '#f1efe7', accent: '#1945f5' },
@@ -20,26 +40,35 @@ const preloaderThemes: RemixThemesInput = {
 
 export default function AppRoot() {
   const [loading, setLoading] = useState(() => {
+    if (typeof window === 'undefined') return false;
+
+    const searchParams = new URLSearchParams(window.location.search);
     if (
-      typeof window !== 'undefined' &&
-      (new URLSearchParams(window.location.search).has('nopreload') ||
-        window.location.pathname.startsWith('/services'))
+      searchParams.has('nopreload') ||
+      window.location.pathname.startsWith('/services')
     ) {
-      preloaderCompletedForDocument = true;
+      markAsVisited();
       return false;
     }
-    return !preloaderStartedForDocument && !preloaderCompletedForDocument;
+
+    // Force replay when requested via query param
+    if (searchParams.has('preload') || searchParams.has('replay')) {
+      return true;
+    }
+
+    // Run ONLY on first visit: if already visited in this browser, skip
+    if (checkHasVisited()) {
+      return false;
+    }
+
+    return true;
   });
   const completionHandled = useRef(false);
-
-  useEffect(() => {
-    if (loading) preloaderStartedForDocument = true;
-  }, [loading]);
 
   const finishIntro = useCallback(() => {
     if (completionHandled.current) return;
     completionHandled.current = true;
-    preloaderCompletedForDocument = true;
+    markAsVisited();
     setLoading(false);
   }, []);
 
@@ -65,5 +94,6 @@ export default function AppRoot() {
         <BrowserRouter><App /></BrowserRouter>
       </div>
     </IntroActive.Provider>
+    <PerformanceDiagnostics />
   </>;
 }

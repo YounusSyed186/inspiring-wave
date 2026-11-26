@@ -878,7 +878,7 @@ export default function DoodleCrewFooter({
           const ease = Math.min(1, dt * (target ? 14 : 6))
           const nx = prev.x + (o.x * p.flip - prev.x) * ease
           const ny = prev.y + (o.y - prev.y) * ease
-          ;(g as unknown as { [k: string]: { x: number; y: number } })[key] = { x: nx, y: ny }
+            ; (g as unknown as { [k: string]: { x: number; y: number } })[key] = { x: nx, y: ny }
           if (ref.pupil) ref.pupil.setAttribute("transform", "translate(" + nx.toFixed(2) + " " + ny.toFixed(2) + ")")
           if (ref.blink) ref.blink.setAttribute("transform", "translate(0 " + (eye.y * (1 - lid)).toFixed(2) + ") scale(1 " + lid.toFixed(3) + ")")
         }
@@ -971,13 +971,13 @@ export default function DoodleCrewFooter({
                   <g
                     key={e}
                     ref={(el) => {
-                      ;(eyeRefs.current[p.i] ||= [])[e] = { ...(eyeRefs.current[p.i]?.[e] || { pupil: null }), blink: el }
+                      ; (eyeRefs.current[p.i] ||= [])[e] = { ...(eyeRefs.current[p.i]?.[e] || { pupil: null }), blink: el }
                     }}
                   >
                     {eye.r > 0 && <circle cx={eye.x} cy={eye.y} r={eye.r} />}
                     <g
                       ref={(el) => {
-                        ;(eyeRefs.current[p.i] ||= [])[e] = { ...(eyeRefs.current[p.i]?.[e] || { blink: null }), pupil: el }
+                        ; (eyeRefs.current[p.i] ||= [])[e] = { ...(eyeRefs.current[p.i]?.[e] || { blink: null }), pupil: el }
                       }}
                     >
                       <circle className="k" cx={eye.x} cy={eye.y} r={eye.pupil} />

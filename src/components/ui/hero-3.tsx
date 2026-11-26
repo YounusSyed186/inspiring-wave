@@ -11,7 +11,7 @@ import {
   useAnimationFrame,
   useMotionValue,
 } from "framer-motion";
-import { ArrowUpRight, Sparkles, MousePointerClick } from "lucide-react";
+import { ArrowUpRight, MousePointerClick } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -484,7 +484,7 @@ const DEFAULT_WORK_CATALOG: Omit<MarqueeWorkItem, "image">[] = [
 // ---------------------------------------------------------------------------
 
 export const AnimatedMarqueeHero: React.FC<AnimatedMarqueeHeroProps> = ({
-  tagline,
+  tagline: _tagline,
   title,
   description,
   ctaText,
@@ -718,18 +718,6 @@ export const AnimatedMarqueeHero: React.FC<AnimatedMarqueeHeroProps> = ({
 
       {/* 5. Center Mixed-Media Typographic Stage */}
       <div className="relative z-20 flex flex-col items-center max-w-5xl mx-auto my-auto pt-4">
-        {/* Tagline Pill */}
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={FADE_UP_SPRING}
-          className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/[0.06] px-4 py-1.5 font-mono text-xs uppercase tracking-[0.2em] text-[#f1efe7]/90 backdrop-blur-md shadow-lg"
-        >
-          <Sparkles className="w-3.5 h-3.5 text-[#d8f03c]" />
-          <span>{tagline}</span>
-        </motion.div>
-
         {/* Mixed-Media Remix Headline: Vector Box ("SELECTED") + Scissor-Cut Swatch ("work.") */}
         <motion.div
           initial="hidden"

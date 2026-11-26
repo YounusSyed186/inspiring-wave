@@ -34,10 +34,7 @@ body{overflow-x:clip}
    opaque world rises over it. Long sections retain their natural height. */
 @media (min-width:901px) and (prefers-reduced-motion:no-preference) {
   .home-cinematic{position:relative;background:var(--deep)}
-  .home-cinematic>section{position:relative;isolation:isolate;box-shadow:0 -1px 0 rgba(255,255,255,.05)}
-  .home-cinematic>section:not(:first-child){clip-path:polygon(0 var(--stack-arc,24px),12% var(--stack-arc-mid,17px),28% var(--stack-arc-inner,7px),50% 0,72% var(--stack-arc-inner,7px),88% var(--stack-arc-mid,17px),100% var(--stack-arc,24px),100% 100%,0 100%)}
-  .home-cinematic>section{position:relative}
-  .home-cinematic>section::after{content:'';position:absolute;z-index:30;pointer-events:none;inset:0 0 auto;height:clamp(22px,5vh,55px);background:linear-gradient(to bottom,rgba(0,0,0,.2),transparent);opacity:calc((1 - var(--stack-progress,0)) * .45)}
+  .home-cinematic>section{position:relative;isolation:isolate}
   .home-cinematic>section:nth-child(1){z-index:1}
   .home-cinematic>section:nth-child(2){z-index:2}
   .home-cinematic>section:nth-child(3){z-index:3}

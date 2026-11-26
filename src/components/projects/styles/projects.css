@@ -1,0 +1,754 @@
+/* ==========================================================================
+   INSPIRING WAVE — THE EDITORIAL ORBIT (CIRCULAR EDITORIAL PROJECT CAROUSEL)
+   ========================================================================== */
+
+:root {
+  --projects-background: #080D18;
+  --projects-background-deep: #070B16;
+  --projects-ivory: #F7F0E5;
+  --projects-paper: #FAF3E8;
+  --projects-blue: #173CFF;
+  --projects-lime: #D9FF00;
+  --projects-muted: #9DA5B3;
+  --projects-terracotta: #AE3219;
+}
+
+.iw-projects-orbit {
+  position: relative;
+  width: 100%;
+  min-height: max(760px, 100vh);
+  background: #070B16;
+  color: var(--projects-ivory);
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  align-items: stretch;
+  padding: 0 clamp(24px, 4.5vw, 76px);
+}
+
+.iw-projects-orbit *,
+.iw-projects-orbit *::before,
+.iw-projects-orbit *::after {
+  box-sizing: border-box;
+}
+
+.iw-projects-orbit :focus-visible {
+  outline: 2px solid var(--projects-lime);
+  outline-offset: 4px;
+}
+
+.iwp-bg-atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 26% 52%, rgba(14, 23, 48, 0.72) 0%, transparent 48%),
+    radial-gradient(circle at 78% 66%, rgba(23, 60, 255, 0.1) 0%, transparent 38%),
+    radial-gradient(circle at 18% 24%, rgba(23, 60, 255, 0.07) 0%, transparent 40%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 12%, #000 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 12%, #000 84%, transparent 100%);
+  z-index: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Desktop 54% / 46% Split Composition (No Visible Divider)
+   -------------------------------------------------------------------------- */
+.iwp-layout {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1680px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 54% 46%;
+  align-items: stretch;
+  gap: clamp(20px, 3vw, 48px);
+  min-height: max(760px, 100vh);
+}
+
+/* --------------------------------------------------------------------------
+   Left: Invisible Orbital Card Stack Viewport
+   -------------------------------------------------------------------------- */
+.iwp-orbit-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: max(760px, 100vh);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.iwp-orbit-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iwp-orbit-card {
+  position: absolute;
+  left: 52%;
+  top: 50%;
+  width: clamp(300px, 30vw, 520px);
+  margin-left: calc(clamp(300px, 30vw, 520px) * -0.5);
+  margin-top: calc(clamp(300px, 30vw, 520px) / 1.5 * -0.5);
+  aspect-ratio: 1.5 / 1;
+  border-radius: 12px;
+  border: 1px solid rgba(247, 240, 229, 0.16);
+  padding: clamp(16px, 1.8vw, 26px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+  overflow: hidden;
+  cursor: pointer;
+  transform-origin: center center;
+  box-shadow: 0 24px 54px rgba(3, 6, 16, 0.62);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  color: var(--projects-ivory);
+  background: #0B1120;
+  appearance: none;
+}
+
+.iwp-orbit-card.is-active {
+  border-color: rgba(247, 240, 229, 0.42);
+  box-shadow: 0 34px 72px rgba(2, 5, 14, 0.82);
+}
+
+.iwp-orbit-card:hover .iwp-card-arrow {
+  transform: translate(3px, -3px);
+}
+
+.iwp-orbit-card:hover:not(.is-active) {
+  border-color: rgba(217, 255, 0, 0.55);
+}
+
+.iwp-card-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.8) 0.5px, transparent 0.5px);
+  background-size: 6px 6px;
+}
+
+.iwp-card-top {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.iwp-card-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: clamp(9.5px, 0.76vw, 12px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.iwp-card-slash {
+  opacity: 0.55;
+}
+
+.iwp-card-cross {
+  font-family: var(--mono, monospace);
+  font-size: 16px;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+/* Artwork inside each card */
+.iwp-card-media-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.iwp-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.iwp-card-media-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(6, 10, 20, 0.55) 0%,
+    rgba(6, 10, 20, 0.16) 45%,
+    rgba(6, 10, 20, 0.68) 100%
+  );
+}
+
+.iwp-card-body {
+  position: relative;
+  z-index: 3;
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.iwp-card-micro-specs {
+  position: absolute;
+  right: clamp(16px, 1.8vw, 26px);
+  top: clamp(46px, 5vw, 62px);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  color: rgba(17, 17, 17, 0.68);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.iwp-card-title {
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-style: normal;
+  font-weight: 400;
+  font-synthesis: none;
+  font-size: clamp(22px, 2.2vw, 38px);
+  line-height: 0.94;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  max-width: 11ch;
+}
+
+.iwp-card-footer {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 8px;
+}
+
+.iwp-card-arrow {
+  font-size: 18px;
+  line-height: 1;
+  transition: transform 0.25s ease;
+}
+
+.iwp-card-corner-tick {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-left: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.45;
+}
+
+/* Theme 1: Warm Ivory Editorial Poster (matches Reference A active card) */
+.iwp-card--ivory {
+  background: var(--projects-paper);
+  color: #111111;
+  border-color: rgba(255, 255, 255, 0.65);
+}
+
+.iwp-card--ivory .iwp-card-media-wrap {
+  left: 34%;
+  top: 14%;
+  right: 0;
+  bottom: 0;
+  border-top-left-radius: 64% 48%;
+}
+
+.iwp-card--ivory .iwp-card-media-scrim {
+  background: linear-gradient(125deg, rgba(250, 243, 232, 0.25) 0%, transparent 45%);
+}
+
+.iwp-card-ivory-wave {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--projects-paper);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.iwp-card--ivory .iwp-card-title {
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-style: normal;
+  font-weight: 400;
+  font-synthesis: none;
+  text-transform: uppercase;
+  font-size: clamp(21px, 2.1vw, 35px);
+  line-height: 0.94;
+  letter-spacing: 0.005em;
+  color: #111111;
+  max-width: 10ch;
+}
+
+/* Theme 2: Deep Obsidian / Charcoal Sculptural Card */
+.iwp-card--black {
+  background: #0D1119;
+  color: var(--projects-ivory);
+}
+
+.iwp-card--black .iwp-card-title {
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+/* Theme 3: Cobalt Blue Interactive Web Card */
+.iwp-card--blue {
+  background: #0F2AD6;
+  color: #FFFFFF;
+}
+
+.iwp-card--blue .iwp-card-media-scrim {
+  background: linear-gradient(160deg, rgba(16, 44, 214, 0.74) 0%, rgba(7, 18, 92, 0.52) 100%);
+}
+
+.iwp-card-blue-arcs,
+.iwp-card-editorial-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.iwp-card--blue .iwp-card-title {
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+/* Theme 4: Vermilion / Editorial Poster Card */
+.iwp-card--editorial {
+  background: var(--projects-terracotta);
+  color: #FFF4EA;
+}
+
+.iwp-card--editorial .iwp-card-media-scrim {
+  background: linear-gradient(155deg, rgba(168, 42, 19, 0.84) 0%, rgba(84, 18, 8, 0.65) 100%);
+}
+
+.iwp-card--editorial .iwp-card-title {
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+/* Live work uses the captured homepage as the card artwork. */
+.iwp-orbit-card .iwp-card-media-wrap {
+  inset: 0;
+  border-radius: 0;
+  background-position: top center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.iwp-orbit-card .iwp-card-img { opacity: 0; }
+
+.iwp-orbit-card .iwp-card-media-scrim {
+  background: linear-gradient(180deg, rgba(4, 8, 16, 0.34), transparent 44%, rgba(4, 8, 16, 0.82));
+}
+
+.iwp-orbit-card .iwp-card-ivory-wave,
+.iwp-orbit-card .iwp-card-blue-arcs,
+.iwp-orbit-card .iwp-card-editorial-lines,
+.iwp-orbit-card .iwp-card-micro-specs {
+  display: none;
+}
+
+.iwp-orbit-card .iwp-card-top,
+.iwp-orbit-card .iwp-card-title,
+.iwp-orbit-card .iwp-card-footer {
+  color: #fffaf0;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.72);
+}
+
+.iwp-orbit-card .iwp-card-title {
+  max-width: 13ch;
+}
+
+/* --------------------------------------------------------------------------
+   Right 46%: Independent Editorial Details Panel
+   -------------------------------------------------------------------------- */
+.iwp-details-column {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  padding: clamp(56px, 7vh, 88px) 0 clamp(56px, 7vh, 88px) clamp(8px, 2.2vw, 36px);
+}
+
+.iwp-details-panel {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 2.5vh, 28px);
+  max-width: 560px;
+}
+
+.iwp-details-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.iwp-section-kicker {
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 11.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(247, 240, 229, 0.78);
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(247, 240, 229, 0.25);
+}
+
+.iwp-counter-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.iwp-counter-text {
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--projects-muted);
+}
+
+.iwp-counter-text strong {
+  color: var(--projects-ivory);
+  font-weight: 600;
+}
+
+.iwp-progress-segments {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.iwp-progress-seg {
+  width: 12px;
+  height: 3px;
+  padding: 0;
+  border: 0;
+  border-radius: 1px;
+  background: rgba(247, 240, 229, 0.22);
+  cursor: pointer;
+  transition: width 0.28s ease, background-color 0.25s ease;
+}
+
+.iwp-progress-seg.is-active {
+  width: 24px;
+  background: var(--projects-lime);
+}
+
+.iwp-details-body {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.9vh, 22px);
+}
+
+.iwp-featured-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(247, 240, 229, 0.85);
+}
+
+.iwp-lime-square {
+  width: 8px;
+  height: 8px;
+  background: var(--projects-lime);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.iwp-title-slot {
+  overflow: hidden;
+  min-height: clamp(88px, 11vh, 138px);
+  display: flex;
+  align-items: flex-end;
+}
+
+.iwp-detail-title {
+  margin: 0;
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-style: normal;
+  font-size: clamp(46px, 4.8vw, 82px);
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 0.94;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: var(--projects-ivory);
+}
+
+.iwp-detail-desc {
+  margin: 0;
+  font-family: var(--sans, 'Instrument Sans', system-ui, sans-serif);
+  font-size: clamp(14.5px, 1.05vw, 17px);
+  line-height: 1.55;
+  color: rgba(247, 240, 229, 0.82);
+  max-width: 46ch;
+  min-height: 52px;
+}
+
+.iwp-detail-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(247, 240, 229, 0.22);
+}
+
+.iwp-meta-grid {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1.45fr 0.75fr 1fr;
+  gap: 0;
+}
+
+.iwp-meta-col {
+  padding: 2px 16px 2px 0;
+}
+
+.iwp-meta-col + .iwp-meta-col {
+  padding-left: 16px;
+  border-left: 1px solid rgba(247, 240, 229, 0.18);
+}
+
+.iwp-meta-col dt {
+  font-family: var(--mono, 'IBM Plex Mono', monospace);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--projects-muted);
+  margin-bottom: 6px;
+}
+
+.iwp-meta-col dd {
+  margin: 0;
+  font-family: var(--sans, 'Instrument Sans', system-ui, sans-serif);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--projects-ivory);
+}
+
+/* Bottom Actions: Angled Ivory CTA + Prev/Next Buttons */
+.iwp-details-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.iwp-cta-angled {
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.iwp-cta-lime-back {
+  position: absolute;
+  inset: 0;
+  background: var(--projects-lime);
+  transform: translate(5px, 6px) skewX(-10deg);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.iwp-cta-face {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 28px;
+  background: var(--projects-ivory);
+  color: #0B101A;
+  font-family: var(--display, 'Anton', Impact, sans-serif);
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: skewX(-10deg);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.iwp-cta-arrow {
+  display: inline-block;
+  transition: transform 0.25s ease;
+}
+
+.iwp-cta-angled:hover .iwp-cta-face {
+  transform: translate(-2px, -2px) skewX(-10deg);
+}
+
+.iwp-cta-angled:hover .iwp-cta-lime-back {
+  transform: translate(7px, 8px) skewX(-10deg);
+}
+
+.iwp-cta-angled:hover .iwp-cta-arrow {
+  transform: translate(3px, -3px);
+}
+
+.iwp-nav-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.iwp-nav-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(247, 240, 229, 0.34);
+  background: transparent;
+  color: var(--projects-ivory);
+  font-size: 17px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 0.22s ease, background-color 0.22s ease, border-color 0.22s ease;
+}
+
+.iwp-nav-btn--next {
+  background: var(--projects-lime);
+  border-color: var(--projects-lime);
+  color: #0B101A;
+  font-weight: 700;
+}
+
+.iwp-nav-btn:hover {
+  transform: scale(1.06);
+}
+
+.iwp-nav-btn--prev:hover {
+  border-color: var(--projects-ivory);
+  background: rgba(247, 240, 229, 0.08);
+}
+
+/* --------------------------------------------------------------------------
+   Tablet (768px – 1023px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .iwp-layout {
+    grid-template-columns: 50% 50%;
+    gap: 20px;
+  }
+
+  .iwp-orbit-card {
+    width: clamp(270px, 38vw, 390px);
+  }
+
+  .iwp-detail-title {
+    font-size: clamp(36px, 4.8vw, 52px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile Vertical Overlapping Pitch-Deck (<= 767px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 767px) {
+  .iw-projects-orbit {
+    min-height: 100svh;
+    padding: 68px 18px 56px;
+    align-items: stretch;
+  }
+
+  .iwp-layout {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    min-height: auto;
+  }
+
+  .iwp-orbit-viewport {
+    height: clamp(410px, 56svh, 520px);
+    overflow: hidden;
+    justify-content: center;
+    border-radius: 10px;
+  }
+
+  .iwp-orbit-stage {
+    padding-left: 0;
+    justify-content: center;
+  }
+
+  .iwp-orbit-card {
+    left: 50%;
+    width: min(88vw, 360px);
+    margin-left: calc(min(88vw, 360px) * -0.5);
+    margin-top: calc(min(88vw, 360px) / 1.5 * -0.5);
+    padding: 15px 16px;
+  }
+
+  .iwp-card-micro-specs {
+    display: none;
+  }
+
+  .iwp-details-column {
+    padding-left: 0;
+  }
+
+  .iwp-title-slot {
+    min-height: auto;
+  }
+
+  .iwp-detail-title {
+    font-size: clamp(38px, 11vw, 56px);
+  }
+
+  .iwp-detail-desc {
+    min-height: auto;
+  }
+
+  .iwp-meta-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .iwp-meta-col {
+    padding: 0;
+  }
+
+  .iwp-meta-col + .iwp-meta-col {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced Motion
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .iw-projects-orbit *,
+  .iw-projects-orbit *::before,
+  .iw-projects-orbit *::after {
+    animation: none !important;
+    transition-duration: 0.01s !important;
+  }
+}

@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useRef, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useScroll, useTransform, useSpring, motion } from 'framer-motion';
-import { Sparkles, Maximize2 } from 'lucide-react';
 
 export interface Image {
 	src: string;
@@ -28,7 +27,7 @@ const LAYER_META = [
 ];
 
 const LAYER_POSITIONS = [
-	// 0: Center Hero Frame (expands 1x -> 4x to fill viewport)
+	// 0: Center Hero Frame (expands 1x -> 4x)
 	'z-20 [&>div]:!h-[28vh] [&>div]:!w-[28vw] max-sm:[&>div]:!h-[26vh] max-sm:[&>div]:!w-[54vw]',
 	// 1: Top-Center-Right
 	'z-10 [&>div]:!-top-[30vh] [&>div]:!left-[6vw] [&>div]:!h-[28vh] [&>div]:!w-[32vw] max-sm:[&>div]:!-top-[28vh] max-sm:[&>div]:!left-[14vw] max-sm:[&>div]:!h-[20vh] max-sm:[&>div]:!w-[44vw]',
@@ -46,6 +45,21 @@ const LAYER_POSITIONS = [
 
 export function ZoomParallax({ images }: ZoomParallaxProps) {
 	const container = useRef<HTMLDivElement>(null);
+	const [reducedMotion, setReducedMotion] = useState(() =>
+		typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+			? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+			: false
+	);
+
+	useEffect(() => {
+		if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+		const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+		const onChange = () => setReducedMotion(mq.matches);
+		onChange();
+		mq.addEventListener('change', onChange);
+		return () => mq.removeEventListener('change', onChange);
+	}, []);
+
 	const { scrollYProgress } = useScroll({
 		target: container,
 		offset: ['start start', 'end end'],
@@ -64,7 +78,9 @@ export function ZoomParallax({ images }: ZoomParallaxProps) {
 	const scale8 = useTransform(smoothProgress, [0, 1], [1, 8]);
 	const scale9 = useTransform(smoothProgress, [0, 1], [1, 9]);
 
-	const hudOpacity = useTransform(smoothProgress, [0, 0.72, 0.95], [1, 0.85, 0]);
+	const hudOpacity = useTransform(smoothProgress, [0, 0.72, 0.92], [1, 0.85, 0]);
+	// Subtle deep-navy veil at the very end of the zoom (0.84 -> 1.0) so #dimensions hands off cleanly into #trust (#070B16)
+	const handoffVeilOpacity = useTransform(smoothProgress, [0.82, 0.98], [0, 1]);
 	const zoomReadout = useTransform(smoothProgress, (v) => `${(1 + v * 3).toFixed(2)}x`);
 	const progressBarWidth = useTransform(smoothProgress, (v) => `${Math.round(v * 100)}%`);
 
@@ -73,8 +89,32 @@ export function ZoomParallax({ images }: ZoomParallaxProps) {
 		[scale4, scale5, scale6, scale8, scale9]
 	);
 
+	if (reducedMotion) {
+		return (
+			<div ref={container} className="relative w-full bg-[#030506] px-6 py-12">
+				<div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+					{images.slice(0, 7).map(({ src, alt, tag }, index) => (
+						<div
+							key={index}
+							className="relative aspect-[4/3] overflow-hidden rounded-xl border border-white/15 bg-[#080c12]"
+						>
+							<img
+								src={src || '/assets/hero/barrel.webp'}
+								alt={alt || `Gallery layer ${index + 1}`}
+								className="h-full w-full object-cover"
+							/>
+							<span className="absolute bottom-2 left-2.5 font-display text-xs font-bold uppercase text-[#f1efe7] drop-shadow">
+								{tag || LAYER_META[index % LAYER_META.length].tag}
+							</span>
+						</div>
+					))}
+				</div>
+			</div>
+		);
+	}
+
 	return (
-		<div ref={container} className="relative h-[260vh] w-full select-none">
+		<div ref={container} className="relative h-[220vh] max-lg:h-[155vh] w-full select-none">
 			<div className="sticky top-0 h-screen w-full overflow-hidden bg-[#030506]">
 				{/* Blueprint perspective grid & radial vignette */}
 				<div
@@ -91,29 +131,8 @@ export function ZoomParallax({ images }: ZoomParallaxProps) {
 					className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(25,69,245,0.16),transparent_65%)]"
 				/>
 
-				{/* Top Spatial Telemetry HUD Bar */}
-				<motion.div
-					style={{ opacity: hudOpacity }}
-					aria-hidden="true"
-					className="pointer-events-none absolute top-20 left-6 right-6 sm:left-12 sm:right-12 z-30 flex items-center justify-between font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-[#f1efe7]/70"
-				>
-					<div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/15">
-						<span className="w-2 h-2 rounded-full bg-[#d8f03c] animate-pulse" />
-						<span>OPTICAL RIG // 07 DIMENSIONS</span>
-					</div>
-					<div className="hidden md:flex items-center gap-4 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/15">
-						<span>7-LAYER PARALLAX FIELD</span>
-						<span className="text-white/25">|</span>
-						<span className="text-[#d8f03c] font-bold flex items-center gap-1.5">
-							<Maximize2 className="w-3 h-3" />
-							<span>ZOOM: </span>
-							<motion.span>{zoomReadout}</motion.span>
-						</span>
-					</div>
-				</motion.div>
-
-				{/* 7 Zoom Parallax Layers */}
-				{images.slice(0, 7).map(({ src, alt, tag, code }, index) => {
+				{/* 7 Independent Zoom Parallax Layers */}
+				{images.slice(0, 7).map(({ src, alt, tag }, index) => {
 					const scale = scales[index % scales.length];
 					const meta = LAYER_META[index % LAYER_META.length];
 					const posClass = LAYER_POSITIONS[index % LAYER_POSITIONS.length];
@@ -123,7 +142,7 @@ export function ZoomParallax({ images }: ZoomParallaxProps) {
 						<motion.div
 							key={index}
 							style={{ scale }}
-							className={`absolute top-0 left-0 flex h-full w-full items-center justify-center will-change-transform ${posClass}`}
+							className={`pointer-events-none absolute top-0 left-0 flex h-full w-full items-center justify-center will-change-transform ${posClass}`}
 						>
 							<div
 								className={`relative h-[25vh] w-[25vw] overflow-hidden rounded-xl shadow-[0_24px_60px_rgba(0,0,0,0.85)] ${
@@ -139,30 +158,7 @@ export function ZoomParallax({ images }: ZoomParallaxProps) {
 									decoding="async"
 									className="h-full w-full object-cover"
 								/>
-
-								{/* Subtle dark gradient for badge legibility */}
-								<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
-
-								{/* Top-left layer index tag */}
-								<motion.div
-									style={{ opacity: hudOpacity }}
-									className="pointer-events-none absolute top-2 left-2 right-2 flex items-center justify-between gap-1 font-mono text-[8px] sm:text-[9px] uppercase tracking-wider"
-								>
-									<span
-										className="px-1.5 py-0.5 rounded font-bold text-[#080a0b] truncate"
-										style={{ backgroundColor: meta.accent }}
-									>
-										{code || meta.code}
-									</span>
-									{isCenter && (
-										<span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/75 text-[#f1efe7] border border-white/15">
-											<Sparkles className="w-2.5 h-2.5 text-[#d8f03c]" />
-											<span>PRIMARY</span>
-										</span>
-									)}
-								</motion.div>
-
-								{/* Bottom caption inside each card */}
+								<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 								<motion.div
 									style={{ opacity: hudOpacity }}
 									className="pointer-events-none absolute bottom-2 left-2.5 right-2.5 flex items-end justify-between text-left"
@@ -178,6 +174,13 @@ export function ZoomParallax({ images }: ZoomParallaxProps) {
 						</motion.div>
 					);
 				})}
+
+				{/* Subtle #070B16 atmospheric handoff veil at end of gallery zoom */}
+				<motion.div
+					aria-hidden="true"
+					style={{ opacity: handoffVeilOpacity }}
+					className="pointer-events-none absolute inset-0 z-25 bg-[#070B16]"
+				/>
 
 				{/* Bottom Progress Rail */}
 				<motion.div

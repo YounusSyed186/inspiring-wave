@@ -11,10 +11,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ["'Barlow Condensed'", "Impact", "sans-serif"],
-        serif: ["'Instrument Serif'", "Georgia", "serif"],
-        mono: ["'IBM Plex Mono'", "monospace"],
-        sans: ["Inter", "Arial", "sans-serif"],
+        display: ["var(--font-display)", "Anton", "Impact", "sans-serif"],
+        sans: ["var(--font-sans)", "'Instrument Sans'", "system-ui", "sans-serif"],
+        serif: ["var(--font-serif)", "'Instrument Serif'", "Georgia", "serif"],
+        mono: ["var(--font-mono)", "'IBM Plex Mono'", "monospace"],
       },
       colors: {
         "chart-1": "var(--color-chart-1, #1945f5)",
