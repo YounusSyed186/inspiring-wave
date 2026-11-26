@@ -27,8 +27,8 @@ const ServicesThreeScene = lazy(() =>
 const meta: Record<InstallationSlug, { number: string; title: string[]; tone: string; concept: string }> = {
   'digital-strategy': { number: '01', title: ['Digital', 'Strategy'], tone: 'paper', concept: 'The world in perspective' },
   'web-development': { number: '02', title: ['Web', 'Development'], tone: 'cobalt', concept: 'Digital architecture' },
-  'ui-ux-design': { number: '03', title: ['UI/UX', 'Design'], tone: 'paper', concept: 'The art of order' },
-  'social-media': { number: '04', title: ['Social', 'Media'], tone: 'cobalt', concept: 'The ripple effect' },
+  'ui-ux-design': { number: '03', title: ['Branding'], tone: 'paper', concept: 'The art of order' },
+  'social-media': { number: '04', title: ['Digital', 'Marketing'], tone: 'cobalt', concept: 'The ripple effect' },
   'mobile-app-development': { number: '05', title: ['Mobile App', 'Development'], tone: 'paper', concept: 'Interaction in motion' },
   'software-development': { number: '06', title: ['Software', 'Development'], tone: 'navy', concept: 'Systems that scale' },
 };

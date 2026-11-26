@@ -305,9 +305,8 @@ export const ServicePanel: React.FC<ServicePanelProps> = ({
             >
               {layout.id === 'uiux' ? (
                 <div className="relative inline-flex items-center gap-3">
-                  <span>UI/UX&nbsp;</span>
                   <span className="relative inline-block px-1">
-                    <span>DESIGN</span>
+                    <span>BRANDING</span>
                     {/* Imperfect hand-drawn ivory oval around DESIGN */}
                     <svg
                       className="absolute -inset-x-5 -inset-y-2.5 w-[calc(100%+40px)] h-[calc(100%+20px)] pointer-events-none overflow-visible"

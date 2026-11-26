@@ -47,8 +47,8 @@ export const PANELS_CONFIG: Record<string, PanelLayout> = {
   uiux: {
     id: 'uiux',
     number: '03',
-    category: 'EXPERIENCE',
-    title: ['UI/UX DESIGN'],
+    category: 'IDENTITY',
+    title: ['BRANDING'],
     theme: 'cobalt',
     slug: 'ui-ux-design',
     left: 525,
@@ -60,8 +60,8 @@ export const PANELS_CONFIG: Record<string, PanelLayout> = {
   social: {
     id: 'social',
     number: '04',
-    category: 'SOCIAL',
-    title: ['SOCIAL', 'MEDIA'],
+    category: 'GROWTH',
+    title: ['DIGITAL', 'MARKETING'],
     theme: 'cream',
     slug: 'social-media',
     left: 458,

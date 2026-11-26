@@ -81,7 +81,7 @@ export default function AppRoot() {
       year="2026"
       period="HYDERABAD — INDIA"
       handle="INSPIRINGWAVE.IN"
-      roles={['Digital Strategy', 'Web Development', 'UI/UX Design', 'Creative Technology']}
+      roles={['Digital Strategy', 'Web Development', 'Branding', 'Digital Marketing']}
       kicker="INSPIRING WAVE"
       tagline="INSPIRING WAVE IN MOTION"
       motto="MAKE WAVES"

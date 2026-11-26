@@ -1,8 +1,8 @@
 export const services = [
   { slug: 'digital-strategy', title: 'Digital Strategy', summary: 'Clarify the opportunity, connect business goals to human needs, and shape a focused digital roadmap.', deliverables: ['Research & discovery', 'Product strategy', 'Digital roadmaps'] },
   { slug: 'web-development', title: 'Web Development', summary: 'Fast, expressive websites and platforms engineered for clarity, reliability and measurable growth.', deliverables: ['Creative development', 'Commerce & platforms', 'Performance engineering'] },
-  { slug: 'ui-ux-design', title: 'UI/UX Design', summary: 'Digital products that turn complexity into intuitive, distinctive experiences people want to return to.', deliverables: ['Experience design', 'Interface systems', 'Prototyping & testing'] },
-  { slug: 'social-media', title: 'Social Media', summary: 'Strategy and creative that give brands a coherent voice and the momentum to travel across culture.', deliverables: ['Content strategy', 'Campaign creative', 'Channel management'] },
+  { slug: 'ui-ux-design', title: 'Branding', summary: 'Distinctive brand identities, visual systems and guidelines built to stand out and scale.', deliverables: ['Brand identity', 'Visual systems', 'Brand guidelines'] },
+  { slug: 'social-media', title: 'Digital Marketing', summary: 'Strategy and creative campaigns that give brands a coherent voice and measurable momentum.', deliverables: ['Growth & performance', 'Campaign creative', 'Channel management'] },
   { slug: 'mobile-app-development', title: 'Mobile App Development', summary: 'Purposeful mobile experiences built around the way people move, decide and interact.', deliverables: ['iOS & Android', 'Cross-platform apps', 'API integration'] },
   { slug: 'software-development', title: 'Software Development', summary: 'Custom systems that connect operations, simplify workflows and scale with the organisation.', deliverables: ['Custom software', 'ERP & CRM integration', 'Quality assurance'] }
 ];
