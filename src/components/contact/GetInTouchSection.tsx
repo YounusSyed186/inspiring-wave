@@ -220,7 +220,7 @@ export function GetInTouchSection({ seed = 29, className = '' }: GetInTouchSecti
         peelBtnRef.current.style.opacity = s.tearProgress > 0.72 || s.reduced ? '1' : '0';
       }
 
-      if (keepRunning && s.inView) {
+      if (keepRunning && s.inView && !document.hidden) {
         s.raf = requestAnimationFrame(renderTearFrame);
       }
     },
@@ -241,6 +241,9 @@ export function GetInTouchSection({ seed = 29, className = '' }: GetInTouchSecti
     const updateDimensions = () => {
       const w = el.clientWidth;
       const h = el.clientHeight;
+      if (s.W > 0 && Math.abs(w - s.W) <= 2 && Math.abs(h - s.H) < 120) {
+        return;
+      }
       s.mobile = w < 768;
       s.W = w;
       s.H = h;

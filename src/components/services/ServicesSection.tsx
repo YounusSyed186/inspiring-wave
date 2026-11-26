@@ -184,6 +184,10 @@ export function ServicesSection() {
       const installations = INSTALLATION_ORDER.map(
         (slug) => stage.querySelector<HTMLElement>(`[data-service="${slug}"]`)!
       ).filter(Boolean);
+      const cachedChildren = installations.map((inst) => ({
+        backing: inst.querySelector<HTMLElement>('.iw-installation-depth'),
+        art: inst.querySelector<HTMLElement>('.iw-art'),
+      }));
       const editorial = stage.querySelector<HTMLElement>('.iw-editorial-copy');
       const field = stage.querySelector<HTMLElement>('.iw-landscape-field');
       const bgVisual = stage.querySelector<HTMLElement>('.iw-services-bg-img');
@@ -227,8 +231,7 @@ export function ServicesSection() {
           installation.style.pointerEvents = rootT > 0.25 ? 'auto' : 'none';
           installation.tabIndex = 0;
 
-          const backing = installation.querySelector<HTMLElement>('.iw-installation-depth');
-          const art = installation.querySelector<HTMLElement>('.iw-art');
+          const { backing, art } = cachedChildren[index] ?? {};
           if (backing) {
             backing.style.transform = `translate3d(${lerp(28, 14, rootT)}px,${lerp(32, 16, rootT)}px,${lerp(-80, -24, rootT)}px) scaleY(${lerp(0.4, 1, rootT)})`;
           }

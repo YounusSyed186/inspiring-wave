@@ -87,9 +87,17 @@ export function MotionProvider({ children }: MotionProviderProps) {
     const timer = window.setTimeout(refresh, 250);
     const timerLate = window.setTimeout(refresh, 1100);
     let roTimer = 0;
+    let lastBodyH = document.body.scrollHeight;
+    let lastWinW = window.innerWidth;
     const ro = new ResizeObserver(() => {
+      const nextH = document.body.scrollHeight;
+      const nextW = window.innerWidth;
+      // Ignore minor mobile address-bar height jitter during active touch scrolling
+      if (nextW === lastWinW && Math.abs(nextH - lastBodyH) < 48) return;
+      lastBodyH = nextH;
+      lastWinW = nextW;
       window.clearTimeout(roTimer);
-      roTimer = window.setTimeout(refresh, 140);
+      roTimer = window.setTimeout(refresh, 160);
     });
     ro.observe(document.body);
     return () => {

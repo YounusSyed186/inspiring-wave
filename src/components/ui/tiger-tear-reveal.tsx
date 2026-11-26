@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { animationScheduler, damp } from "@/lib/animation/AnimationScheduler"
 
 /**
  * Tiger Tear Reveal: a poster that rips in two as you scroll.
@@ -444,7 +445,6 @@ export default function TigerTearReveal({
     const root = rootRef.current
     const stage = stageRef.current
     if (!root || !stage) return
-    let raf = 0
     let visible = true
     let p = cfg.current.progress ?? 0
     let look: Pt = [0, 0]
@@ -465,62 +465,62 @@ export default function TigerTearReveal({
 
     const io = new IntersectionObserver(([e]) => {
       visible = e.isIntersecting
-      if (visible && !raf) raf = requestAnimationFrame(tick)
     })
     io.observe(root)
 
-    function tick(now: number) {
-      raf = 0
-      if (!visible) return
-      const c = cfg.current
-      const rootRect = root!.getBoundingClientRect()
-      const target = c.controlled
-        ? clamp01(c.progress ?? 0)
-        : scrollProgress(rootRect.top, rootH, stageH)
-      p = c.reduced ? (target > 0.3 ? 1 : 0) : p + (target - p) * 0.18
-      if (Math.abs(target - p) < 0.0005) p = target
+    const unsub = animationScheduler.register({
+      id: `tiger-tear-${id}`,
+      priority: 3,
+      update: (now, dt) => {
+        if (!visible) return
+        const c = cfg.current
+        const rootRect = root.getBoundingClientRect()
+        const target = c.controlled
+          ? clamp01(c.progress ?? 0)
+          : scrollProgress(rootRect.top, rootH, stageH)
+        p = c.reduced ? (target > 0.3 ? 1 : 0) : damp(p, target, 11.5, dt)
+        if (Math.abs(target - p) < 0.0005) p = target
 
-      let want: Pt = [0, 0]
-      if (pointer.current && p > 0.45) {
-        want = [
-          Math.max(-1, Math.min(1, (pointer.current.x - rootRect.left - stageW / 2) / (stageW * 0.35))),
-          Math.max(-1, Math.min(1, (pointer.current.y - Math.max(0, rootRect.top) - stageH * 0.58) / (stageH * 0.35))),
+        let want: Pt = [0, 0]
+        if (pointer.current && p > 0.45) {
+          want = [
+            Math.max(-1, Math.min(1, (pointer.current.x - rootRect.left - stageW / 2) / (stageW * 0.35))),
+            Math.max(-1, Math.min(1, (pointer.current.y - Math.max(0, rootRect.top) - stageH * 0.58) / (stageH * 0.35))),
+          ]
+        }
+        look = [
+          Math.abs(want[0] - look[0]) < 0.002 ? want[0] : damp(look[0], want[0], 10, dt),
+          Math.abs(want[1] - look[1]) < 0.002 ? want[1] : damp(look[1], want[1], 10, dt),
         ]
-      }
-      look = [
-        Math.abs(want[0] - look[0]) < 0.001 ? want[0] : look[0] + (want[0] - look[0]) * 0.16,
-        Math.abs(want[1] - look[1]) < 0.001 ? want[1] : look[1] + (want[1] - look[1]) * 0.16,
-      ]
 
-      let blink = 0
-      if (!c.reduced && p > 0.55) {
-        const since = now - nextBlink
-        if (since > 0) blink = since < 90 ? since / 90 : since < 200 ? 1 - (since - 90) / 110 : 0
-        if (since > 200) nextBlink = now + 3200 + Math.random() * 3400
-      }
-      const squint = c.reduced ? 0 : Math.max(0, 1 - (now - squintAt.current) / 900)
+        let blink = 0
+        if (!c.reduced && p > 0.55) {
+          const since = now - nextBlink
+          if (since > 0) blink = since < 90 ? since / 90 : since < 200 ? 1 - (since - 90) / 110 : 0
+          if (since > 200) nextBlink = now + 3200 + Math.random() * 3400
+        }
+        const squint = c.reduced ? 0 : Math.max(0, 1 - (now - squintAt.current) / 900)
 
-      const next: Frame = { p, look, blink, squint }
-      if (
-        !last ||
-        Math.abs(next.p - last.p) > 4e-4 ||
-        Math.abs(next.look[0] - last.look[0]) > 2e-3 ||
-        Math.abs(next.look[1] - last.look[1]) > 2e-3 ||
-        Math.abs(next.blink - last.blink) > 1e-2 ||
-        Math.abs(next.squint - last.squint) > 1e-2
-      ) {
-        last = next
-        setF(next)
-      }
-      raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
+        const next: Frame = { p, look, blink, squint }
+        if (
+          !last ||
+          Math.abs(next.p - last.p) > 1.2e-3 ||
+          Math.abs(next.look[0] - last.look[0]) > 5e-3 ||
+          Math.abs(next.look[1] - last.look[1]) > 5e-3 ||
+          Math.abs(next.blink - last.blink) > 2e-2 ||
+          Math.abs(next.squint - last.squint) > 2e-2
+        ) {
+          last = next
+          setF(next)
+        }
+      },
+    })
     return () => {
-      cancelAnimationFrame(raf)
+      unsub()
       io.disconnect()
       ro.disconnect()
     }
-  }, [])
+  }, [id])
 
   const s = stages(f.p)
   const pop = reduced ? s.pop : easeOutBack(s.pop)

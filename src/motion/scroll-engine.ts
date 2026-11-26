@@ -38,6 +38,20 @@ class ScrollMotionEngine {
   readonly state = { ...initialState };
   private listeners = new Set<MotionListener>();
   private previousTime = 0;
+  private cachedMaxScroll = 1;
+  private lastMaxScrollRead = 0;
+
+  invalidateMaxScroll() {
+    this.lastMaxScrollRead = 0;
+  }
+
+  private getMaxScroll(nowSeconds: number): number {
+    if (!this.lastMaxScrollRead || nowSeconds - this.lastMaxScrollRead > 0.5) {
+      this.cachedMaxScroll = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+      this.lastMaxScrollRead = nowSeconds;
+    }
+    return this.cachedMaxScroll;
+  }
 
   sample(timeSeconds: number, currentScroll: number, targetScroll: number) {
     if (!this.previousTime) {
@@ -73,7 +87,7 @@ class ScrollMotionEngine {
     const waveAlpha = 1 - Math.exp(-waveRate * dt);
     const waveIntensity = this.state.waveIntensity
       + (targetWave - this.state.waveIntensity) * waveAlpha;
-    const maxScroll = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+    const maxScroll = this.getMaxScroll(timeSeconds);
 
     this.state.previousScroll = this.state.currentScroll;
     this.state.currentScroll = currentScroll;

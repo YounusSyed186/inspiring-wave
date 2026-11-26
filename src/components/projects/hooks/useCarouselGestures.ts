@@ -98,10 +98,10 @@ export function useCarouselGestures({
       onDragCommit(targetPosition + delta);
     };
 
-    el.addEventListener('pointerdown', onPointerDown);
-    el.addEventListener('pointermove', onPointerMove);
-    el.addEventListener('pointerup', finishDrag);
-    el.addEventListener('pointercancel', finishDrag);
+    el.addEventListener('pointerdown', onPointerDown, { passive: true });
+    el.addEventListener('pointermove', onPointerMove, { passive: true });
+    el.addEventListener('pointerup', finishDrag, { passive: true });
+    el.addEventListener('pointercancel', finishDrag, { passive: true });
 
     return () => {
       el.removeEventListener('pointerdown', onPointerDown);

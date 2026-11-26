@@ -700,17 +700,22 @@ export class CreativeMachine {
 
   private buildLights() {
     const L = this.lights
-    L.add(new THREE.HemisphereLight('#cdd7ff', '#04060b', 0.5))
+    const lite = this.layout === 'mobile'
+    L.add(new THREE.HemisphereLight('#cdd7ff', '#04060b', lite ? 0.72 : 0.5))
     const key = new THREE.DirectionalLight('#ffe7cc', 2.4)
     key.position.set(-7, 9, 10)
     const rim = new THREE.DirectionalLight('#3d66ff', 3.4)
     rim.position.set(8, 4, -9)
-    const fill = new THREE.DirectionalLight('#8ea6ff', 0.6)
-    fill.position.set(7, -2, 7)
-    const front = new THREE.DirectionalLight('#f5efe4', 0.7)
-    front.position.set(0, 2, 14)
-    L.add(key, rim, fill, front)
-    for (let i = 0; i < 2; i++) {
+    L.add(key, rim)
+    if (!lite) {
+      const fill = new THREE.DirectionalLight('#8ea6ff', 0.6)
+      fill.position.set(7, -2, 7)
+      const front = new THREE.DirectionalLight('#f5efe4', 0.7)
+      front.position.set(0, 2, 14)
+      L.add(fill, front)
+    }
+    const corridorCount = lite ? 1 : 2
+    for (let i = 0; i < corridorCount; i++) {
       const l = new THREE.PointLight('#2f5bff', 0, 9, 1.4)
       l.position.set(0, 1.7, -5 - i * 6)
       this.corridorLights.push(l)

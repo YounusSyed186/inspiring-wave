@@ -209,9 +209,18 @@ export function ServicesThreeScene({
     let currentW = 1;
     let currentH = 1;
     let currentDpr = 1;
-    const resize = () => {
+    let resizeRaf = 0;
+    const isDebug =
+      typeof window !== 'undefined' &&
+      (new URLSearchParams(window.location.search).get('debugPerformance') === '1' ||
+        new URLSearchParams(window.location.search).has('services-debug'));
+
+    const resize = (force = false) => {
       const width = Math.max(1, canvas.clientWidth || window.innerWidth);
       const height = Math.max(1, canvas.clientHeight || window.innerHeight);
+      if (!force && Math.abs(width - currentW) <= 2 && Math.abs(height - currentH) < 120) {
+        return;
+      }
       currentW = width;
       currentH = height;
       currentDpr = adaptiveQuality.getEffectiveDpr(width, height);
@@ -222,6 +231,14 @@ export function ServicesThreeScene({
       camera.updateProjectionMatrix();
       runtimeRef.current.applyScene?.(runtimeRef.current.progress);
     };
+    const scheduleResize = () => {
+      cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(() => resize(false));
+    };
+
+    if (typeof renderer.compileAsync === 'function') {
+      void renderer.compileAsync(scene, camera).catch(() => {});
+    }
 
     const render = (progress: number) => {
       INSTALLATION_ORDER.forEach((slug) => {
@@ -253,11 +270,13 @@ export function ServicesThreeScene({
       camera.position.set(lerp(0.6, 0.15, assembly), lerp(0.25, -0.15, exit), lerp(zBase, zEnd, assembly) - exit * 2.1);
       camera.lookAt(currentW < 960 ? 0.25 : 0.65, lerp(0, -1.2, exit), 0);
       renderer.render(scene, camera);
-      canvas.dataset.rendering = 'true';
-      canvas.dataset.progress = progress.toFixed(4);
-      canvas.dataset.camera = [camera.position.x, camera.position.y, camera.position.z].map((value) => value.toFixed(3)).join(',');
-      canvas.dataset.drawCalls = String(renderer.info.render.calls);
-      canvas.dataset.triangles = String(renderer.info.render.triangles);
+      if (isDebug) {
+        canvas.dataset.rendering = 'true';
+        canvas.dataset.progress = progress.toFixed(4);
+        canvas.dataset.camera = [camera.position.x, camera.position.y, camera.position.z].map((value) => value.toFixed(3)).join(',');
+        canvas.dataset.drawCalls = String(renderer.info.render.calls);
+        canvas.dataset.triangles = String(renderer.info.render.triangles);
+      }
       sceneMetricsRegistry.update({
         id: 'services-3d',
         active: true,
@@ -269,26 +288,29 @@ export function ServicesThreeScene({
         height: canvas.height,
         dpr: currentDpr,
       });
-      runtimeRef.current.metrics = {
-        camera: [camera.position.x, camera.position.y, camera.position.z],
-        rendering: true,
-        errors: runtimeRef.current.metrics.errors,
-        drawCalls: renderer.info.render.calls,
-        triangles: renderer.info.render.triangles,
-      };
-      onMetrics?.({ ...runtimeRef.current.metrics });
+      if (onMetrics) {
+        runtimeRef.current.metrics = {
+          camera: [camera.position.x, camera.position.y, camera.position.z],
+          rendering: true,
+          errors: runtimeRef.current.metrics.errors,
+          drawCalls: renderer.info.render.calls,
+          triangles: renderer.info.render.triangles,
+        };
+        onMetrics({ ...runtimeRef.current.metrics });
+      }
     };
     runtimeRef.current.applyScene = render;
-    resize();
-    const ro = new ResizeObserver(resize);
+    resize(true);
+    const ro = new ResizeObserver(scheduleResize);
     ro.observe(canvas);
     const unsubQuality = adaptiveQuality.subscribe((nextProfile) => {
       renderer.shadowMap.enabled = nextProfile.shadowsEnabled;
       sun.castShadow = nextProfile.shadowsEnabled;
-      resize();
+      resize(true);
     });
 
     return () => {
+      cancelAnimationFrame(resizeRaf);
       unsubQuality();
       ro.disconnect();
       sceneMetricsRegistry.remove('services-3d');

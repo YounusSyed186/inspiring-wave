@@ -227,7 +227,7 @@ export function InspiringWaveFooter({
         drawFlap(FLAPS + k, s.prev?.flaps[k], openOld[k]);
       }
 
-      if (keepRunning && s.inView) {
+      if (keepRunning && s.inView && !document.hidden) {
         s.raf = requestAnimationFrame(renderTearFrame);
       }
     },
@@ -248,6 +248,9 @@ export function InspiringWaveFooter({
     const updateDimensions = () => {
       const w = el.clientWidth;
       const h = el.clientHeight;
+      if (s.W > 0 && Math.abs(w - s.W) <= 2 && Math.abs(h - s.H) < 120) {
+        return;
+      }
       const isMobile = w < 768;
       if (isMobile !== s.mobile) {
         s.mobile = isMobile;

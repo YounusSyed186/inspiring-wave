@@ -169,6 +169,12 @@ export function WaveMediaRenderer() {
     let bufferHeight = 0;
     let previousScroll = -1;
     let previousCurve = Number.NaN;
+    let lastWinW = innerWidth;
+    let lastWinH = innerHeight;
+    let resizeRaf = 0;
+    const isDebug =
+      new URLSearchParams(window.location.search).get('debugPerformance') === '1' ||
+      new URLSearchParams(window.location.search).has('wave-debug');
 
     function resize() {
       if (disposed) return;
@@ -297,7 +303,9 @@ export function WaveMediaRenderer() {
       gl.bindTexture(gl.TEXTURE_2D, plane.texture);
       gl.uniform4f(planeUniforms.uRect, rect.x * dpr, rect.y * dpr, rect.width * dpr, rect.height * dpr);
       gl.uniform4f(planeUniforms.uUv, uv[0], uv[1], uv[2], uv[3]);
-      const opacity = Number.parseFloat(getComputedStyle(plane.image).opacity);
+      const opacity = plane.image.closest('.service-stage')
+        ? Number.parseFloat(getComputedStyle(plane.image).opacity)
+        : 1;
       gl.uniform1f(planeUniforms.uAlpha, Number.isFinite(opacity) ? opacity : 1);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       return true;
@@ -312,7 +320,9 @@ export function WaveMediaRenderer() {
       resize();
       previousScroll = state.currentScroll;
       previousCurve = state.waveIntensity;
-      canvas.dataset.waveIntensity = state.waveIntensity.toFixed(3);
+      if (isDebug) {
+        canvas.dataset.waveIntensity = state.waveIntensity.toFixed(3);
+      }
       dirty = false;
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
@@ -359,7 +369,18 @@ export function WaveMediaRenderer() {
       });
     }
 
-    const onResize = () => { dirty = true; render(scrollMotion.state, true); };
+    const onResize = () => {
+      cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(() => {
+        if (Math.abs(innerWidth - lastWinW) <= 2 && Math.abs(innerHeight - lastWinH) < 120) {
+          return;
+        }
+        lastWinW = innerWidth;
+        lastWinH = innerHeight;
+        dirty = true;
+        render(scrollMotion.state, true);
+      });
+    };
     const unsubQuality = adaptiveQuality.subscribe(() => {
       dirty = true;
       render(scrollMotion.state, true);

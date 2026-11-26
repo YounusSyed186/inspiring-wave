@@ -102,18 +102,29 @@ export function CreativeMachineCanvas({
     let viewW = 1440
     let viewH = 900
     let currentDpr = 1
-    const resize = () => {
+    let resizeRaf = 0
+    const applyResize = (force = false) => {
       const rect = canvas.parentElement?.getBoundingClientRect()
-      viewW = Math.max(1, Math.round(rect?.width || window.innerWidth))
-      viewH = Math.max(1, Math.round(rect?.height || window.innerHeight))
+      const nextW = Math.max(1, Math.round(rect?.width || window.innerWidth))
+      const nextH = Math.max(1, Math.round(rect?.height || window.innerHeight))
+      // Ignore minor mobile browser-chrome height fluctuations during touch scroll
+      if (!force && Math.abs(nextW - viewW) <= 2 && Math.abs(nextH - viewH) < 120) {
+        return
+      }
+      viewW = nextW
+      viewH = nextH
       currentDpr = adaptiveQuality.getEffectiveDpr(viewW, viewH)
       renderer.setPixelRatio(currentDpr)
       renderer.setSize(viewW, viewH, false)
       camera.aspect = viewW / viewH
       camera.updateProjectionMatrix()
     }
-    resize()
-    const ro = new ResizeObserver(resize)
+    const scheduleResize = () => {
+      cancelAnimationFrame(resizeRaf)
+      resizeRaf = requestAnimationFrame(() => applyResize(false))
+    }
+    applyResize(true)
+    const ro = new ResizeObserver(scheduleResize)
     if (canvas.parentElement) ro.observe(canvas.parentElement)
     const unsubQuality = adaptiveQuality.subscribe(() => {
       currentDpr = adaptiveQuality.getEffectiveDpr(viewW, viewH)
@@ -137,10 +148,14 @@ export function CreativeMachineCanvas({
     window.addEventListener('pointermove', onPointerMove, { passive: true })
     window.addEventListener('touchmove', onTouchMove, { passive: true })
 
-    // Precompile shaders once during mount to avoid first-scroll hitch
-    try {
-      renderer.compile(scene, camera)
-    } catch {}
+    // Precompile shaders asynchronously when supported to avoid blocking initial main-thread load
+    if (typeof renderer.compileAsync === 'function') {
+      void renderer.compileAsync(scene, camera).catch(() => {})
+    } else {
+      try {
+        renderer.compile(scene, camera)
+      } catch {}
+    }
 
     let elapsed = 0
     let lastP = -1
@@ -242,6 +257,7 @@ export function CreativeMachineCanvas({
       canvas.removeEventListener('webglcontextlost', handleContextLost)
       window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('touchmove', onTouchMove)
+      cancelAnimationFrame(resizeRaf)
       ro.disconnect()
       sceneMetricsRegistry.remove('creative-machine-hero')
       machine.dispose()

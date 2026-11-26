@@ -278,6 +278,7 @@ export function createCurvedPhaseDecal(
     }
   }
   uvAttr.needsUpdate = true;
+  const scratchPoint = new THREE.Vector3();
 
   const updateAt = (centerU: number, deformAmount = 0, waveTime = 0) => {
     const centerFrame = ribbon.frameAt(centerU);
@@ -309,7 +310,7 @@ export function createCurvedPhaseDecal(
         const designWeight = designDistance < 1 ? Math.pow(1 - designDistance, 2) : 0;
         const acrossWeight = Math.sin(across * Math.PI);
         const waveLift = Math.sin(uSample * TAU * 2 - waveTime * 1.65) * 0.018;
-        const surfacePoint = sampleFrame.position.clone()
+        scratchPoint.copy(sampleFrame.position)
           .addScaledVector(sampleFrame.width, THREE.MathUtils.lerp(-ribbon.halfWidth, ribbon.halfWidth, across))
           .addScaledVector(
             sampleFrame.normal,
@@ -317,16 +318,16 @@ export function createCurvedPhaseDecal(
           );
 
         const idx = iu * (segsV + 1) + iv;
-        posAttr.setXYZ(idx, surfacePoint.x, surfacePoint.y, surfacePoint.z);
+        posAttr.setXYZ(idx, scratchPoint.x, scratchPoint.y, scratchPoint.z);
         normAttr.setXYZ(idx, sampleFrame.normal.x, sampleFrame.normal.y, sampleFrame.normal.z);
       }
     }
     posAttr.needsUpdate = true;
     normAttr.needsUpdate = true;
-    geometry.computeBoundingSphere();
   };
 
   updateAt(uCenter, 0, 0);
+  geometry.computeBoundingSphere();
   return { geometry, updateAt };
 }
 
